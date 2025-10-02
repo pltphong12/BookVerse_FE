@@ -1,0 +1,78 @@
+import { Book, KeyRound, LayoutDashboard, Library, TagsIcon, User, UserCog, UserPen} from 'lucide-react';
+import { Link, NavLink } from 'react-router-dom';
+import Logo from '../../../assets/logo.png';
+export const LeftSidebar = () => {
+
+    return (
+        <div className="z-30">
+            <ul className="menu pt-2 w-60 bg-base-100 min-h-full text-base-content border-r border-gray-200 dark:border-gray-700">
+                <li className="mb-2 font-semibold text-xl">
+                    <Link to={'/'}><img
+                        src={Logo}
+                        alt="BookVerse Logo"
+                        style={{
+                            width: 'auto',
+                            height: 'auto',
+                            objectFit: 'contain',
+                            filter: 'brightness(0) saturate(100%) invert(20%) sepia(60%) saturate(500%) hue-rotate(180deg)',
+                        }}
+                    /></Link> </li>
+                <div className='divider'></div>
+                <li className="">
+                    <NavLink
+                        to={"/admin"}
+                        className="mb-2 flex items-center gap-2" >
+                        <LayoutDashboard />
+                        Trang quản lý
+                    </NavLink>
+
+                    <NavLink
+                        to={"/admin/authors"}
+                        className="mb-2 flex items-center gap-2" >
+                        <UserPen />
+                        Tác giả
+                    </NavLink>
+                    <NavLink
+                        to={"/admin/books"}
+                        className="mb-2 flex items-center gap-2" >
+                        <Book />
+                        Sách
+                    </NavLink>
+                    <NavLink
+                        to={"/admin/categories"}
+                        className="mb-2 flex items-center gap-2" >
+                        <TagsIcon />
+                        Thể loại
+                    </NavLink>
+
+                    <NavLink
+                        to={"/admin/publishers"}
+                        className="mb-2 flex items-center gap-2" >
+                        <Library />
+                        Nhà xuất bản
+                    </NavLink>
+
+                    <NavLink
+                        to={"/admin/users"}
+                        className="mb-2 flex items-center gap-2" >
+                        <User />
+                        Người dùng
+                    </NavLink>
+                    <NavLink
+                        to={"/admin/roles"}
+                        className="mb-2 flex items-center gap-2" >
+                        <UserCog />
+                        Vai trò
+                    </NavLink>
+                    <NavLink
+                        to={"/admin/permissions"}
+                        className="mb-2 flex items-center gap-2" >
+                        <KeyRound />
+                        Quyền hạn
+                    </NavLink>
+
+                </li>
+            </ul>
+        </div>
+    )
+}

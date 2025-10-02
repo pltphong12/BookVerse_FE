@@ -1,0 +1,21 @@
+/* Tăng z-index cho menu portal */
+.select__menu-portal {
+    z-index: 9999 !important;
+  }
+  
+  /* Tùy chỉnh border khi focus */
+  .select__control--is-focused {
+    box-shadow: 0 0 0 2px #2563eb !important;
+    border-color: #2563eb !important;
+  }
+  
+  /* Ẩn separator giữa các icon */
+  .select__indicator-separator {
+    display: none !important;
+  }
+  
+  /* Tùy chỉnh chiều cao, font, ... nếu muốn */
+  .select__control {
+    min-height: 40px;
+    font-size: 15px;
+  }
