@@ -7,6 +7,7 @@ import { Pagination } from "../../global/Pagination";
 import { RoleSearchAndFilter } from "./role.search_filter";
 import { deleteRole, ICreateRole, resetDeleteRole } from "../../../redux/slide/role.slide";
 import { RoleView } from "./role.view";
+import { RoleForm } from "./role.form";
 
 interface RoleTableProps {
     load: () => Promise<void>;
@@ -69,7 +70,7 @@ export const RoleTable: React.FC<RoleTableProps> = ({ load, page, totalPage, set
         switch (role) {
             case 'admin': return 'badge badge-error';
             case 'publisher': return 'badge badge-info';
-            case 'user': return 'badge badge-success';
+            case 'customer': return 'badge badge-success';
             case 'editor': return 'badge badge-warning';
             default: return 'badge';
         }
@@ -170,7 +171,7 @@ export const RoleTable: React.FC<RoleTableProps> = ({ load, page, totalPage, set
                                                 tabIndex={0}
                                                 className="dropdown-content menu bg-base-100 rounded-box z-[10] w-36 p-2 shadow-lg border border-base-content/20"
                                             >
-                                                <li>
+                                                {/* <li>
                                                     <button
                                                         className="flex items-center gap-2 text-info"
                                                         onClick={() => handleViewRole(record)}
@@ -178,12 +179,12 @@ export const RoleTable: React.FC<RoleTableProps> = ({ load, page, totalPage, set
                                                         <View className="w-4 h-4" />
                                                         <span>Xem</span>
                                                     </button>
-                                                </li>
+                                                </li> */}
                                                 <li>
                                                     <button
                                                         className="flex items-center gap-2 text-warning"
                                                         onClick={() => {
-                                                            // setToRoleEdit(record);
+                                                            setRoleToEdit(record);
                                                             setIsModalOpen(true);
                                                         }}
                                                     >
@@ -228,18 +229,18 @@ export const RoleTable: React.FC<RoleTableProps> = ({ load, page, totalPage, set
             {sortedRoles.length === 0 && <div className=''>Không có dữ liệu</div>}
             < Pagination page={page} totalPage={totalPage} setPage={setPage} />
 
-            <RoleView
+            {/* <RoleView
                 isOpen={isViewModalOpen}
                 setIsOpen={setIsViewModalOpen}
                 role={selectedRole}
-            />
+            /> */}
 
-            {/* < RoleForm
+            < RoleForm
                 isModalOpen={isModalOpen}
                 setIsModalOpen={setIsModalOpen}
                 load={load}
                 roleToEdit={roleToEdit}
-            /> */}
+            />
         </>
     )
 }

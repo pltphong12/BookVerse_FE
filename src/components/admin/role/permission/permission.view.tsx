@@ -33,7 +33,7 @@ export const PermissionView: React.FC<PermissionViewProps> = ({ isOpen, setIsOpe
                 {/* Content */}
                 <div className="space-y-4">
                     <div className="items-center space-x-4">
-                        <h4 className="text-lg font-semibold">Thể loại: </h4>
+                        <h4 className="text-lg font-semibold">Tên quyền hạn: </h4>
                         <p>{permission.name}</p>
                     </div>
                     <div className="items-center space-x-4">

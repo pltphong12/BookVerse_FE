@@ -78,7 +78,8 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
         switch (role) {
             case 'admin': return 'badge badge-error';
             case 'publisher': return 'badge badge-info';
-            case 'user': return 'badge badge-success';
+            case 'customer': return 'badge badge-success';
+            case 'editor': return 'badge badge-warning';
             default: return 'badge';
         }
     };

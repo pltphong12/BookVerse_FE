@@ -39,7 +39,7 @@ export const InternalLoginPage = () => {
         setLoading(true);
         try {
             const res = await callLoginApi(data.username, data.password);
-            showToast(`Login successfully`, ToastType.SUCCESS);
+            showToast(`Đăng nhập thành công`, ToastType.SUCCESS);
             localStorage.setItem('access_token', res.data.data?.accessToken as string);
             setUser(res.data.data?.user as IUser);
             setTimeout(() => {
@@ -121,7 +121,7 @@ export const InternalLoginPage = () => {
                                 className="btn mt-2 w-full btn-primary flex justify-center items-center"
                                 disabled={loading}
                             >
-                                {!loading ? "Login" : <span className="loading loading-spinner loading-l"></span>}
+                                {!loading ? "Đăng nhập" : <span className="loading loading-spinner loading-l"></span>}
                             </button>
 
                             <div className='text-center mt-4'>

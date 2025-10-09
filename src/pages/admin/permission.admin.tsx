@@ -1,10 +1,10 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
+import { PermissionTable } from "../../components/admin/role/permission/permission.table";
 import { useAppDispatch } from "../../redux/hook";
 import { clearBreadcrumbs, setBreadcrumbs } from "../../redux/slide/breadcrumbs.slice";
-import { callFetchAllPermissionsWithPaginationAndFilterApi } from "../../services/api";
+import { callFetchAllPermissionsApi, callFetchAllPermissionsWithPaginationAndFilterApi } from "../../services/api";
 import { IPermission } from "../../types/backend";
-import { PermissionTable } from "../../components/admin/role/permission/permission.table";
 
 export const PermissionPage = () => {
     const size = 10;
@@ -18,14 +18,37 @@ export const PermissionPage = () => {
     // Filter
     const [search, setSearch] = React.useState<string>("");
     const [method, setMethod] = React.useState<string>("");
+    const [domain, setDomain] = React.useState<string>("");
 
     // Fetching to render at dropdown
     const [dateFrom, setDateFrom] = React.useState<string>("")
 
+    // Fetch all permissions to get domains
+    const { data: allPermissionsQuery } = useQuery({
+        queryKey: ['fetchAllPermissions'],
+        queryFn: callFetchAllPermissionsApi,
+        refetchOnWindowFocus: false,
+        staleTime: 5 * 60 * 1000, // 5 minutes
+    });
+
+    // Extract unique domains from all permissions
+    const domains = React.useMemo(() => {
+        if (!allPermissionsQuery?.data?.data) return [];
+
+        const uniqueDomains = new Set<string>();
+        allPermissionsQuery.data.data.forEach((permission: IPermission) => {
+            if (permission.domain) {
+                uniqueDomains.add(permission.domain);
+            }
+        });
+
+        return Array.from(uniqueDomains).sort();
+    }, [allPermissionsQuery]);
+
     // Fetch all with pagination and filter
     const { data: permissionsQuery, isPending, error } = useQuery({
-        queryKey: ['fetchingPermissions', search, method, dateFrom, page],
-        queryFn: () => callFetchAllPermissionsWithPaginationAndFilterApi(search, method, dateFrom, page, size),
+        queryKey: ['fetchingPermissions', search, method, domain, dateFrom, page],
+        queryFn: () => callFetchAllPermissionsWithPaginationAndFilterApi(search, method, domain, dateFrom, page, size),
         refetchOnWindowFocus: false,
         placeholderData: (previousData) => previousData
     });
@@ -35,7 +58,7 @@ export const PermissionPage = () => {
             setDataSource(permissionsQuery.data.data.result);
             setTotalPage(permissionsQuery.data.data.meta.pages)
         }
-        
+
     }, [permissionsQuery]);
 
     React.useEffect(() => {
@@ -74,7 +97,10 @@ export const PermissionPage = () => {
                         search={search}
                         setSearch={setSearch}
                         method={method}
-                        setMethod={setMethod}         
+                        setMethod={setMethod}
+                        domain={domain}
+                        setDomain={setDomain}
+                        domains={domains}
                         dateFrom={dateFrom}
                         setDateFrom={setDateFrom}
                     />

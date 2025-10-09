@@ -45,8 +45,8 @@ export const callLogoutApi = () => {
 Module Users
  */
 
-export const callFetchAllUserWithPaginationApi = (fullName: string, roleId: number, dateFrom: string, page: number, size: number) => {
-    const url: string = `api/v1/users/search?page=${page}&size=${size}&name=${fullName}&role_id=${roleId}&date_from=${dateFrom}`
+export const callFetchAllUserWithPaginationApi = (username: string, roleId: number, dateFrom: string, page: number, size: number) => {
+    const url: string = `api/v1/users/search?page=${page}&size=${size}&username=${username}&roleId=${roleId}&dateFrom=${dateFrom}`
     return axiosInstance.get<IBackendRes<IPagination<IUser>>>(url)
 }
 
@@ -115,7 +115,7 @@ export const callFetchAllRole = () => {
 }
 
 export const callFetchAllRolesWithPaginationAndFilterApi = (name: string, dateFrom: string, page: number, size: number) => {
-const url = `api/v1/roles/search?name=${name}&date_from=${dateFrom}&page=${page}&size=${size}`
+const url = `api/v1/roles/search?name=${name}&dateFrom=${dateFrom}&page=${page}&size=${size}`
   return axiosInstance.get<IBackendRes<IPagination<IRole>>>(url)
 }
 
@@ -150,27 +150,34 @@ export const callDeleteRolesApi = (id: number) => {
 Module Permissions
  */
 
-export const callFetchAllPermissionsWithPaginationAndFilterApi = (name: string, method: string, dateFrom: string, page: number, size: number) => {
-const url = `api/v1/permissions/search?name=${name}&method=${method}&date_from=${dateFrom}&page=${page}&size=${size}`
+export const callFetchAllPermissionsApi = () => {
+  const url = 'api/v1/permissions'
+  return axiosInstance.get<IBackendRes<IPermission[]>>(url)
+}
+
+export const callFetchAllPermissionsWithPaginationAndFilterApi = (name: string, method: string, domain: string, dateFrom: string, page: number, size: number) => {
+const url = `api/v1/permissions/search?name=${name}&method=${method}&domain=${domain}&dateFrom=${dateFrom}&page=${page}&size=${size}`
   return axiosInstance.get<IBackendRes<IPagination<IPermission>>>(url)
 }
 
-export const callCreatePermissionApi = (name: string, apiPath: string, method: string) => {
+export const callCreatePermissionApi = (name: string, apiPath: string, domain: string, method: string) => {
   const url = '/api/v1/permissions'
   const data = {
     name: name,
     apiPath: apiPath,
+    domain: domain,
     method: method
   }
   return axiosInstance.post<IBackendRes<IPermission>>(url,data)
 }
 
-export const callUpdatePermissionApi = (id: number, name: string, apiPath: string, method: string) => {
+export const callUpdatePermissionApi = (id: number, name: string, apiPath: string, domain: string, method: string) => {
   const url = '/api/v1/permissions'
   const data = {
     id: id,
     name: name,
     apiPath: apiPath,
+    domain: domain,
     method: method
   }
   return axiosInstance.put<IBackendRes<IPermission>>(url,data)
@@ -186,7 +193,7 @@ Module Books
  */
 
 export const callFetchAllBooksWithPaginationApi = (title: string, publisherId: number, authorId: number, categoryId: number,dateFrom: string, page: number, size: number) => {
-  const url: string = `api/v1/books/search?title=${title}&publisher_id=${publisherId}&author_id=${authorId}&category_id=${categoryId}&date_from=${dateFrom}&page=${page}&size=${size}`
+  const url: string = `api/v1/books/search?title=${title}&publisherId=${publisherId}&authorId=${authorId}&categoryId=${categoryId}&dateFrom=${dateFrom}&page=${page}&size=${size}`
   return axiosInstance.get<IBackendRes<IPagination<IBook>>>(url)
 }
 
@@ -261,7 +268,7 @@ export const callFetchAllAuthorsApi = () => {
 }
 
 export const callFetchAllAuthorsWithPaginationAndFilterApi = (name: string, nationality: string, dateFrom: string, page: number, size: number) => {
-  const url = `api/v1/authors/search?name=${name}&nationality=${nationality}&date_from=${dateFrom}&page=${page}&size=${size}`
+  const url = `api/v1/authors/search?name=${name}&nationality=${nationality}&dateFrom=${dateFrom}&page=${page}&size=${size}`
   return axiosInstance.get<IBackendRes<IPagination<IAuthor>>>(url)
 }
 
@@ -304,7 +311,7 @@ export const callFetchAllCategoriesApi = () => {
 }
 
 export const callFetchAllCategoriesWithPaginationAndFilterApi = (name: string, dateFrom: string, page: number, size: number) => {
-  const url = `api/v1/categories/search?name=${name}&date_from=${dateFrom}&page=${page}&size=${size}`
+  const url = `api/v1/categories/search?name=${name}&dateFrom=${dateFrom}&page=${page}&size=${size}`
   return axiosInstance.get<IBackendRes<IPagination<ICategory>>>(url)
 }
 
@@ -343,7 +350,7 @@ export const callFetchAllPublishersApi = () => {
 }
 
 export const callFetchAllPublishersWithPaginationAndFilterApi = (name: string, dateFrom: string, page: number, size: number) => {
-  const url = `api/v1/publishers/search?name=${name}&date_from=${dateFrom}&page=${page}&size=${size}`
+  const url = `api/v1/publishers/search?name=${name}&dateFrom=${dateFrom}&page=${page}&size=${size}`
   return axiosInstance.get<IBackendRes<IPagination<IPublisher>>>(url)
 }
 

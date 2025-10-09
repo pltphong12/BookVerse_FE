@@ -21,6 +21,9 @@ const createPermissionSchema = z.object({
     apiPath: z.string()
         .min(2, 'Tên đường dẫn ít nhất 2 kí tự')
         .max(100, 'Tên đường dẫn tối đa 100 kí tự'),
+    domain: z.string()
+        .min(2, 'Tên phương thức nhất 2 kí tự')
+        .max(100, 'Tên phương thức tối đa 100 kí tự'),
     method: z.string()
         .min(2, 'Tên phương thức nhất 2 kí tự')
         .max(100, 'Tên phương thức tối đa 100 kí tự'),
@@ -52,6 +55,7 @@ export const PermissionForm: React.FC<PermissionFormProps> = ({ isModalOpen, set
         defaultValues: {
             name: '',
             apiPath: '',
+            domain: '',
             method: '',
         }
     });
@@ -60,6 +64,7 @@ export const PermissionForm: React.FC<PermissionFormProps> = ({ isModalOpen, set
         if (permissionToEdit) {
             setValue('name', permissionToEdit.name);
             setValue('apiPath', permissionToEdit.apiPath);
+            setValue('domain', permissionToEdit.domain);
             setValue('method', permissionToEdit.method);
         } else {
             reset({
@@ -156,6 +161,23 @@ export const PermissionForm: React.FC<PermissionFormProps> = ({ isModalOpen, set
 
                     <div className="form-control mt-4">
                         <label className="label">
+                            <span className="label-text">Tên đối tượng</span>
+                        </label>
+                        <input
+                            type="text"
+                            {...register('domain')}
+                            placeholder="Nhập tên đối tượng"
+                            className={`input input-bordered w-full ${errors.domain ? 'input-error' : ''}`}
+                        />
+                        {errors.domain && (
+                            <label className="label">
+                                <span className="label-text-alt text-error">{errors.domain.message}</span>
+                            </label>
+                        )}
+                    </div>
+
+                    <div className="form-control mt-4">
+                        <label className="label">
                             <span className="label-text">Phương thức</span>
                         </label>
                         <Controller
@@ -164,21 +186,25 @@ export const PermissionForm: React.FC<PermissionFormProps> = ({ isModalOpen, set
                             render={({ field }) => (
                                 <Select
                                     {...field}
-                                    options={methodList.map(category => ({
-                                        value: category,
-                                        label: category
+                                    options={methodList.map(method => ({
+                                        value: method,
+                                        label: method
                                     }))}
                                     value={methodList
-                                        .filter(category => category === field.value)
-                                        .map(category => ({
-                                            value: category,
-                                            label: category
+                                        .filter(method => method === field.value)
+                                        .map(method => ({
+                                            value: method,
+                                            label: method
                                         }))[0]}
                                     onChange={(selected) => {
                                         field.onChange(selected?.value || 0);
                                     }}
                                     className={`${errors.method ? 'border-error' : ''}`}
                                     placeholder="Chọn phương thức"
+                                    menuPortalTarget={document.body}
+                                    styles={{
+                                        menuPortal: (base) => ({ ...base, zIndex: 1000 })
+                                    }}
                                 />
                             )}
                         />

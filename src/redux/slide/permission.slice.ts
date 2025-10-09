@@ -7,6 +7,7 @@ export interface ICreatePermission{
     id?: number
     name: string
     apiPath: string 
+    domain: string
     method: string
 }
 
@@ -34,7 +35,7 @@ export const createPermission = createAsyncThunk(
     'permission/create',
     async (payload: ICreatePermission) => {
         try {
-            const response = await callCreatePermissionApi(payload.name, payload.apiPath, payload.method)
+            const response = await callCreatePermissionApi(payload.name, payload.apiPath, payload.domain, payload.method)
             return response.data as IBackendRes<IPermission>
         } catch (error) {
             if (error instanceof AxiosError) {
@@ -48,7 +49,7 @@ export const updatePermission = createAsyncThunk(
     'permission/update',
     async ( payload : { id: number; data: ICreatePermission }) => {
         try {
-            const response = await callUpdatePermissionApi(payload.id, payload.data.name, payload.data.apiPath, payload.data.method)
+            const response = await callUpdatePermissionApi(payload.id, payload.data.name, payload.data.apiPath, payload.data.domain, payload.data.method)
             return response.data as IBackendRes<IPermission>
         } catch (error) {
             if (error instanceof AxiosError) {

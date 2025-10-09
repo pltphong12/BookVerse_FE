@@ -1,13 +1,12 @@
-import { ChevronDown, ChevronUp, Edit, Trash, View } from "lucide-react";
+import { ChevronDown, ChevronUp, Edit, Trash } from "lucide-react";
 import React, { useState } from "react";
+import { showToast, ToastType } from "../../../../common/showToast";
 import { useAppDispatch, useAppSelector } from "../../../../redux/hook";
+import { deletePermission, ICreatePermission, resetDeletePermission } from "../../../../redux/slide/permission.slice";
 import { IPermission } from "../../../../types/backend";
 import { Pagination } from "../../../global/Pagination";
-import { PermissionView } from "./permission.view";
-import { PermissionSearchAndFilter } from "./permission.search_filter";
-import { deletePermission, ICreatePermission, resetDeletePermission } from "../../../../redux/slide/permission.slice";
-import { showToast, ToastType } from "../../../../common/showToast";
 import { PermissionForm } from "./permission.form";
+import { PermissionSearchAndFilter } from "./permission.search_filter";
 
 
 interface PermissionTableProps {
@@ -20,11 +19,14 @@ interface PermissionTableProps {
     setSearch: React.Dispatch<React.SetStateAction<string>>;
     method: string;
     setMethod: React.Dispatch<React.SetStateAction<string>>;
+    domain: string;
+    setDomain: React.Dispatch<React.SetStateAction<string>>;
+    domains: string[];
     dateFrom: string;
     setDateFrom: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const PermissionTable: React.FC<PermissionTableProps> = ({ load, page, totalPage, setPage, dataSource, search, setSearch, method, setMethod, dateFrom, setDateFrom }) => {
+export const PermissionTable: React.FC<PermissionTableProps> = ({ load, page, totalPage, setPage, dataSource, search, setSearch, method, setMethod, domain, setDomain, domains, dateFrom, setDateFrom }) => {
     const [isViewModalOpen, setIsViewModalOpen] = React.useState<boolean>(false);
     const [selectedPermission, setSelectedPermission] = React.useState<IPermission | null>(null);
 
@@ -103,6 +105,9 @@ export const PermissionTable: React.FC<PermissionTableProps> = ({ load, page, to
                     setSearchWithName={setSearch}
                     method={method}
                     setMethod={setMethod}
+                    domain={domain}
+                    setDomain={setDomain}
+                    domains={domains}
                     dateFrom={dateFrom}
                     setDateFrom={setDateFrom}
                     setPage={setPage}
@@ -204,7 +209,7 @@ export const PermissionTable: React.FC<PermissionTableProps> = ({ load, page, to
                                                 tabIndex={0}
                                                 className="dropdown-content menu bg-base-100 rounded-box z-[10] w-36 p-2 shadow-lg border border-base-content/20"
                                             >
-                                                <li>
+                                                {/* <li>
                                                     <button
                                                         className="flex items-center gap-2 text-info"
                                                         onClick={() => handleViewPermission(record)}
@@ -212,7 +217,7 @@ export const PermissionTable: React.FC<PermissionTableProps> = ({ load, page, to
                                                         <View className="w-4 h-4" />
                                                         <span>Xem</span>
                                                     </button>
-                                                </li>
+                                                </li> */}
                                                 <li>
                                                     <button
                                                         className="flex items-center gap-2 text-warning"
@@ -239,7 +244,7 @@ export const PermissionTable: React.FC<PermissionTableProps> = ({ load, page, to
                                                             <li className="mt-1">
                                                                 <button
                                                                     className="btn btn-error btn-sm w-full"
-                                                                onClick={() => executeDeletePermission(record.id)}
+                                                                    onClick={() => executeDeletePermission(record.id)}
                                                                 >
                                                                     Xóa
                                                                 </button>
@@ -262,11 +267,11 @@ export const PermissionTable: React.FC<PermissionTableProps> = ({ load, page, to
             {sortedPermissions.length === 0 && <div className=''>Không có dữ liệu</div>}
             < Pagination page={page} totalPage={totalPage} setPage={setPage} />
 
-            <PermissionView
+            {/* <PermissionView
                 isOpen={isViewModalOpen}
                 setIsOpen={setIsViewModalOpen}
                 permission={selectedPermission}
-            />
+            /> */}
 
             < PermissionForm
                 isModalOpen={isModalOpen}

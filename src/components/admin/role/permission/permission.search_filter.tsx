@@ -7,12 +7,15 @@ interface PermissionSearchAndFilterProps {
     setSearchWithName: React.Dispatch<React.SetStateAction<string>>;
     method: string;
     setMethod: React.Dispatch<React.SetStateAction<string>>;
+    domain: string;
+    setDomain: React.Dispatch<React.SetStateAction<string>>;
+    domains: string[];
     dateFrom: string;
     setDateFrom: React.Dispatch<React.SetStateAction<string>>;
     setPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export const PermissionSearchAndFilter: React.FC<PermissionSearchAndFilterProps> = ({ searchWithName, setSearchWithName, method, setMethod, dateFrom, setDateFrom, setPage }) => {
+export const PermissionSearchAndFilter: React.FC<PermissionSearchAndFilterProps> = ({ searchWithName, setSearchWithName, method, setMethod, domain, setDomain, domains, dateFrom, setDateFrom, setPage }) => {
     const [isExpanded, setIsExpanded] = useState<boolean>(false);
     const methodList = ['GET', 'POST', 'PUT', 'DELETE']
     const searchRef = useRef<HTMLInputElement>(null);
@@ -88,6 +91,33 @@ export const PermissionSearchAndFilter: React.FC<PermissionSearchAndFilterProps>
                             classNamePrefix="select"
                         />
                     </div>
+
+                    <div className="space-y-2">
+                        <label htmlFor="domain" className="block text-sm font-medium text-gray-700">
+                            Domain
+                        </label>
+                        <Select
+                            id="domain"
+                            value={domains.find(d => d === domain) ? {
+                                value: domain,
+                                label: domains.find(d => d === domain) || 'Tất cả domain'
+                            } : { value: '', label: 'Tất cả domain' }}
+                            onChange={(selected) => {
+                                setDomain(selected?.value || '');
+                                setPage(1);
+                            }}
+                            options={[
+                                { value: '', label: 'Tất cả domain' },
+                                ...domains.map(d => ({
+                                    value: d,
+                                    label: d
+                                }))
+                            ]}
+                            className="w-full"
+                            classNamePrefix="select"
+                        />
+                    </div>
+
                     <div className="space-y-2">
                         <label htmlFor="dateFrom" className="block text-sm font-medium text-gray-700">
                             Ngày tạo
