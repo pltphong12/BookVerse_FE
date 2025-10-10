@@ -1,23 +1,29 @@
-import { Book, KeyRound, LayoutDashboard, Library, TagsIcon, User, UserCog, UserPen} from 'lucide-react';
+import { Book, KeyRound, LayoutDashboard, Library, TagsIcon, User, UserCog, UserPen } from 'lucide-react';
 import { Link, NavLink } from 'react-router-dom';
 import Logo from '../../../assets/logo.png';
 export const LeftSidebar = () => {
 
     return (
-        <div className="z-30">
+        <div className="z-30 overflow-y-auto h-full [scrollbar-width:none]">
             <ul className="menu pt-2 w-60 bg-base-100 min-h-full text-base-content border-r border-gray-200 dark:border-gray-700">
-                <li className="mb-2 font-semibold text-xl">
-                    <Link to={'/'}><img
-                        src={Logo}
-                        alt="BookVerse Logo"
-                        style={{
-                            width: 'auto',
-                            height: 'auto',
-                            objectFit: 'contain',
-                            filter: 'brightness(0) saturate(100%) invert(20%) sepia(60%) saturate(500%) hue-rotate(180deg)',
-                        }}
-                    /></Link> </li>
-                <div className='divider'></div>
+                <li className="font-semibold text-xl">
+                    <Link to={'/'}>
+                        <img
+                            className="w-auto h-auto object-contain"
+                            src={Logo}
+                            alt="BookVerse Logo"
+                            style={{
+                                filter: 'brightness(0) saturate(100%) invert(20%) sepia(60%) saturate(500%) hue-rotate(180deg)',
+                            }}
+                        />
+                    </Link>
+                </li>
+
+                <div className='divider m-0'></div>
+                {/* Phần 1: Dashboard */}
+                <li className="menu-title">
+                    <span>Dashboard</span>
+                </li>
                 <li className="">
                     <NavLink
                         to={"/admin"}
@@ -25,33 +31,15 @@ export const LeftSidebar = () => {
                         <LayoutDashboard />
                         Trang quản lý
                     </NavLink>
+                </li>
 
-                    <NavLink
-                        to={"/admin/authors"}
-                        className="mb-2 flex items-center gap-2" >
-                        <UserPen />
-                        Tác giả
-                    </NavLink>
-                    <NavLink
-                        to={"/admin/books"}
-                        className="mb-2 flex items-center gap-2" >
-                        <Book />
-                        Sách
-                    </NavLink>
-                    <NavLink
-                        to={"/admin/categories"}
-                        className="mb-2 flex items-center gap-2" >
-                        <TagsIcon />
-                        Thể loại
-                    </NavLink>
+                <div className='divider m-0'></div>
 
-                    <NavLink
-                        to={"/admin/publishers"}
-                        className="mb-2 flex items-center gap-2" >
-                        <Library />
-                        Nhà xuất bản
-                    </NavLink>
-
+                {/* Phần 2: Account */}
+                <li className="menu-title">
+                    <span>Account</span>
+                </li>
+                <li className="">
                     <NavLink
                         to={"/admin/users"}
                         className="mb-2 flex items-center gap-2" >
@@ -70,7 +58,39 @@ export const LeftSidebar = () => {
                         <KeyRound />
                         Quyền hạn
                     </NavLink>
+                </li>
 
+                <div className='divider m-0'></div>
+
+                {/* Phần 3: Nội dung */}
+                <li className="menu-title">
+                    <span>Content</span>
+                </li>
+                <li className="">
+                    <NavLink
+                        to={"/admin/authors"}
+                        className="mb-2 flex items-center gap-2" >
+                        <UserPen />
+                        Tác giả
+                    </NavLink>
+                    <NavLink
+                        to={"/admin/books"}
+                        className="mb-2 flex items-center gap-2" >
+                        <Book />
+                        Sách
+                    </NavLink>
+                    <NavLink
+                        to={"/admin/categories"}
+                        className="mb-2 flex items-center gap-2" >
+                        <TagsIcon />
+                        Thể loại
+                    </NavLink>
+                    <NavLink
+                        to={"/admin/publishers"}
+                        className="mb-2 flex items-center gap-2" >
+                        <Library />
+                        Nhà xuất bản
+                    </NavLink>
                 </li>
             </ul>
         </div>

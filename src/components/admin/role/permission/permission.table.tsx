@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp, Edit, Trash } from "lucide-react";
+import { ChevronDown, ChevronUp, Edit, Trash, View } from "lucide-react";
 import React, { useState } from "react";
 import { showToast, ToastType } from "../../../../common/showToast";
 import { useAppDispatch, useAppSelector } from "../../../../redux/hook";
@@ -7,6 +7,7 @@ import { IPermission } from "../../../../types/backend";
 import { Pagination } from "../../../global/Pagination";
 import { PermissionForm } from "./permission.form";
 import { PermissionSearchAndFilter } from "./permission.search_filter";
+import { PermissionView } from "./permission.view";
 
 
 interface PermissionTableProps {
@@ -209,7 +210,7 @@ export const PermissionTable: React.FC<PermissionTableProps> = ({ load, page, to
                                                 tabIndex={0}
                                                 className="dropdown-content menu bg-base-100 rounded-box z-[10] w-36 p-2 shadow-lg border border-base-content/20"
                                             >
-                                                {/* <li>
+                                                <li>
                                                     <button
                                                         className="flex items-center gap-2 text-info"
                                                         onClick={() => handleViewPermission(record)}
@@ -217,7 +218,7 @@ export const PermissionTable: React.FC<PermissionTableProps> = ({ load, page, to
                                                         <View className="w-4 h-4" />
                                                         <span>Xem</span>
                                                     </button>
-                                                </li> */}
+                                                </li>
                                                 <li>
                                                     <button
                                                         className="flex items-center gap-2 text-warning"
@@ -267,11 +268,11 @@ export const PermissionTable: React.FC<PermissionTableProps> = ({ load, page, to
             {sortedPermissions.length === 0 && <div className=''>Không có dữ liệu</div>}
             < Pagination page={page} totalPage={totalPage} setPage={setPage} />
 
-            {/* <PermissionView
+            <PermissionView
                 isOpen={isViewModalOpen}
                 setIsOpen={setIsViewModalOpen}
                 permission={selectedPermission}
-            /> */}
+            />
 
             < PermissionForm
                 isModalOpen={isModalOpen}

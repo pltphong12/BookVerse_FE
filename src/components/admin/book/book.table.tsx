@@ -263,7 +263,7 @@ export const BookTable: React.FC<BookTableProps> = (props) => {
                 </table>
 
             </div >
-            {sortedBooks.length === 0 && <div className=''>No Data</div>}
+            {sortedBooks.length === 0 && <div className=''>Không có dữ liệu</div>}
             < Pagination page={page} totalPage={totalPage} setPage={setPage} />
 
             <BookView

@@ -151,7 +151,7 @@ export const AuthorForm: React.FC<AuthorFormProps> = ({ isModalOpen, setIsModalO
                         <input
                             type="text"
                             {...register('name')}
-                            placeholder="Enter author name"
+                            placeholder="Nhập tên tác giả"
                             className={`input input-bordered w-full ${errors.name ? 'input-error' : ''}`}
                         />
                         {errors.name && (
@@ -168,7 +168,7 @@ export const AuthorForm: React.FC<AuthorFormProps> = ({ isModalOpen, setIsModalO
                         <input
                             type="text"
                             {...register('nationality')}
-                            placeholder="Enter nationality"
+                            placeholder="Nhập quê quán"
                             className={`input input-bordered w-full ${errors.nationality ? 'input-error' : ''}`}
                         />
                         {errors.nationality && (
