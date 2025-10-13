@@ -18,8 +18,8 @@ export interface IPagination<T> {
     meta: IMeta;
 }
 
-export interface IAccount {
-    user: IUser
+export interface ILoginRes {
+    user?: IUser
     accessToken: string;
 }
 
@@ -27,6 +27,7 @@ export interface IUser{
     id: number;
     username: string;
     fullName: string;
+    email: string;
     address: string;
     phone: string;
     avatar: string;
@@ -89,6 +90,13 @@ export interface IBook {
     publisher: IPublisher;
     price: number;
     quantity: number;
+    sold: number;
+    discount: number;
+    publishYear: number;
+    weight: number;
+    size: string;
+    numberOfPages: number;
+    coverFormat: string;
     description: string;
     image: string;
     authors: IAuthorInBook[];

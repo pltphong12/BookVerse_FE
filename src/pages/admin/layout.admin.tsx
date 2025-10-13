@@ -3,13 +3,13 @@ import { Outlet } from 'react-router-dom';
 import { BreadCrumbs } from '../../components/admin/sidebar/BreadCrumbs';
 import { Header } from '../../components/admin/sidebar/Header';
 import { LeftSidebar } from '../../components/admin/sidebar/LeftSideBar';
-import { useUser } from '../../components/context/AuthContext';
-import { useAppSelector } from '../../redux/hook';
+import { useAppDispatch, useAppSelector } from '../../redux/hook';
 import { callGetAccountApi } from '../../services/api';
 import { IUser } from '../../types/backend';
+import { setAccount } from '../../redux/slide/account.slide';
 
 export default function LayoutAdmin() {
-  const { setUser } = useUser();
+  const dispatch = useAppDispatch()
 
   const breadcrumbItems = useAppSelector((state) => state.breadcrumbs.items);
 
@@ -17,15 +17,14 @@ export default function LayoutAdmin() {
     const getAccount = async () => {
       try {
         const res = await callGetAccountApi()
-        setUser(res.data?.data as IUser)
+        dispatch(setAccount(res.data?.data as IUser))
       } catch (error) {
         alert(error)
       }
     }
     getAccount()
-  }, [setUser])
+  }, [dispatch])
 
-  
 
   return (
     <div className="h-screen bg-white text-black dark:bg-gray-900 dark:text-white overflow-hidden">

@@ -29,6 +29,7 @@ export const PermissionPage = () => {
         queryFn: callFetchAllPermissionsApi,
         refetchOnWindowFocus: false,
         staleTime: 5 * 60 * 1000, // 5 minutes
+        retry: false
     });
 
     // Extract unique domains from all permissions
@@ -46,11 +47,12 @@ export const PermissionPage = () => {
     }, [allPermissionsQuery]);
 
     // Fetch all with pagination and filter
-    const { data: permissionsQuery, isPending, error } = useQuery({
+    const { data: permissionsQuery, isPending } = useQuery({
         queryKey: ['fetchingPermissions', search, method, domain, dateFrom, page],
         queryFn: () => callFetchAllPermissionsWithPaginationAndFilterApi(search, method, domain, dateFrom, page, size),
         refetchOnWindowFocus: false,
-        placeholderData: (previousData) => previousData
+        placeholderData: (previousData) => previousData,
+        retry: false
     });
 
     React.useEffect(() => {
@@ -78,11 +80,6 @@ export const PermissionPage = () => {
         if (isPending) return (
             <>
                 <div>Loading...</div>
-            </>
-        )
-        else if (error) return (
-            <>
-                <div>Error + {error.message}</div>
             </>
         )
         else {

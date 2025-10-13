@@ -28,32 +28,37 @@ export const BookPage = () => {
     const [dateFrom, setDateFrom] = React.useState<string>("")
 
     // Fetch all with pagination and filter
-    const { data: booksQuery, isPending, error } = useQuery({
+    const { data: booksQuery, isPending } = useQuery({
         queryKey: ['fetchingBooks', search, publisherId, authorId, categoryId, dateFrom, page],
         queryFn: () => callFetchAllBooksWithPaginationApi(search, publisherId, authorId, categoryId, dateFrom, page, size),
         refetchOnWindowFocus: false,
-        placeholderData: (previousData) => previousData
+        placeholderData: (previousData) => previousData,
+        retry: false
     });
 
     // Fetch all authors with pagination and filter
     const { data: authorsQuery } = useQuery({
         queryKey: ['fetchAllAuthors'],
         queryFn: callFetchAllAuthorsApi,
-        refetchOnWindowFocus: false
+        refetchOnWindowFocus: false,
+        retry: false
     })
 
     // Fetch all categories with pagination and filter
     const { data: categoriesQuery } = useQuery({
         queryKey: ['fetchAllCategories'],
         queryFn: callFetchAllCategoriesApi,
-        refetchOnWindowFocus: false
+        refetchOnWindowFocus: false,
+        retry: false
+
     })
 
     // Fetch all categories with pagination and filter
     const { data: publishersQuery } = useQuery({
         queryKey: ['fetchAllPublishers'],
         queryFn: callFetchAllPublishersApi,
-        refetchOnWindowFocus: false
+        refetchOnWindowFocus: false,
+        retry: false
     })
 
     React.useEffect(() => {
@@ -89,11 +94,6 @@ export const BookPage = () => {
         if (isPending) return (
             <>
                 <div>Đang tải...</div>
-            </>
-        )
-        else if (error) return (
-            <>
-                <div>Lỗi + {error.message}</div>
             </>
         )
         else {

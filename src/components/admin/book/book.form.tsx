@@ -34,9 +34,31 @@ const createBookSchema = z.object({
     }),
     price: z.number()
         .min(0, 'Giá sách phải lớn hơn 0'),
+    discount: z.number()
+        .min(0, 'Giảm giá phải lớn hơn 0')
+        .max(100, 'Giảm giá tối đa 100%'),
     quantity: z.number()
         .min(0, 'Số lượng phải lớn hơn 0')
         .int('Số lượng phải là số nguyên'),
+    publishYear: z.number()
+        .min(0, "Năm xuất bản phải từ 0 trở lên")
+        .max(new Date().getFullYear(), "Năm xuất bản không được vượt quá năm hiện tại")
+        .int("Năm xuất bản phải là số nguyên"),
+    weight: z.number()
+        .min(1, "Trọng lượng phải lớn hơn 0")
+        .max(10000, "Trọng lượng không được vượt quá 10kg")
+        .int("Trọng lượng phải là số nguyên"),
+    dimensions: z.string()
+        .min(1, "Kích thước phải lớn hơn 1 kí tự")
+        .max(100, "Kích thước không được vượt quá 100 kí tự"),
+    numberOfPages: z.number()
+        .min(1, "Số trang phải lớn hơn 0")
+        .max(10000, "Số trang không được vượt quá 10,000")
+        .int("Số trang phải là số nguyên"),
+    coverFormat: z.enum(["PAPERBACK", "HARDCOVER"], {
+        errorMap: () => ({ message: "Vui lòng chọn định dạng bìa" })
+    }),
+
     description: z.string()
         .min(10, 'Mô tả ít nhất 10 kí tự')
         .max(1000, 'Mô tả tối đa 1000 kí tự'),
@@ -71,7 +93,13 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
             authors: [],
             category: { id: 0 },
             price: 0,
+            discount: 0,
             quantity: 0,
+            publishYear: 0,
+            weight: 0,
+            dimensions: '',
+            numberOfPages: 0,
+            coverFormat: 'PAPERBACK',
             description: '',
             image: undefined
         }
@@ -84,8 +112,14 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
             setValue('authors', bookToEdit.authors.map(author => ({ id: author.id })));
             setValue('category.id', bookToEdit.category.id);
             setValue('price', bookToEdit.price);
+            setValue('discount', bookToEdit.discount);
             setValue('quantity', bookToEdit.quantity);
             setValue('description', bookToEdit.description);
+            setValue('publishYear', bookToEdit.publishYear);
+            setValue('weight', bookToEdit.weight);
+            setValue('dimensions', bookToEdit.dimensions);
+            setValue('numberOfPages', bookToEdit.numberOfPages);
+            setValue('coverFormat', bookToEdit.coverFormat as "PAPERBACK" | "HARDCOVER");
             setPreviewUrl(`${import.meta.env.VITE_BACKEND_URL}/storage/book/${bookToEdit.image}`);
         } else {
             reset({
@@ -94,7 +128,13 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
                 authors: [],
                 category: { id: 0 },
                 price: 0,
+                discount: 0,
                 quantity: 0,
+                publishYear: 0,
+                weight: 0,
+                dimensions: '',
+                numberOfPages: 0,
+                coverFormat: 'PAPERBACK',
                 description: '',
                 image: undefined
             });
@@ -109,7 +149,13 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
             authors: [],
             category: { id: 0 },
             price: 0,
+            discount: 0,
             quantity: 0,
+            publishYear: 0,
+            weight: 0,
+            dimensions: '',
+            numberOfPages: 0,
+            coverFormat: 'PAPERBACK',
             description: '',
         });
         setPreviewUrl('');
@@ -181,7 +227,7 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
 
     return (
         <dialog id="book_modal" className={`modal ${isModalOpen ? 'modal-open' : ''} modal-bottom sm:modal-middle w-full`}>
-            <div className="modal-box">
+            <div className="modal-box min-w-[60%]">
                 <h3 className="font-bold text-lg mb-4">{bookToEdit ? 'Chỉnh sửa sách' : 'Tạo sách'}</h3>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <div className="form-control mt-4">
@@ -200,6 +246,23 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
                             </label>
                         )}
                     </div>
+
+                    {/* <div className="form-control mt-4">
+                        <label className="label">
+                            <span className="label-text">Mã ISBN</span>
+                        </label>
+                        <input
+                            type="text"
+                            {...register('isbn')}
+                            placeholder="Nhập mã ISBN"
+                            className={`input input-bordered w-full ${errors.isbn ? 'input-error' : ''}`}
+                        />
+                        {errors.isbn && (
+                            <label className="label">
+                                <span className="label-text-alt text-error">{errors.isbn.message}</span>
+                            </label>
+                        )}
+                    </div> */}
 
                     <div className="form-control mt-4">
                         <label className="label">
@@ -327,6 +390,24 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
 
                         <div className="form-control w-full mt-4">
                             <label className="label">
+                                <span className="label-text">Giảm giá</span>
+                            </label>
+                            <input
+                                type="number"
+                                {...register('discount', { valueAsNumber: true })}
+                                placeholder="Nhập giảm giá"
+                                className={`input input-bordered w-full ${errors.discount ? 'input-error' : ''}`}
+                            />
+
+                            {errors.discount && (
+                                <label className="label">
+                                    <span className="label-text-alt text-error">{errors.discount.message}</span>
+                                </label>
+                            )}
+                        </div>
+
+                        <div className="form-control w-full mt-4">
+                            <label className="label">
                                 <span className="label-text">Số lượng</span>
                             </label>
                             <input
@@ -338,6 +419,98 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
                             {errors.quantity && (
                                 <label className="label">
                                     <span className="label-text-alt text-error">{errors.quantity.message}</span>
+                                </label>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="flex gap-4">
+                        <div className="form-control w-full mt-4">
+                            <label className="label">
+                                <span className="label-text">Năm xuất bản</span>
+                            </label>
+                            <input
+                                type="number"
+                                {...register('publishYear', { valueAsNumber: true })}
+                                placeholder="Nhập năm xuất bản"
+                                className={`input input-bordered w-full ${errors.publishYear ? 'input-error' : ''}`}
+                            />
+                            {errors.publishYear && (
+                                <label className="label">
+                                    <span className="label-text-alt text-error">{errors.publishYear.message}</span>
+                                </label>
+                            )}
+                        </div>
+
+                        <div className="form-control w-full mt-4">
+                            <label className="label">
+                                <span className="label-text">Trọng lượng (gr)</span>
+                            </label>
+                            <input
+                                type="number"
+                                {...register('weight', { valueAsNumber: true })}
+                                placeholder="Nhập trọng lượng"
+                                className={`input input-bordered w-full ${errors.weight ? 'input-error' : ''}`}
+                            />
+
+                            {errors.weight && (
+                                <label className="label">
+                                    <span className="label-text-alt text-error">{errors.weight.message}</span>
+                                </label>
+                            )}
+                        </div>
+
+                        <div className="form-control w-full mt-4">
+                            <label className="label">
+                                <span className="label-text">Số trang</span>
+                            </label>
+                            <input
+                                type="number"
+                                {...register('numberOfPages', { valueAsNumber: true })}
+                                placeholder="Nhập số trang"
+                                className={`input input-bordered w-full ${errors.numberOfPages ? 'input-error' : ''}`}
+                            />
+                            {errors.numberOfPages && (
+                                <label className="label">
+                                    <span className="label-text-alt text-error">{errors.numberOfPages.message}</span>
+                                </label>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="flex gap-4">
+                        <div className="form-control w-full mt-4">
+                            <label className="label">
+                                <span className="label-text">Kích thước</span>
+                            </label>
+                            <input
+                                type="text"
+                                {...register('dimensions')}
+                                placeholder="Nhập kích thước"
+                                className={`input input-bordered w-full ${errors.dimensions ? 'input-error' : ''}`}
+                            />
+                            {errors.dimensions && (
+                                <label className="label">
+                                    <span className="label-text-alt text-error">{errors.dimensions.message}</span>
+                                </label>
+                            )}
+                        </div>
+
+                        <div className="form-control w-full mt-4">
+                            <label className="label">
+                                <span className="label-text">Định dạng bìa</span>
+                            </label>
+                            <select
+                                {...register('coverFormat')}
+                                className={`select select-bordered w-full ${errors.coverFormat ? 'select-error' : ''}`}
+                            >
+                                <option value="PAPERBACK">Bìa Mềm (Paperback)</option>
+                                <option value="HARDCOVER">Bìa Cứng (Hardcover)</option>
+                            </select>
+
+                            {errors.coverFormat && (
+                                <label className="label">
+                                    <span className="label-text-alt text-error">{errors.coverFormat.message}</span>
                                 </label>
                             )}
                         </div>
@@ -410,7 +583,7 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
                         </button>
                     </div>
                 </form>
-            </div>
-        </dialog>
+            </div >
+        </dialog >
     );
 };

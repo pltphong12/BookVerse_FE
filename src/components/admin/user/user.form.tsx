@@ -26,13 +26,15 @@ const createUserSchema = z.object({
     fullName: z.string()
         .min(2, 'Họ và tên có ít nhất 2 kí tự')
         .max(100, 'Họ và tên có nhiều nhất 50 kí tự'),
+    email: z.string()
+        .email('Email không hợp lệ'),
     address: z.string()
         .min(5, 'Địa chỉ có ít nhất 2 kí tự')
         .max(200, 'Địa chỉ có nhiều nhất 50 kí tự'),
     phone: z.string()
         .min(10, 'Số điện thoại có ít nhất 2 kí tự')
         .max(15, 'Số điện thoại có nhiều nhất 50 kí tự')
-        .regex(/^[0-9+\-\s()]*$/,''),
+        .regex(/^[0-9+\-\s()]*$/, ''),
     role: z.object({
         id: z.string()
     }),
@@ -50,7 +52,7 @@ export const UserForm: React.FC<UserFormProps> = ({ isModalOpen, setIsModalOpen,
     const isUpdateUserSuccess = useAppSelector((state) => state.user.isUpdateUserSuccess);
     const isUpdateUserFailed = useAppSelector((state) => state.user.isUpdateUserFailed);
     const message = useAppSelector((state) => state.user.message);
-    
+
     const {
         register,
         handleSubmit,
@@ -64,6 +66,7 @@ export const UserForm: React.FC<UserFormProps> = ({ isModalOpen, setIsModalOpen,
             username: '',
             password: '',
             fullName: '',
+            email: '',
             address: '',
             phone: '',
             role: { id: '1' },
@@ -75,6 +78,7 @@ export const UserForm: React.FC<UserFormProps> = ({ isModalOpen, setIsModalOpen,
         if (userToEdit) {
             setValue('username', userToEdit.username);
             setValue('fullName', userToEdit.fullName);
+            setValue('email', userToEdit.email);
             setValue('address', userToEdit.address);
             setValue('phone', userToEdit.phone);
             setValue('role.id', userToEdit.role.id.toString());
@@ -84,6 +88,7 @@ export const UserForm: React.FC<UserFormProps> = ({ isModalOpen, setIsModalOpen,
                 username: '',
                 password: '',
                 fullName: '',
+                email: '',
                 address: '',
                 phone: '',
                 role: { id: '1' },
@@ -98,6 +103,7 @@ export const UserForm: React.FC<UserFormProps> = ({ isModalOpen, setIsModalOpen,
             username: '',
             password: '',
             fullName: '',
+            email: '',
             address: '',
             phone: '',
             role: { id: '1' },
@@ -235,6 +241,17 @@ export const UserForm: React.FC<UserFormProps> = ({ isModalOpen, setIsModalOpen,
                             )}
                         </div>
                     )}
+                    <div className="form-control w-full mt-4">
+                        <label className="label">
+                            <span className="label-text">Email</span>
+                        </label>
+                        <input type="email" {...register('email')} placeholder="Nhập email" className={`input input-bordered w-full ${errors.email ? 'input-error' : ''}`} />
+                        {errors.email && (
+                            <label className="label">
+                                <span className="label-text-alt text-error">{errors.email.message}</span>
+                            </label>
+                        )}
+                    </div>
                     <div className="flex gap-4">
                         <div className="form-control w-full mt-4">
                             <label className="label">

@@ -27,7 +27,6 @@ interface AuthorTableProps {
 export const AuthorTable: React.FC<AuthorTableProps> = ({ load, page, totalPage, setPage, dataSource, searchWithName, setSearchWithName, searchWithNationality, setSearchWithNationality, dateFrom, setDateFrom }) => {
     const [isViewModalOpen, setIsViewModalOpen] = React.useState<boolean>(false);
     const [selectedAuthor, setSelectedAuthor] = React.useState<IAuthor | null>(null);
-
     const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState<boolean>(false);
 
     const isDeleteAuthorSuccess = useAppSelector((state) => state.author.isDeleteAuthorSuccess);

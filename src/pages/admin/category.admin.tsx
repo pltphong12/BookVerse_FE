@@ -20,11 +20,12 @@ export const CategoryPage = () => {
     const [dateFrom, setDateFrom] = React.useState<string>("")
 
     // Fetch all with pagination and filter
-    const { data: categoriesQuery, isPending, error } = useQuery({
+    const { data: categoriesQuery, isPending } = useQuery({
         queryKey: ['fetchingCategories', searchWithName, dateFrom, page],
         queryFn: () => callFetchAllCategoriesWithPaginationAndFilterApi(searchWithName, dateFrom, page, size),
         refetchOnWindowFocus: false,
-        placeholderData: (previousData) => previousData
+        placeholderData: (previousData) => previousData,
+        retry: false
     });
 
     
@@ -54,11 +55,6 @@ export const CategoryPage = () => {
         if (isPending) return (
             <>
                 <div>Đang tải...</div>
-            </>
-        )
-        else if (error) return (
-            <>
-                <div>Lỗi + {error.message}</div>
             </>
         )
         else {

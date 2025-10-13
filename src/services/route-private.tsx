@@ -1,5 +1,5 @@
 import { ReactNode } from "react"
-import NotFound from "../pages/error/NotFound"
+import { Navigate } from "react-router-dom"
 
 export const PrivateRoute: React.FC<{ children: ReactNode }> = ({ children }) => {
     const user = localStorage.getItem('access_token')
@@ -12,6 +12,6 @@ export const PrivateRoute: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
 
     return (
-        <NotFound statusError="401" message="Unauthentication" navigate="/login" />
+        <Navigate to="/login" />
     )
 }

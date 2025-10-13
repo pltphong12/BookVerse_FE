@@ -12,14 +12,14 @@ export const BookView: React.FC<BookViewProps> = ({ isOpen, setIsOpen, book }) =
     if (!isOpen || !book) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-999 flex items-center justify-center p-4">
             {/* Backdrop */}
             <div className="fixed inset-0 bg-black opacity-50" onClick={() => setIsOpen(false)}></div>
 
             {/* Modal */}
-            <div className="relative z-50 w-full max-w-2xl rounded-lg bg-white p-6 dark:bg-gray-800">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-4">
+            <div className="relative z-50 w-full max-w-4xl max-h-[90vh] rounded-lg bg-white dark:bg-gray-800 flex flex-col">
+                {/* Header - Fixed */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
                     <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                         Thông tin sách
                     </h3>
@@ -31,17 +31,17 @@ export const BookView: React.FC<BookViewProps> = ({ isOpen, setIsOpen, book }) =
                     </button>
                 </div>
 
-                {/* Content */}
-                <div className="p-6">
+                {/* Content - Scrollable */}
+                <div className="flex-1 overflow-y-scroll [scrollbar-width:none] p-6">
                     <div className="flex flex-col lg:flex-row gap-8">
                         {/* Book Cover */}
                         <div className="flex-shrink-0">
-                            <div className="w-64 h-80 bg-gradient-to-b from-blue-900 to-blue-700 rounded-lg shadow-lg overflow-hidden relative">
+                            <div className="w-64 h-96 bg-gradient-to-b from-blue-900 to-blue-700 rounded-lg shadow-lg overflow-hidden relative">
                                 {book.image ? (
                                     <img
                                         src={`${import.meta.env.VITE_BACKEND_URL}/storage/book/${book.image}`}
                                         alt={book.title}
-                                        className="w-full h-full object-cover"
+                                        className="w-full h-full"
                                     />
                                 ) : (
                                     <div className="absolute inset-0 bg-gradient-to-br from-blue-800 to-blue-900">
@@ -132,6 +132,16 @@ export const BookView: React.FC<BookViewProps> = ({ isOpen, setIsOpen, book }) =
                                 </div>
 
                                 <div className="flex justify-between items-center">
+                                    <span className="text-gray-600 dark:text-gray-400 font-medium">Đã bán:</span>
+                                    <span className="text-xl   text-gray-800 dark:text-white">{book.sold} cuốn</span>
+                                </div>
+
+                                <div className="flex justify-between items-center">
+                                    <span className="text-gray-600 dark:text-gray-400 font-medium">Giảm giá:</span>
+                                    <span className="text-xl   text-gray-800 dark:text-white">{book.discount} %</span>
+                                </div>
+
+                                <div className="flex justify-between items-center">
                                     <span className="text-gray-600 dark:text-gray-400 font-medium">Ngày tạo:</span>
                                     <span className="text-gray-800 dark:text-white font-semibold">
                                         {book.createdAt && new Intl.DateTimeFormat('en-US', {
@@ -146,38 +156,21 @@ export const BookView: React.FC<BookViewProps> = ({ isOpen, setIsOpen, book }) =
                                 </div>
                             </div>
 
-                            {/* Description */}
-
-
-                            {/* Additional Information */}
                         </div>
                     </div>
-                    <div className='pt-4'>
+
+                    {/* Description Section */}
+                    <div className='pt-6'>
                         <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                            <h3 className="text-lg   text-gray-800 dark:text-white">Mô tả</h3>
-                            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                                {book.description || 'Chưa có mô tả cho cuốn sách này.'}
-                            </p>
-                        </div>
-                    </div>
-                    {/* <div className='pt-4'>
-                        <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                            <h3 className="text-lg   text-gray-800 dark:text-white mb-3">Thông tin bổ sung</h3>
-                            <div className="flex justify-between items-center">
-                                <span className="text-gray-600 dark:text-gray-400 font-medium">Ngày tạo:</span>
-                                <span className="text-gray-800 dark:text-white font-semibold">
-                                    {book.createdAt && new Intl.DateTimeFormat('en-US', {
-                                        year: 'numeric',
-                                        month: '2-digit',
-                                        day: '2-digit',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                        second: '2-digit'
-                                    }).format(new Date(book.createdAt))}
-                                </span>
+                            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-3">Mô tả</h3>
+                            <h4 className="text-md font-semibold text-gray-800 dark:text-white mb-3">{book.title}</h4>
+                            <div className="max-h-48 overflow-y-auto">
+                                <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
+                                    {book.description || 'Chưa có mô tả cho cuốn sách này.'}
+                                </p>
                             </div>
                         </div>
-                    </div> */}
+                    </div>
                 </div>
             </div>
         </div>

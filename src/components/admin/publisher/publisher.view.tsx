@@ -11,7 +11,7 @@ export const PublisherView: React.FC<PublisherViewProps> = ({ isOpen, setIsOpen,
     if (!isOpen || !publisher) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-999 flex items-center justify-center">
             {/* Backdrop */}
             <div className="fixed inset-0 bg-black opacity-50" onClick={() => setIsOpen(false)}></div>
 

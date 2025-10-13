@@ -1,6 +1,6 @@
 import { Book, KeyRound, LayoutDashboard, Library, TagsIcon, User, UserCog, UserPen } from 'lucide-react';
 import { Link, NavLink } from 'react-router-dom';
-import Logo from '../../../assets/logo.png';
+import Logo from '../../../assets/main_logo.png';
 export const LeftSidebar = () => {
 
     return (
@@ -13,7 +13,7 @@ export const LeftSidebar = () => {
                             src={Logo}
                             alt="BookVerse Logo"
                             style={{
-                                filter: 'brightness(0) saturate(100%) invert(20%) sepia(60%) saturate(500%) hue-rotate(180deg)',
+                                filter: 'brightness(0) saturate(100%) invert(39%) sepia(57%) saturate(2000%) hue-rotate(200deg) brightness(96%) contrast(94%)',
                             }}
                         />
                     </Link>

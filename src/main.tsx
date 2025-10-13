@@ -2,7 +2,6 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { RouterProvider } from "react-router-dom";
 import { router } from './App.tsx';
-import { AuthProvider } from './components/context/AuthContext.tsx';
 import { store } from './redux/store.ts';
 import './styles/index.css';
 import { ToastContainer } from 'react-toastify';
@@ -16,11 +15,9 @@ const queryClient = new QueryClient()
 createRoot(document.getElementById('root')!).render(
   <Provider store={store}>
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <ReactQueryDevtools initialIsOpen={false}/>
-        <RouterProvider router={router} />
-        <ToastContainer />
-      </AuthProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
+      <RouterProvider router={router} />
+      <ToastContainer />
     </QueryClientProvider>
   </Provider>
 )

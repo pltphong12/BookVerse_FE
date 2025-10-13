@@ -1,49 +1,44 @@
-import { createBrowserRouter, Outlet } from 'react-router-dom'
-import { Header } from './components/client/header'
-import { Footer } from './components/client/footer'
-import NotFound from './pages/error/NotFound';
-import { HomePage } from './pages/home/homePage';
-import { PrivateRoute } from './services/route-private';
+import { createBrowserRouter } from 'react-router-dom';
+import { AuthorPage } from './pages/admin/author.admin';
+import { BookPage } from './pages/admin/book.admin';
+import { CategoryPage } from './pages/admin/category.admin';
+import { DashboardAdmin } from './pages/admin/dashboard.admin';
 import LayoutAdmin from './pages/admin/layout.admin';
-import ErrorPage from './pages/error/errorPage';
+import { PermissionPage } from './pages/admin/permission.admin';
+import { PublisherPage } from './pages/admin/publisher.admin';
+import { RolePage } from './pages/admin/role.admin';
 import { UserPage } from './pages/admin/user.admin';
 import { InternalLoginPage } from './pages/auth/login_internal';
 import { RegisterPage } from './pages/auth/register';
-import { DashboardAdmin } from './pages/admin/dashboard.admin';
-import { BookPage } from './pages/admin/book.admin';
-import { AuthorPage } from './pages/admin/author.admin';
-import { PublisherPage } from './pages/admin/publisher.admin';
-import { CategoryPage } from './pages/admin/category.admin';
-import { PermissionPage } from './pages/admin/permission.admin';
-import { RolePage } from './pages/admin/role.admin';
+import { Home } from './pages/client/home';
+import { LayoutClient } from './pages/client/layout.client';
+import NotFound from './pages/error/NotFound';
+import { PrivateRoute } from './services/route-private';
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
-    errorElement: <NotFound statusError='404' message='Oops! That page can’t be found' navigate='/' />,
+    element: 
+    <App>
+      <LayoutClient />
+    </App>,
+    errorElement: <NotFound />,
     children: [
       {
         index: true,
-        element: <HomePage />,
-      },
-      // {
-      //   path: "/users",
-      //   element: <UserPage />,
-      // },
-      // {
-      //   path: "/products",
-      //   element: <ProductPage />,
-      // },
+        element: <Home />,
+      }
     ],
   },
   {
     path: "/admin",
     element:
       <PrivateRoute>
-        <LayoutAdmin />
+        <App>
+          <LayoutAdmin />
+        </App>
       </PrivateRoute>,
-    errorElement: <ErrorPage />,
+    errorElement: <NotFound />,
     children: [
       {
         index: true,
@@ -89,15 +84,11 @@ export const router = createBrowserRouter([
   },
 ]);
 
-export function App() {
+export function App(props: { children: React.ReactNode }) {
 
   return (
     <>
-      <Header />
-      <Outlet />
-      <Footer />
+      {props.children}
     </>
   )
 }
-
-

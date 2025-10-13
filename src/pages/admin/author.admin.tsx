@@ -21,11 +21,12 @@ export const AuthorPage = () => {
     const [dateFrom, setDateFrom] = React.useState<string>("")
 
     // Fetch all with pagination and filter
-    const { data: authorsQuery, isPending, error } = useQuery({
+    const { data: authorsQuery, isPending} = useQuery({
         queryKey: ['fetchingAuthors', searchWithName, searchWithNationality, dateFrom, page],
         queryFn: () => callFetchAllAuthorsWithPaginationAndFilterApi(searchWithName, searchWithNationality, dateFrom, page, size),
         refetchOnWindowFocus: false,
-        placeholderData: (previousData) => previousData
+        placeholderData: (previousData) => previousData,
+        retry: false
     });
 
     
@@ -55,11 +56,6 @@ export const AuthorPage = () => {
         if (isPending) return (
             <>
                 <div>Đang tải...</div>
-            </>
-        )
-        else if (error) return (
-            <>
-                <div>Lỗi + {error.message}</div>
             </>
         )
         else {

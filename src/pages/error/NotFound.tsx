@@ -1,49 +1,72 @@
-type NotFoundProps = {
-    statusError: string,
-    message: string,
-    navigate: string
-}
+import { ArrowLeft, Home } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-const NotFound = ({ statusError, message, navigate }: NotFoundProps) => {
+const NotFound: React.FC = () => {
+    const navigate = useNavigate();
+
+    const handleGoBack = () => {
+        navigate(-1);
+    };
+
+    const handleGoHome = () => {
+        navigate('/');
+    };
+
     return (
-        <>
-            <div className="min-h-screen flex items-center justify-center bg-blue-500">
-                <section className="relative z-10 bg-primary py-[120px] bg-blue-500">
-                    <div className="container mx-auto">
-                        <div className="-mx-4 flex">
-                            <div className="w-full px-4">
-                                <div className="mx-auto max-w-[400px] text-center">
-                                    <h2 className="mb-2 text-[50px] font-bold leading-none text-white sm:text-[80px] md:text-[100px]">
-                                        {statusError}
-                                    </h2>
-                                    <h4 className="mb-3 text-[22px] font-semibold leading-tight text-white">
-                                        {message}
-                                    </h4>
-                                    <p className="mb-8 text-lg text-white">
-                                        The page you are looking for it maybe deleted
-                                    </p>
-                                    <a
-                                        href={navigate}
-                                        className="inline-block rounded-lg border border-white px-8 py-3 text-center text-base font-semibold text-white transition hover:bg-white hover:text-blue-500"
-                                    >
-                                        Go To Home
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+        <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center px-4">
+            <div className="max-w-2xl w-full text-center">
+                {/* 404 Animation */}
+                <div className="mb-8">
+                    <div className="relative">
+                        <div className="text-9xl font-bold text-primary-600">404</div>
+                        
                     </div>
+                </div>
 
-                    <div className="absolute left-0 top-0 -z-10 flex h-full w-full items-center justify-between space-x-5 md:space-x-8 lg:space-x-14">
-                        <div className="h-full w-1/3 bg-gradient-to-t from-[#FFFFFF14] to-[#C4C4C400]"></div>
-                        <div className="flex h-full w-1/3">
-                            <div className="h-full w-1/2 bg-gradient-to-b from-[#FFFFFF14] to-[#C4C4C400]"></div>
-                            <div className="h-full w-1/2 bg-gradient-to-t from-[#FFFFFF14] to-[#C4C4C400]"></div>
-                        </div>
-                        <div className="h-full w-1/3 bg-gradient-to-b from-[#FFFFFF14] to-[#C4C4C400]"></div>
-                    </div>
-                </section>
+                {/* Error Message */}
+                <div className="mb-8">
+                    <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                        Trang không tồn tại
+                    </h1>
+                    <p className="text-xl text-gray-600 mb-2">
+                        Xin lỗi, trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển.
+                    </p>
+                    <p className="text-gray-500">
+                        Có thể trang này chưa được xuất bản hoặc bạn đã nhập sai địa chỉ.
+                    </p>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+                    <button
+                        onClick={handleGoHome}
+                        className="btn btn-primary btn-lg flex items-center gap-2"
+                    >
+                        <Home className="w-5 h-5" />
+                        Về trang chủ
+                    </button>
+
+                    <button
+                        onClick={handleGoBack}
+                        className="btn btn-outline btn-lg flex items-center gap-2"
+                    >
+                        <ArrowLeft className="w-5 h-5" />
+                        Quay lại
+                    </button>
+                </div>
+
+
+                {/* Contact Info */}
+                <div className="mt-8 text-sm text-gray-500">
+                    <p>
+                        Nếu bạn tin rằng đây là lỗi, vui lòng{' '}
+                        <a href="mailto:support@bookverse.vn" className="text-primary-600 hover:underline">
+                            liên hệ với chúng tôi
+                        </a>
+                    </p>
+                </div>
             </div>
-        </>
+        </div>
     );
 };
 

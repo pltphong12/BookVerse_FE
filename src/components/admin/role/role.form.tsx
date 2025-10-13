@@ -68,7 +68,8 @@ export const RoleForm: React.FC<RoleFormProps> = ({ isModalOpen, setIsModalOpen,
     const { data: permissionsQuery } = useQuery({
         queryKey: ['fetchAllPermissions'],
         queryFn: callFetchAllPermissionsApi,
-        refetchOnWindowFocus: false
+        refetchOnWindowFocus: false,
+        retry: false
     })
     useEffect(() => {
         if (permissionsQuery?.data.data) {

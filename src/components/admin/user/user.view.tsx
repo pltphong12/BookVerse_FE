@@ -10,7 +10,7 @@ interface UserViewProps {
 export const UserView: React.FC<UserViewProps> = ({ isOpen, setIsOpen, user }) => {
     if (!isOpen || !user) return null;
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-999 flex items-center justify-center">  
             {/* Backdrop */}
             <div className="fixed inset-0 bg-black opacity-50" onClick={() => setIsOpen(false)}></div>
 
@@ -56,6 +56,10 @@ export const UserView: React.FC<UserViewProps> = ({ isOpen, setIsOpen, user }) =
                         <div>
                             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Địa chỉ</p>
                             <p className="text-gray-900 dark:text-white">{user.address}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</p>
+                            <p className="text-gray-900 dark:text-white">{user.email}</p>
                         </div>
                         <div>
                             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Ngày tạo</p>

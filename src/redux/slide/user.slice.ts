@@ -7,6 +7,7 @@ export interface ICreateUser {
   username: string
   password: string
   fullName: string
+  email: string
   address: string
   phone: string
   role: {
@@ -44,6 +45,7 @@ export const createUser = createAsyncThunk(
         payload.username, 
         payload.password, 
         payload.fullName, 
+        payload.email,
         payload.address, 
         payload.phone, 
         payload.role.id,
@@ -81,6 +83,7 @@ export const updateUser = createAsyncThunk(
         payload.data.username,
         payload.data.password,
         payload.data.fullName,
+        payload.data.email,
         payload.data.address,
         payload.data.phone,
         payload.data.role.id,

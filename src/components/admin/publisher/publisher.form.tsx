@@ -281,7 +281,7 @@ export const PublisherForm: React.FC<PublisherFormProps> = ({ isModalOpen, setIs
                             {isSubmitting ? (
                                 <span className="loading loading-spinner loading-sm"></span>
                             ) : (
-                                publisherToEdit ? 'Update' : 'Save'
+                                publisherToEdit ? 'Cập nhật' : 'Lưu'
                             )}
                         </button>
                         <button
@@ -290,7 +290,7 @@ export const PublisherForm: React.FC<PublisherFormProps> = ({ isModalOpen, setIs
                             onClick={handleClose}
                             disabled={isSubmitting}
                         >
-                            Close
+                            Đóng
                         </button>
                     </div>
                 </form>

@@ -205,7 +205,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ isModalOpen, setIsMo
                             {isSubmitting ? (
                                 <span className="loading loading-spinner loading-sm"></span>
                             ) : (
-                                categoryToEdit ? 'Update' : 'Save'
+                                categoryToEdit ? 'Cập nhật' : 'Lưu'
                             )}
                         </button>
                         <button
@@ -214,7 +214,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ isModalOpen, setIsMo
                             onClick={handleClose}
                             disabled={isSubmitting}
                         >
-                            Close
+                            Đóng
                         </button>
                     </div>
                 </form>

@@ -37,7 +37,7 @@ export const DashboardAdmin = () => {
     useEffect(() => {
         dispatch(clearBreadcrumbs())
         dispatch(setBreadcrumbs([
-          { label: "Manage", path: "/admin" },
+          { label: "Quản lý", path: "/admin" },
           { label: "Dashboard", path: "/admin" },
         ]));
       }, [dispatch, location.pathname]);

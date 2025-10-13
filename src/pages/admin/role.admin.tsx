@@ -22,11 +22,12 @@ export const RolePage = () => {
     const [dateFrom, setDateFrom] = React.useState<string>("")
 
     // Fetch all with pagination and filter
-    const { data: rolesQuery, isPending, error } = useQuery({
+    const { data: rolesQuery, isPending } = useQuery({
         queryKey: ['fetchingRoles', search, dateFrom, page],
         queryFn: () => callFetchAllRolesWithPaginationAndFilterApi(search, dateFrom, page, size),
         refetchOnWindowFocus: false,
-        placeholderData: (previousData) => previousData
+        placeholderData: (previousData) => previousData,
+        retry: false
     });
 
     React.useEffect(() => {
@@ -54,11 +55,6 @@ export const RolePage = () => {
         if (isPending) return (
             <>
                 <div>Loading...</div>
-            </>
-        )
-        else if (error) return (
-            <>
-                <div>Error + {error.message}</div>
             </>
         )
         else {

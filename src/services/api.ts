@@ -1,4 +1,4 @@
-import { IAccount, IAuthor, IAuthorInBook, IBackendRes, IBook, ICategory, ICategoryInBook, IFile, IPagination, IPermission, IPublisher, IRole, IUser } from "../types/backend";
+import { ILoginRes, IAuthor, IAuthorInBook, IBackendRes, IBook, ICategory, ICategoryInBook, IFile, IPagination, IPermission, IPublisher, IRole, IUser } from "../types/backend";
 import axiosInstance from "./axios-customize";
 
 
@@ -10,7 +10,7 @@ Module Auth
 export const callLoginApi = (username: string, password: string) => {
     const url: string = 'api/v1/auth/login'
     const data = { username: username, password: password }
-    return axiosInstance.post<IBackendRes<IAccount>>(url, data)
+    return axiosInstance.post<IBackendRes<ILoginRes>>(url, data)
 }
 
 export const callRegisterApi = (username: string, password: string, fullName: string, address: string, phone: string) => {
@@ -27,7 +27,7 @@ export const callRegisterApi = (username: string, password: string, fullName: st
 
 export const callRefreshTokenApi = () => {
     const url: string = 'api/v1/auth/refresh'
-    return axiosInstance.get<IBackendRes<IAccount>>(url)
+    return axiosInstance.get<IBackendRes<ILoginRes>>(url)
 }
 
 export const callGetAccountApi = () => {
@@ -50,13 +50,14 @@ export const callFetchAllUserWithPaginationApi = (username: string, roleId: numb
     return axiosInstance.get<IBackendRes<IPagination<IUser>>>(url)
 }
 
-export const callCreateUserApi = (username: string, password: string, fullName: string, address: string, phone: string, role: number, avatar: string) => {
+export const callCreateUserApi = (username: string, password: string, fullName: string, email: string, address: string, phone: string, role: number, avatar: string) => {
   const url = "/api/v1/users";
 
   const data = {
     username: username,
     password: password,
     fullName: fullName,
+    email: email,
     address: address,
     phone: phone,
     role: {
@@ -73,6 +74,7 @@ export const callUpdateUserApi = (
   username: string,
   password: string,
   fullName: string,
+  email: string,
   address: string,
   phone: string,
   role: number,
@@ -85,6 +87,7 @@ export const callUpdateUserApi = (
     username: null,
     password: null,
     fullName: fullName,
+    email: email,
     address: address,
     phone: phone,
     role: {
@@ -203,7 +206,14 @@ export const callCreateBookApi = (
   authors: IAuthorInBook[], 
   category: ICategoryInBook, 
   price: number, 
+  discount: number,
   quantity: number, 
+  publishYear: number,
+  weight: number,
+  dimensions: string,
+  numberOfPages: number,
+  coverFormat: string,
+  isbn: string,
   image: string, 
   description: string) => {
     const url = "/api/v1/books";
@@ -214,7 +224,14 @@ export const callCreateBookApi = (
       authors: authors,
       category: category,
       price: price,
+      discount: discount,
       quantity: quantity,
+      publishYear: publishYear,
+      weight: weight,
+      dimensions: dimensions,
+      numberOfPages: numberOfPages,
+      coverFormat: coverFormat,
+      isbn: isbn,
       image: image,
       description: description
     };
@@ -228,8 +245,15 @@ export const callUpdateBookApi = (
   publisher: IPublisher, 
   authors: IAuthorInBook[], 
   category: ICategoryInBook, 
-  price: number, 
+  price: number,
+  discount: number,
   quantity: number, 
+  publishYear: number,
+  weight: number,
+  dimensions: string,
+  numberOfPages: number,
+  coverFormat: string,
+  isbn: string,
   image: string, 
   description: string
 ) => {
@@ -242,7 +266,14 @@ export const callUpdateBookApi = (
     authors: authors,
     category: category,
     price: price,
+    discount: discount,
     quantity: quantity,
+    publishYear: publishYear,
+    weight: weight,
+    dimensions: dimensions,
+    numberOfPages: numberOfPages,
+    coverFormat: coverFormat,
+    isbn: isbn,
     image: image,
     description: description
   };

@@ -7,9 +7,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Logo from '../../assets/logo.png';
 import { showToast, ToastType } from '../../common/showToast';
-import { useUser } from '../../components/context/AuthContext';
 import { callLoginApi } from '../../services/api';
 import { IUser } from '../../types/backend';
+import { useAppDispatch } from '../../redux/hook';
+import { setAccount } from '../../redux/slide/account.slide';
 
 const loginSchema = z.object({
     username: z.string().min(2, 'Username is required'),
@@ -20,8 +21,8 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export const InternalLoginPage = () => {
     const [loading, setLoading] = React.useState<boolean>(false);
-    const { setUser } = useUser();
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
 
     const {
         register,
@@ -41,11 +42,18 @@ export const InternalLoginPage = () => {
             const res = await callLoginApi(data.username, data.password);
             showToast(`Đăng nhập thành công`, ToastType.SUCCESS);
             localStorage.setItem('access_token', res.data.data?.accessToken as string);
-            setUser(res.data.data?.user as IUser);
-            setTimeout(() => {
-                navigate('/admin');
-                setLoading(false);
-            }, 1000);
+            dispatch(setAccount(res.data.data?.user as IUser));
+            if (res.data.data?.user?.role?.name === 'CUSTOMER') {
+                setTimeout(() => {
+                    navigate('/');
+                    setLoading(false);
+                }, 1000);
+            } else {
+                setTimeout(() => {
+                    navigate('/admin');
+                    setLoading(false);
+                }, 1000);
+            }
         } catch (error) {
             if (error instanceof AxiosError) {
                 showToast(`${error.response?.data?.error}`, ToastType.ERROR);

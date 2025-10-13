@@ -1,5 +1,4 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { counterSlice } from './slide/counter.slice'
 import { userSlice } from './slide/user.slice'
 import { breadcrumbsSlice } from './slide/breadcrumbs.slice'
 import { bookSlice } from './slide/book.slice'
@@ -8,11 +7,12 @@ import { publisherSlice } from './slide/publisher.slice'
 import { categorySlice } from './slide/categogy.slide'
 import { permissionSlice } from './slide/permission.slice'
 import { roleSlice } from './slide/role.slide'
+import { accountSlice } from './slide/account.slide'
 
 
 export const store = configureStore({
   reducer: {
-    counter: counterSlice.reducer,
+    account: accountSlice.reducer,
     user: userSlice.reducer,
     breadcrumbs: breadcrumbsSlice.reducer,
     book: bookSlice.reducer,
