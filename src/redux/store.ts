@@ -8,6 +8,7 @@ import { categorySlice } from './slide/categogy.slide'
 import { permissionSlice } from './slide/permission.slice'
 import { roleSlice } from './slide/role.slide'
 import { accountSlice } from './slide/account.slide'
+import { supplierSlice } from './slide/supplier.slide'
 
 
 export const store = configureStore({
@@ -20,7 +21,8 @@ export const store = configureStore({
     publisher: publisherSlice.reducer,
     category: categorySlice.reducer,
     permission: permissionSlice.reducer,
-    role: roleSlice.reducer
+    role: roleSlice.reducer,
+    supplier: supplierSlice.reducer
   }
 })
 

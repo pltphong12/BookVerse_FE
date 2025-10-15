@@ -2,83 +2,83 @@ import { Edit, Trash, View } from "lucide-react";
 import React from "react";
 import { showToast, ToastType } from "../../../common/showToast";
 import { useAppDispatch, useAppSelector } from "../../../redux/hook";
-import { deleteCategory, ICreateCategory, resetDeleteCategory } from "../../../redux/slide/categogy.slide";
-import { ICategory } from "../../../types/backend";
+import { deleteSupplier, ICreateSupplier, resetDeleteSupplier } from "../../../redux/slide/supplier.slide";
+import { ISupplier } from "../../../types/backend";
 import { Pagination } from "../../global/Pagination";
-import { CategorySearchAndFilter } from "./category.search_filter";
-import { CategoryView } from "./category.view";
-import { CategoryForm } from "./categoty.form";
+import { SupplierSearchAndFilter } from "./supplier.search_filter";
+import { SupplierView } from "./supplier.view";
+import { SupplierForm } from "./supplier.form";
 
 
-interface CategoryTableProps {
+interface SupplierTableProps {
     load: () => Promise<void>;
     page: number;
     totalPage: number;
     setPage: React.Dispatch<React.SetStateAction<number>>;
-    dataSource: ICategory[];
-    searchWithName: string;
-    setSearchWithName: React.Dispatch<React.SetStateAction<string>>;
+    dataSource: ISupplier[];
+    search: string;
+    setSearch: React.Dispatch<React.SetStateAction<string>>;
     dateFrom: string;
     setDateFrom: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const CategoryTable: React.FC<CategoryTableProps> = ({ load, page, totalPage, setPage, dataSource, searchWithName, setSearchWithName, dateFrom, setDateFrom }) => {
+export const SupplierTable: React.FC<SupplierTableProps> = ({ load, page, totalPage, setPage, dataSource, search, setSearch, dateFrom, setDateFrom }) => {
     const [isViewModalOpen, setIsViewModalOpen] = React.useState<boolean>(false);
-    const [selectedCategory, setSelectedCategory] = React.useState<ICategory | null>(null);
+    const [selectedSupplier, setSelectedSupplier] = React.useState<ISupplier | null>(null);
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState<boolean>(false);
 
-    const isDeleteCategorySuccess = useAppSelector((state) => state.category.isDeleteCategorySuccess);
-    const isDeleteCategoryFailed = useAppSelector((state) => state.category.isDeleteCategoryFailed);
+    const isDeleteSupplierSuccess = useAppSelector((state) => state.supplier.isDeleteSupplierSuccess);
+    const isDeleteSupplierFailed = useAppSelector((state) => state.supplier.isDeleteSupplierFailed);
 
-    const [categoryToEdit, setCategoryToEdit] = React.useState<ICreateCategory | undefined>(undefined);
+    const [supplierToEdit, setSupplierToEdit] = React.useState<ICreateSupplier | undefined>(undefined);
     const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
-    const message = useAppSelector((state) => state.category.message);
+    const message = useAppSelector((state) => state.supplier.message);
     const dispatch = useAppDispatch();
 
-    const handleViewCategory = (category: ICategory) => {
-        setSelectedCategory(category);
+    const handleViewSupplier = (supplier: ISupplier) => {
+        setSelectedSupplier(supplier);
         setIsViewModalOpen(true);
     };
 
-    const executeDeleteCategory = (id: number) => {
-        dispatch(deleteCategory(id));
+    const executeDeleteSupplier = (id: number) => {
+        dispatch(deleteSupplier(id));
     }
 
     React.useEffect(() => {
-        if (isDeleteCategorySuccess) {
-            showToast("Xóa tác giả thành công", ToastType.SUCCESS);
-            dispatch(resetDeleteCategory());
-            setPage(1)
+        if (isDeleteSupplierSuccess) {
+            showToast("Xóa nhà cung cấp thành công", ToastType.SUCCESS);
+            dispatch(resetDeleteSupplier());
             load()
+            setPage(1)
         }
-        if (isDeleteCategoryFailed) {
-            showToast("Xóa tác giả không thành công" + message, ToastType.ERROR);
-            dispatch(resetDeleteCategory());
+        if (isDeleteSupplierFailed) {
+            showToast("Xóa nhà cung cấp không thành công " + message, ToastType.ERROR);
+            dispatch(resetDeleteSupplier());
         }
-    }, [isDeleteCategorySuccess, isDeleteCategoryFailed, message, dispatch, setPage, load]);
+    }, [isDeleteSupplierSuccess, isDeleteSupplierFailed, message, dispatch, setPage, load]);
     return (
         <>
             <div className='flex'>
-                <CategorySearchAndFilter
-                    searchWithName={searchWithName}
-                    setSearchWithName={setSearchWithName}
+                <SupplierSearchAndFilter
+                    search={search}
+                    setSearch={setSearch}
                     dateFrom={dateFrom}
                     setDateFrom={setDateFrom}
                     setPage={setPage}
                 />
             </div>
             <div className="flex justify-between">
-                <div className="text-2xl font-bold">Quản lý thể loại</div>
+                <div className="text-2xl font-bold">Quản lý nhà cung cấp</div>
                 <button
                     className="btn btn-neutral justify-end"
                     onClick={() => {
                         setIsModalOpen(true);
-                        setCategoryToEdit(undefined);
+                        setSupplierToEdit(undefined);
                     }}
                 >
-                    Tạo thể loại
+                    Tạo nhà cung cấp
                 </button>
             </div>
 
@@ -92,7 +92,17 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({ load, page, totalP
                             </th>
                             <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
-                                    <span>Tên thể loại</span>
+                                    <span>Tên nhà cung cấp</span>
+                                </div>
+                            </th>
+                            <th className='cursor-pointer hover:bg-base-200'>
+                                <div className='flex items-center gap-1'>
+                                    <span>Địa chỉ</span>
+                                </div>
+                            </th>
+                            <th className='cursor-pointer hover:bg-base-200'>
+                                <div className='flex items-center gap-1'>
+                                    <span>Email</span>
                                 </div>
                             </th>
                             <th className='cursor-pointer hover:bg-base-200'>
@@ -120,6 +130,13 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({ load, page, totalP
                                         </div>
                                     </td>
                                     <td>
+                                        {record.address}
+                                    </td>
+                                    <td>
+                                        {record.email}
+                                    </td>
+
+                                    <td>
                                         {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(record.createdAt as string))}
                                     </td>
                                     <td className="w-[1%]">
@@ -136,7 +153,7 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({ load, page, totalP
                                                 <li>
                                                     <button
                                                         className="flex items-center gap-2 text-info"
-                                                        onClick={() => handleViewCategory(record)}
+                                                        onClick={() => handleViewSupplier(record)}
                                                     >
                                                         <View className="w-4 h-4" />
                                                         <span>Xem</span>
@@ -146,7 +163,7 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({ load, page, totalP
                                                     <button
                                                         className="flex items-center gap-2 text-warning"
                                                         onClick={() => {
-                                                            setCategoryToEdit(record);
+                                                            setSupplierToEdit(record);
                                                             setIsModalOpen(true);
                                                         }}
                                                     >
@@ -168,7 +185,7 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({ load, page, totalP
                                                             <li className="mt-1">
                                                                 <button
                                                                     className="btn btn-error btn-sm w-full"
-                                                                    onClick={() => executeDeleteCategory(record.id)}
+                                                                    onClick={() => executeDeleteSupplier(record.id)}
                                                                 >
                                                                     Xóa
                                                                 </button>
@@ -191,17 +208,17 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({ load, page, totalP
             {dataSource.length === 0 && <div className=''>Không có dữ liệu</div>}
             < Pagination page={page} totalPage={totalPage} setPage={setPage} />
 
-            <CategoryView
+            <SupplierView
                 isOpen={isViewModalOpen}
                 setIsOpen={setIsViewModalOpen}
-                category={selectedCategory}
+                supplier={selectedSupplier}
             />
 
-            <CategoryForm
+            < SupplierForm
                 isModalOpen={isModalOpen}
                 setIsModalOpen={setIsModalOpen}
                 load={load}
-                categoryToEdit={categoryToEdit}
+                supplierToEdit={supplierToEdit}
             />
         </>
     )

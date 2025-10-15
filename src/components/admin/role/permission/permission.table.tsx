@@ -1,5 +1,5 @@
-import { ChevronDown, ChevronUp, Edit, Trash, View } from "lucide-react";
-import React, { useState } from "react";
+import { Edit, Trash, View } from "lucide-react";
+import React from "react";
 import { showToast, ToastType } from "../../../../common/showToast";
 import { useAppDispatch, useAppSelector } from "../../../../redux/hook";
 import { deletePermission, ICreatePermission, resetDeletePermission } from "../../../../redux/slide/permission.slice";
@@ -41,31 +41,6 @@ export const PermissionTable: React.FC<PermissionTableProps> = ({ load, page, to
 
     const message = useAppSelector((state) => state.permission.message);
     const dispatch = useAppDispatch();
-
-    const [sortField, setSortField] = React.useState<keyof IPermission>('name');
-    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-
-    const handleSort = (field: keyof IPermission) => {
-        if (sortField === field) {
-            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-        } else {
-            setSortField(field);
-            setSortDirection('asc');
-        }
-    };
-
-    const sortedPermissions = [...dataSource].sort((a, b) => {
-        const aValue = a[sortField] ?? '';
-        const bValue = b[sortField] ?? '';
-        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-        return 0;
-    });
-
-    const SortIcon = ({ field }: { field: keyof IPermission }) => {
-        if (sortField !== field) return null;
-        return sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />;
-    };
 
     const handleViewPermission = (permission: IPermission) => {
         setSelectedPermission(permission);
@@ -135,41 +110,36 @@ export const PermissionTable: React.FC<PermissionTableProps> = ({ load, page, to
                             <th className='cursor-pointer hover:bg-base-200'>
                                 <span>STT</span>
                             </th>
-                            <th onClick={() => handleSort('name')} className='cursor-pointer hover:bg-base-200'>
+                            <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
                                     <span>Tên quyền hạn</span>
-                                    <SortIcon field='name' />
                                 </div>
                             </th>
-                            <th onClick={() => handleSort('domain')} className='cursor-pointer hover:bg-base-200'>
+                            <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
                                     <span>Tên domain</span>
-                                    <SortIcon field='domain' />
                                 </div>
                             </th>
-                            <th onClick={() => handleSort('apiPath')} className='cursor-pointer hover:bg-base-200'>
+                            <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
                                     <span>Đường dẫn API</span>
-                                    <SortIcon field='apiPath' />
                                 </div>
                             </th>
-                            <th onClick={() => handleSort('method')} className='cursor-pointer hover:bg-base-200'>
+                            <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
                                     <span>Phương thức</span>
-                                    <SortIcon field='method' />
                                 </div>
                             </th>
-                            <th onClick={() => handleSort('createdAt')} className='cursor-pointer hover:bg-base-200'>
+                            <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
                                     <span>Ngày tạo</span>
-                                    <SortIcon field='createdAt' />
                                 </div>
                             </th>
                             <th>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {sortedPermissions.map((record, index) => {
+                        {dataSource.map((record, index) => {
                             return (
                                 <tr key={record.id} className='hover:bg-base-300'>
                                     <td>
@@ -265,7 +235,7 @@ export const PermissionTable: React.FC<PermissionTableProps> = ({ load, page, to
                 </table>
 
             </div >
-            {sortedPermissions.length === 0 && <div className=''>Không có dữ liệu</div>}
+            {dataSource.length === 0 && <div className=''>Không có dữ liệu</div>}
             < Pagination page={page} totalPage={totalPage} setPage={setPage} />
 
             <PermissionView

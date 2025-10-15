@@ -1,13 +1,13 @@
-import { ChevronDown, ChevronUp, Edit, Trash, View } from 'lucide-react';
-import { IRole, IUser } from '../../../types/backend';
-import { UserView } from './user.view';
-import React, { useState } from 'react';
-import { deleteUser, resetDeleteUser } from '../../../redux/slide/user.slice';
-import { useAppDispatch, useAppSelector } from '../../../redux/hook';
+import { Edit, Trash, View } from 'lucide-react';
+import React from 'react';
 import { showToast, ToastType } from '../../../common/showToast';
+import { useAppDispatch, useAppSelector } from '../../../redux/hook';
+import { deleteUser, resetDeleteUser } from '../../../redux/slide/user.slice';
+import { IRole, IUser } from '../../../types/backend';
 import { Pagination } from '../../global/Pagination';
 import { UserForm } from './user.form';
 import { UserSearchAndFilter } from './user.search_filter';
+import { UserView } from './user.view';
 
 
 interface UserTableProps {
@@ -40,30 +40,6 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
     const message = useAppSelector((state) => state.user.message);
     const dispatch = useAppDispatch();
 
-    const [sortField, setSortField] = React.useState<keyof IUser>('username');
-    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-
-    const handleSort = (field: keyof IUser) => {
-        if (sortField === field) {
-            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-        } else {
-            setSortField(field);
-            setSortDirection('asc');
-        }
-    };
-
-    const sortedUsers = [...dataSource].sort((a, b) => {
-        const aValue = a[sortField] ?? '';
-        const bValue = b[sortField] ?? '';
-        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-        return 0;
-    });
-
-    const SortIcon = ({ field }: { field: keyof IUser }) => {
-        if (sortField !== field) return null;
-        return sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />;
-    };
 
     const handleViewUser = (user: IUser) => {
         setSelectedUser(user);
@@ -133,36 +109,32 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
                             <th className='cursor-pointer hover:bg-base-200'>
                                 <span>STT</span>
                             </th>
-                            <th onClick={() => handleSort('username')} className='cursor-pointer hover:bg-base-200'>
+                            <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
                                     <span>Tên đăng nhập</span>
-                                    <SortIcon field='username' />
                                 </div>
                             </th>
-                            <th onClick={() => handleSort('fullName')} className='cursor-pointer hover:bg-base-200'>
+                            <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
                                     <span>Họ và tên</span>
-                                    <SortIcon field='fullName' />
                                 </div>
                             </th>
 
-                            <th onClick={() => handleSort('role')} className='cursor-pointer hover:bg-base-200'>
+                            <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
                                     <span>Vai trò</span>
-                                    <SortIcon field='role' />
                                 </div>
                             </th>
-                            <th onClick={() => handleSort('createdAt')} className='cursor-pointer hover:bg-base-200'>
+                            <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
                                     <span>Ngày tạo</span>
-                                    <SortIcon field='createdAt' />
                                 </div>
                             </th>
                             <th>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {sortedUsers.map((record, index) => {
+                        {dataSource.map((record, index) => {
                             return (
                                 <tr key={record.id} className='hover:bg-base-300'>
                                     <td>
@@ -255,7 +227,7 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
                 </table>
 
             </div >
-            {sortedUsers.length === 0 && <div className=''>Không có dữ liệu</div>}
+            {dataSource.length === 0 && <div className=''>Không có dữ liệu</div>}
             <Pagination page={page} totalPage={totalPage} setPage={setPage} />
 
             <UserView

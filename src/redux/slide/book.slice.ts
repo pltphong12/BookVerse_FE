@@ -1,12 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { AxiosError } from 'axios'
 import { callCreateBookApi, callDeleteBookApi, callUpdateBookApi } from '../../services/api'
-import { IAuthorInBook, IBackendRes, IBook, ICategoryInBook, IPublisher } from '../../types/backend'
+import { IAuthorInBook, IBackendRes, IBook, ICategoryInBook, IPublisher, ISupplier } from '../../types/backend'
 
 export interface ICreateBook {
     id: number
     title: string
     publisher: IPublisher
+    supplier: ISupplier
     authors: IAuthorInBook[]
     category: ICategoryInBook
     price: number
@@ -46,7 +47,7 @@ export const createBook = createAsyncThunk(
     'book/create',
     async (payload: ICreateBook) => {
         try {
-            const response = await callCreateBookApi(payload.title, payload.publisher, payload.authors, payload.category, payload.price, payload.discount, payload.quantity, payload.publishYear, payload.weight, payload.dimensions, payload.numberOfPages, payload.coverFormat, payload.isbn, payload.image, payload.description)
+            const response = await callCreateBookApi(payload.title, payload.publisher, payload.supplier, payload.authors, payload.category, payload.price, payload.discount, payload.quantity, payload.publishYear, payload.weight, payload.dimensions, payload.numberOfPages, payload.coverFormat, payload.image, payload.description)
             return response.data as IBackendRes<IBook>
         } catch (error) {
             if (error instanceof AxiosError) {
@@ -74,7 +75,7 @@ export const updateBook = createAsyncThunk(
     'book/update',
     async (payload: { id: number, data: ICreateBook }) => {
         try {
-            const response = await callUpdateBookApi(payload.id, payload.data.title, payload.data.publisher, payload.data.authors, payload.data.category, payload.data.price, payload.data.discount, payload.data.quantity, payload.data.publishYear, payload.data.weight, payload.data.dimensions, payload.data.numberOfPages, payload.data.coverFormat, payload.data.isbn, payload.data.image, payload.data.description)
+            const response = await callUpdateBookApi(payload.id, payload.data.title, payload.data.publisher, payload.data.supplier, payload.data.authors, payload.data.category, payload.data.price, payload.data.discount, payload.data.quantity, payload.data.publishYear, payload.data.weight, payload.data.dimensions, payload.data.numberOfPages, payload.data.coverFormat, payload.data.image, payload.data.description)
             return response.data as IBackendRes<IBook>
         } catch (error) {
             if (error instanceof AxiosError) {

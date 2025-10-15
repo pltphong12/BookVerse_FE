@@ -10,19 +10,21 @@ interface PermissionSelectorProps {
     isDomainPartiallySelected: (domain: string) => boolean;
 }
 
-// Helper function to get method color
-const getMethodColor = (method: string) => {
+// Helper function to get method badge class for DaisyUI
+const getMethodBadgeClass = (method: string) => {
     switch (method.toUpperCase()) {
         case 'GET':
-            return 'bg-blue-100 text-blue-800 border-blue-200';
+            return 'badge-info';
         case 'POST':
-            return 'bg-green-100 text-green-800 border-green-200';
+            return 'badge-success';
         case 'PUT':
-            return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+            return 'badge-warning';
         case 'DELETE':
-            return 'bg-red-100 text-red-800 border-red-200';
+            return 'badge-error';
+        case 'PATCH':
+            return 'badge-secondary';
         default:
-            return 'bg-gray-100 text-gray-800 border-gray-200';
+            return 'badge-neutral';
     }
 };
 
@@ -47,80 +49,89 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({
         return expandedDomains[domain] !== false; // Default to expanded
     };
     return (
-        <div className="max-h-96 overflow-y-auto border border-base-300 rounded-lg p-4">
-            {Object.keys(permissionsByDomain).length === 0 ? (
-                <div className="text-center text-gray-500 py-4">
-                    Đang tải danh sách quyền hạn...
-                </div>
-            ) : (
-                Object.entries(permissionsByDomain).map(([domain, permissions]) => (
-                    <div key={domain} className="mb-6">
-                        {/* Domain Header */}
-                        <div className="flex items-center gap-2 mb-3">
-                            <input
-                                type="checkbox"
-                                className="checkbox checkbox-primary"
-                                checked={isDomainFullySelected(domain)}
-                                ref={(el) => {
-                                    if (el) {
-                                        el.indeterminate = isDomainPartiallySelected(domain);
-                                    }
-                                }}
-                                onChange={() => onDomainToggle(domain)}
-                            />
-                            <button
-                                type="button"
-                                onClick={() => toggleDomainExpansion(domain)}
-                                className="flex items-center gap-2 hover:bg-base-100 p-1 rounded transition-colors"
-                            >
-                                <svg
-                                    className={`w-4 h-4 transition-transform ${isDomainExpanded(domain) ? 'rotate-90' : ''}`}
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
-                                <span className="font-semibold text-base-content text-lg">
-                                    {domain}
-                                </span>
-                                <span className="text-sm text-base-content/70">
-                                    ({permissions.length} quyền)
-                                </span>
-                            </button>
+        <div className="card bg-base-100 shadow-sm border border-base-300">
+            <div className="card-body p-4">
+                <div className="max-h-96 overflow-y-auto">
+                    {Object.keys(permissionsByDomain).length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-8">
+                            <div className="loading loading-spinner loading-lg text-primary"></div>
+                            <p className="text-base-content/60 mt-2">Đang tải danh sách quyền hạn...</p>
                         </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {Object.entries(permissionsByDomain).map(([domain, permissions]) => (
+                                <div key={domain} className="collapse collapse-arrow bg-base-200">
+                                    <input
+                                        type="checkbox"
+                                        checked={isDomainExpanded(domain)}
+                                        onChange={() => toggleDomainExpansion(domain)}
+                                    />
+                                    <div className="collapse-title text-lg font-medium flex items-center gap-3">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox checkbox-primary checkbox-sm"
+                                            checked={isDomainFullySelected(domain)}
+                                            ref={(el) => {
+                                                if (el) {
+                                                    el.indeterminate = isDomainPartiallySelected(domain);
+                                                }
+                                            }}
+                                            onChange={(e) => {
+                                                e.stopPropagation();
+                                                onDomainToggle(domain);
+                                            }}
+                                        />
+                                        <span className="text-base-content font-semibold">
+                                            {domain}
+                                        </span>
+                                        <span className="badge badge-neutral badge-sm">
+                                            {permissions.length} quyền
+                                        </span>
+                                    </div>
 
-                        {/* Permissions Grid - 4 columns */}
-                        {isDomainExpanded(domain) && (
-                            <div className="ml-6 grid grid-cols-4 gap-3">
-                                {permissions.map((permission) => (
-                                    <div key={permission.id} className="flex flex-col gap-2 p-3 border border-base-200 rounded-lg hover:bg-base-50 transition-colors">
-                                        <div className="flex items-center gap-2">
-                                            <input
-                                                type="checkbox"
-                                                className="checkbox checkbox-sm"
-                                                checked={isPermissionSelected(permission.id)}
-                                                onChange={() => onPermissionToggle(permission)}
-                                            />
-                                            <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getMethodColor(permission.method)}`}>
-                                                {permission.method}
-                                            </div>
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="text-sm font-medium text-base-content mb-1 line-clamp-2">
-                                                {permission.name}
-                                            </div>
-                                            <div className="text-xs text-base-content/60 truncate">
-                                                {permission.apiPath}
-                                            </div>
+                                    <div className="collapse-content">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-4">
+                                            {permissions.map((permission) => (
+                                                <div
+                                                    key={permission.id}
+                                                    className={`card bg-base-100 border-2 transition-all duration-200 hover:shadow-md ${isPermissionSelected(permission.id)
+                                                        ? 'border-primary shadow-md'
+                                                        : 'border-base-200'
+                                                        }`}
+                                                >
+                                                    <div className="card-body p-3">
+                                                        <div className="flex items-start gap-3">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="checkbox checkbox-primary checkbox-sm mt-1"
+                                                                checked={isPermissionSelected(permission.id)}
+                                                                onChange={() => onPermissionToggle(permission)}
+                                                            />
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="flex items-center gap-2 mb-2">
+                                                                    <div className={`badge badge-sm ${getMethodBadgeClass(permission.method)}`}>
+                                                                        {permission.method}
+                                                                    </div>
+                                                                </div>
+                                                                <h4 className="font-medium text-base-content text-sm mb-1 line-clamp-2">
+                                                                    {permission.name}
+                                                                </h4>
+                                                                <p className="text-xs text-base-content/60 truncate font-mono">
+                                                                    {permission.apiPath}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                ))
-            )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
         </div>
     );
 };

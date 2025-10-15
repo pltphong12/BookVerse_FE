@@ -1,5 +1,5 @@
-import { ChevronDown, ChevronUp, Edit, Trash, View } from "lucide-react";
-import React, { useState } from "react";
+import { Edit, Trash, View } from "lucide-react";
+import React from "react";
 import { showToast, ToastType } from "../../../common/showToast";
 import { useAppDispatch, useAppSelector } from "../../../redux/hook";
 import { deletePublisher, ICreatePublisher, resetDeletePublisher } from "../../../redux/slide/publisher.slice";
@@ -36,31 +36,6 @@ export const PublisherTable: React.FC<PublisherTableProps> = ({ load, page, tota
 
     const message = useAppSelector((state) => state.publisher.message);
     const dispatch = useAppDispatch();
-
-    const [sortField, setSortField] = React.useState<keyof IPublisher>('name');
-    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-
-    const handleSort = (field: keyof IPublisher) => {
-        if (sortField === field) {
-            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-        } else {
-            setSortField(field);
-            setSortDirection('asc');
-        }
-    };
-
-    const sortedPublishers = [...dataSource].sort((a, b) => {
-        const aValue = a[sortField] ?? '';
-        const bValue = b[sortField] ?? '';
-        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-        return 0;
-    });
-
-    const SortIcon = ({ field }: { field: keyof IPublisher }) => {
-        if (sortField !== field) return null;
-        return sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />;
-    };
 
     const handleViewPublisher = (publisher: IPublisher) => {
         setSelectedPublisher(publisher);
@@ -115,35 +90,31 @@ export const PublisherTable: React.FC<PublisherTableProps> = ({ load, page, tota
                             <th className='cursor-pointer hover:bg-base-200'>
                                 <span>STT</span>
                             </th>
-                            <th onClick={() => handleSort('name')} className='cursor-pointer hover:bg-base-200'>
+                            <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
                                     <span>Tên nhà xuất bản</span>
-                                    <SortIcon field='name' />
                                 </div>
                             </th>
-                            <th onClick={() => handleSort('address')} className='cursor-pointer hover:bg-base-200'>
+                            <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
                                     <span>Địa chỉ</span>
-                                    <SortIcon field='address' />
                                 </div>
                             </th>
-                            <th onClick={() => handleSort('email')} className='cursor-pointer hover:bg-base-200'>
+                            <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
                                     <span>Email</span>
-                                    <SortIcon field='email' />
                                 </div>
                             </th>
-                            <th onClick={() => handleSort('createdAt')} className='cursor-pointer hover:bg-base-200'>
+                            <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
                                     <span>Ngày tạo</span>
-                                    <SortIcon field='createdAt' />
                                 </div>
                             </th>
                             <th>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {sortedPublishers.map((record, index) => {
+                        {dataSource.map((record, index) => {
                             return (
                                 <tr key={record.id} className='hover:bg-base-300'>
                                     <td>
@@ -234,7 +205,7 @@ export const PublisherTable: React.FC<PublisherTableProps> = ({ load, page, tota
                 </table>
 
             </div >
-            {sortedPublishers.length === 0 && <div className=''>Không có dữ liệu</div>}
+            {dataSource.length === 0 && <div className=''>Không có dữ liệu</div>}
             < Pagination page={page} totalPage={totalPage} setPage={setPage} />
 
             <PublisherView

@@ -1,14 +1,14 @@
-import React, { useState } from "react";
-import { IAuthorInBook, IBook, ICategoryInBook, IPublisher } from "../../../types/backend";
-import { Pagination } from "../../global/Pagination";
-import { ChevronDown, ChevronUp, Edit, Trash, View } from "lucide-react";
+import { Edit, Trash, View } from "lucide-react";
+import React from "react";
+import { formatPrice } from "../../../common/formatPrice";
 import { showToast, ToastType } from "../../../common/showToast";
 import { useAppDispatch, useAppSelector } from "../../../redux/hook";
 import { deleteBook, ICreateBook, resetDeleteBook } from "../../../redux/slide/book.slice";
+import { IAuthorInBook, IBook, ICategoryInBook, IPublisher, ISupplier } from "../../../types/backend";
+import { Pagination } from "../../global/Pagination";
 import { BookForm } from "./book.form";
 import { BookSearchAndFilter } from "./book.search_filter";
 import { BookView } from "./book.view";
-import { formatPrice } from "../../../common/formatPrice";
 
 interface BookTableProps {
     load: () => Promise<void>;
@@ -19,6 +19,7 @@ interface BookTableProps {
     search: string;
     setSearch: React.Dispatch<React.SetStateAction<string>>;
     publishers: IPublisher[];
+    suppliers: ISupplier[];
     authors: IAuthorInBook[];
     categories: ICategoryInBook[];
     publisherId: number;
@@ -32,7 +33,7 @@ interface BookTableProps {
 }
 
 export const BookTable: React.FC<BookTableProps> = (props) => {
-    const { dataSource, load, page, totalPage, setPage, search, setSearch, publishers, authors, categories, dateFrom, setDateFrom, publisherId, setPublisherId, authorId, setAuthorId, categoryId, setCategoryId } = props;
+    const { dataSource, load, page, totalPage, setPage, search, setSearch, publishers, suppliers,authors, categories, dateFrom, setDateFrom, publisherId, setPublisherId, authorId, setAuthorId, categoryId, setCategoryId } = props;
 
     const [isViewModalOpen, setIsViewModalOpen] = React.useState<boolean>(false);
     const [selectedBook, setSelectedBook] = React.useState<IBook | null>(null);
@@ -47,31 +48,6 @@ export const BookTable: React.FC<BookTableProps> = (props) => {
 
     const message = useAppSelector((state) => state.book.message);
     const dispatch = useAppDispatch();
-
-    const [sortField, setSortField] = React.useState<keyof IBook>('title');
-    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-
-    const handleSort = (field: keyof IBook) => {
-        if (sortField === field) {
-            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-        } else {
-            setSortField(field);
-            setSortDirection('asc');
-        }
-    };
-
-    const sortedBooks = [...dataSource].sort((a, b) => {
-        const aValue = a[sortField] ?? '';
-        const bValue = b[sortField] ?? '';
-        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-        return 0;
-    });
-
-    const SortIcon = ({ field }: { field: keyof IBook }) => {
-        if (sortField !== field) return null;
-        return sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />;
-    };
 
     const handleViewBook = (book: IBook) => {
         setSelectedBook(book);
@@ -137,16 +113,19 @@ export const BookTable: React.FC<BookTableProps> = (props) => {
                             <th className='cursor-pointer hover:bg-base-200'>
                                 <span>STT</span>
                             </th>
-                            <th onClick={() => handleSort('title')} className='cursor-pointer hover:bg-base-200'>
+                            <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
                                     <span>Tên sách</span>
-                                    <SortIcon field='title' />
                                 </div>
                             </th>
-                            <th onClick={() => handleSort('publisher')} className='cursor-pointer hover:bg-base-200'>
+                            <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
                                     <span>Nhà xuất bản</span>
-                                    <SortIcon field='publisher' />
+                                </div>
+                            </th>
+                            <th className='cursor-pointer hover:bg-base-200'>
+                                <div className='flex items-center gap-1'>
+                                    <span>Nhà cung cấp</span>
                                 </div>
                             </th>
                             <th className='cursor-pointer hover:bg-base-200'>
@@ -159,17 +138,16 @@ export const BookTable: React.FC<BookTableProps> = (props) => {
                                     <span>Giá</span>
                                 </div>
                             </th>
-                            <th onClick={() => handleSort('createdAt')} className='cursor-pointer hover:bg-base-200'>
+                            <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
                                     <span>Ngày tạo</span>
-                                    <SortIcon field='createdAt' />
                                 </div>
                             </th>
                             <th>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {sortedBooks.map((record, index) => {
+                        {dataSource.map((record, index) => {
                             return (
                                 <tr key={record.id} className='hover:bg-base-300'>
                                     <td>
@@ -187,7 +165,9 @@ export const BookTable: React.FC<BookTableProps> = (props) => {
                                     <td>
                                         {record.publisher.name}
                                     </td>
-
+                                    <td>
+                                        {record.supplier?.name || ''}
+                                    </td>
                                     <td>
                                         {record.category.name}
                                     </td>
@@ -221,7 +201,7 @@ export const BookTable: React.FC<BookTableProps> = (props) => {
                                                     <button
                                                         className="flex items-center gap-2 text-warning"
                                                         onClick={() => {
-                                                            setBookToEdit(record);
+                                                            setBookToEdit(record as any);
                                                             setIsModalOpen(true);
                                                         }}
                                                     >
@@ -263,7 +243,7 @@ export const BookTable: React.FC<BookTableProps> = (props) => {
                 </table>
 
             </div >
-            {sortedBooks.length === 0 && <div className=''>Không có dữ liệu</div>}
+            {dataSource.length === 0 && <div className=''>Không có dữ liệu</div>}
             < Pagination page={page} totalPage={totalPage} setPage={setPage} />
 
             <BookView
@@ -278,6 +258,7 @@ export const BookTable: React.FC<BookTableProps> = (props) => {
                 load={load}
                 bookToEdit={bookToEdit}
                 publishers={publishers}
+                suppliers={suppliers}
                 authors={authors}
                 categories={categories}
             />

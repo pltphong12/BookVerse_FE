@@ -1,4 +1,4 @@
-import { ILoginRes, IAuthor, IAuthorInBook, IBackendRes, IBook, ICategory, ICategoryInBook, IFile, IPagination, IPermission, IPublisher, IRole, IUser } from "../types/backend";
+import { ILoginRes, IAuthor, IAuthorInBook, IBackendRes, IBook, ICategory, ICategoryInBook, IFile, IPagination, IPermission, IPublisher, IRole, IUser, ISupplier } from "../types/backend";
 import axiosInstance from "./axios-customize";
 
 
@@ -203,6 +203,7 @@ export const callFetchAllBooksWithPaginationApi = (title: string, publisherId: n
 export const callCreateBookApi = (
   title: string, 
   publisher: IPublisher, 
+  supplier: ISupplier,
   authors: IAuthorInBook[], 
   category: ICategoryInBook, 
   price: number, 
@@ -213,7 +214,6 @@ export const callCreateBookApi = (
   dimensions: string,
   numberOfPages: number,
   coverFormat: string,
-  isbn: string,
   image: string, 
   description: string) => {
     const url = "/api/v1/books";
@@ -221,6 +221,7 @@ export const callCreateBookApi = (
     const data = {
       title: title,
       publisher: publisher,
+      supplier: supplier,
       authors: authors,
       category: category,
       price: price,
@@ -231,7 +232,6 @@ export const callCreateBookApi = (
       dimensions: dimensions,
       numberOfPages: numberOfPages,
       coverFormat: coverFormat,
-      isbn: isbn,
       image: image,
       description: description
     };
@@ -243,6 +243,7 @@ export const callUpdateBookApi = (
   id: number,
   title: string, 
   publisher: IPublisher, 
+  supplier: ISupplier,
   authors: IAuthorInBook[], 
   category: ICategoryInBook, 
   price: number,
@@ -253,7 +254,6 @@ export const callUpdateBookApi = (
   dimensions: string,
   numberOfPages: number,
   coverFormat: string,
-  isbn: string,
   image: string, 
   description: string
 ) => {
@@ -263,6 +263,7 @@ export const callUpdateBookApi = (
     id: id,
     title: title,
     publisher: publisher,
+    supplier: supplier,
     authors: authors,
     category: category,
     price: price,
@@ -273,7 +274,6 @@ export const callUpdateBookApi = (
     dimensions: dimensions,
     numberOfPages: numberOfPages,
     coverFormat: coverFormat,
-    isbn: isbn,
     image: image,
     description: description
   };
@@ -415,6 +415,58 @@ export const callUpdatePublisherApi = (id: number, name: string, address: string
 export const callDeletePublisherApi = (id: number) => {
   const url = `api/v1/publishers/${id}`
   return axiosInstance.delete<IBackendRes<IPublisher>>(url)
+}
+
+/**
+ *
+ Module Suppliers 
+ */
+
+export const callFetchAllSuppliersWithPaginationAndFilterApi = (name: string, dateFrom: string, page: number, size: number) => {
+  const url = `api/v1/suppliers/search?name=${name}&dateFrom=${dateFrom}&page=${page}&size=${size}`
+  return axiosInstance.get<IBackendRes<IPagination<ISupplier>>>(url)
+}
+
+export const callCreateSupplierApi = (name: string, address: string, phone: string, email: string, description: string, image: string) => {
+  const url = 'api/v1/suppliers'
+  const data = {
+    name: name,
+    address: address,
+    phone: phone,
+    email: email,
+    description: description,
+    image: image
+  }
+  return axiosInstance.post<IBackendRes<ISupplier>>(url, data)
+}
+
+export const callUpdateSupplierApi = (id: number, name: string, address: string, phone: string, email: string, description: string, image: string) => {
+  const url = 'api/v1/suppliers'
+  const data = {
+    id: id,
+    name: name,
+    address: address,
+    phone: phone,
+    email: email,
+    description: description,
+    image: image
+  }
+  return axiosInstance.put<IBackendRes<ISupplier>>(url, data)
+}
+
+export const callDeleteSupplierApi = (id: number) => {
+  const url = `api/v1/suppliers/${id}`
+  return axiosInstance.delete<IBackendRes<ISupplier>>(url)
+}
+
+export const callFetchAllSuppliersApi = () => {
+  const url = 'api/v1/suppliers'
+  return axiosInstance.get<IBackendRes<ISupplier[]>>(url)
+}
+
+export const callFetchSupplierByIdApi = (id: number) => {
+  const url = `api/v1/suppliers/${id}`
+  return axiosInstance.get<IBackendRes<ISupplier>>(url)
 }
 
 /**

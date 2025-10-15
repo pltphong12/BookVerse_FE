@@ -14,14 +14,15 @@ import { Home } from './pages/client/home';
 import { LayoutClient } from './pages/client/layout.client';
 import NotFound from './pages/error/NotFound';
 import { PrivateRoute } from './services/route-private';
+import { SupplierPage } from './pages/admin/supplier.admin';
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: 
-    <App>
-      <LayoutClient />
-    </App>,
+    element:
+      <App>
+        <LayoutClient />
+      </App>,
     errorElement: <NotFound />,
     children: [
       {
@@ -71,6 +72,10 @@ export const router = createBrowserRouter([
       {
         path: "/admin/roles",
         element: <RolePage />
+      },
+      {
+        path: "/admin/suppliers",
+        element: <SupplierPage />
       }
     ]
   },

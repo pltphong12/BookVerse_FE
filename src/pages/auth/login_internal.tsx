@@ -76,7 +76,7 @@ export const InternalLoginPage = () => {
                                 width: 'auto',
                                 height: 'auto',
                                 objectFit: 'contain',
-                                filter: 'brightness(0) saturate(100%) invert(20%) sepia(60%) saturate(500%) hue-rotate(180deg)',
+                                filter: 'brightness(0) saturate(100%) invert(39%) sepia(57%) saturate(2000%) hue-rotate(200deg) brightness(96%) contrast(94%)',
                             }}
                         />
                     </div>
@@ -91,6 +91,7 @@ export const InternalLoginPage = () => {
                                     <input
                                         type="text"
                                         {...register('username')}
+                                        placeholder="Nhập tên đăng nhập"
                                         className={`input input-bordered w-full ${errors.username ? 'input-error' : ''}`}
                                     />
                                     {errors.username && (
@@ -106,6 +107,7 @@ export const InternalLoginPage = () => {
                                     <input
                                         type="password"
                                         {...register('password')}
+                                        placeholder="Nhập mật khẩu"
                                         className={`input input-bordered w-full ${errors.password ? 'input-error' : ''}`}
                                     />
                                     {errors.password && (

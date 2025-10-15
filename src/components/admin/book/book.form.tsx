@@ -6,7 +6,7 @@ import { z } from "zod";
 import { showToast, ToastType } from "../../../common/showToast";
 import { useAppDispatch, useAppSelector } from "../../../redux/hook";
 import { createBook, ICreateBook, resetCreateBook, resetUpdateBook, updateBook } from "../../../redux/slide/book.slice";
-import { IAuthorInBook, ICategoryInBook, IPublisher } from "../../../types/backend";
+import { IAuthorInBook, ICategoryInBook, IPublisher, ISupplier } from "../../../types/backend";
 import { callUploadSingleFile } from "../../../services/api";
 
 interface BookFormProps {
@@ -15,6 +15,7 @@ interface BookFormProps {
     setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
     bookToEdit?: ICreateBook | undefined;
     publishers: IPublisher[];
+    suppliers: ISupplier[];
     authors: IAuthorInBook[];
     categories: ICategoryInBook[];
 }
@@ -24,6 +25,9 @@ const createBookSchema = z.object({
         .min(2, 'Tên sách ít nhất 2 kí tự')
         .max(200, 'Tên sách tối đa 200 kí tự'),
     publisher: z.object({
+        id: z.number()
+    }),
+    supplier: z.object({
         id: z.number()
     }),
     authors: z.array(z.object({
@@ -68,7 +72,7 @@ const createBookSchema = z.object({
 
 type CreateBookFormData = z.infer<typeof createBookSchema>;
 
-export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen, load, bookToEdit, publishers, authors, categories }) => {
+export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen, load, bookToEdit, publishers, authors, categories, suppliers }) => {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [previewUrl, setPreviewUrl] = useState<string>('');
     const dispatch = useAppDispatch();
@@ -90,6 +94,7 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
         defaultValues: {
             title: '',
             publisher: { id: 0 },
+            supplier: { id: 0 },
             authors: [],
             category: { id: 0 },
             price: 0,
@@ -109,6 +114,7 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
         if (bookToEdit) {
             setValue('title', bookToEdit.title);
             setValue('publisher', bookToEdit.publisher);
+            setValue('supplier', bookToEdit.supplier);
             setValue('authors', bookToEdit.authors.map(author => ({ id: author.id })));
             setValue('category.id', bookToEdit.category.id);
             setValue('price', bookToEdit.price);
@@ -119,12 +125,13 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
             setValue('weight', bookToEdit.weight);
             setValue('dimensions', bookToEdit.dimensions);
             setValue('numberOfPages', bookToEdit.numberOfPages);
-            setValue('coverFormat', bookToEdit.coverFormat as "PAPERBACK" | "HARDCOVER");
+            setValue('coverFormat', bookToEdit.coverFormat === "Bìa mềm" ? "PAPERBACK" : "HARDCOVER");
             setPreviewUrl(`${import.meta.env.VITE_BACKEND_URL}/storage/book/${bookToEdit.image}`);
         } else {
             reset({
                 title: '',
                 publisher: { id: 0 },
+                supplier: { id: 0 },
                 authors: [],
                 category: { id: 0 },
                 price: 0,
@@ -146,6 +153,7 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
         reset({
             title: '',
             publisher: { id: 0 },
+            supplier: { id: 0 },
             authors: [],
             category: { id: 0 },
             price: 0,
@@ -295,6 +303,41 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
                         {errors.publisher && (
                             <label className="label">
                                 <span className="label-text-alt text-error">{errors.publisher.message}</span>
+                            </label>
+                        )}
+                    </div>
+
+                    <div className="form-control mt-4">
+                        <label className="label">
+                            <span className="label-text">Nhà cung cấp</span>
+                        </label>
+                        <Controller
+                            name="supplier.id"
+                            control={control}
+                            render={({ field }) => (
+                                <Select
+                                    {...field}
+                                    options={suppliers.map(supplier => ({
+                                        value: supplier.id,
+                                        label: supplier.name
+                                    }))}
+                                    value={suppliers
+                                        .filter(supplier => supplier.id === field.value)
+                                        .map(supplier => ({
+                                            value: supplier.id,
+                                            label: supplier.name
+                                        }))[0]}
+                                    onChange={(selected) => {
+                                        field.onChange(selected?.value || 0);
+                                    }}
+                                    className={`${errors.supplier ? 'border-error' : ''}`}
+                                    placeholder="Chọn nhà cung cấp"
+                                />
+                            )}
+                        />
+                        {errors.supplier && (
+                            <label className="label">
+                                <span className="label-text-alt text-error">{errors.supplier.message}</span>
                             </label>
                         )}
                     </div>

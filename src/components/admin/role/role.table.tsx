@@ -1,13 +1,12 @@
-import React, { useState } from "react";
-import { IRole } from "../../../types/backend";
-import { useAppDispatch, useAppSelector } from "../../../redux/hook";
-import { ChevronDown, ChevronUp, Edit, Trash, View } from "lucide-react";
+import { Edit, Trash } from "lucide-react";
+import React from "react";
 import { showToast, ToastType } from "../../../common/showToast";
-import { Pagination } from "../../global/Pagination";
-import { RoleSearchAndFilter } from "./role.search_filter";
+import { useAppDispatch, useAppSelector } from "../../../redux/hook";
 import { deleteRole, ICreateRole, resetDeleteRole } from "../../../redux/slide/role.slide";
-import { RoleView } from "./role.view";
+import { IRole } from "../../../types/backend";
+import { Pagination } from "../../global/Pagination";
 import { RoleForm } from "./role.form";
+import { RoleSearchAndFilter } from "./role.search_filter";
 
 interface RoleTableProps {
     load: () => Promise<void>;
@@ -36,30 +35,6 @@ export const RoleTable: React.FC<RoleTableProps> = ({ load, page, totalPage, set
     const message = useAppSelector((state) => state.role.message);
     const dispatch = useAppDispatch();
 
-    const [sortField, setSortField] = React.useState<keyof IRole>('name');
-    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-
-    const handleSort = (field: keyof IRole) => {
-        if (sortField === field) {
-            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-        } else {
-            setSortField(field);
-            setSortDirection('asc');
-        }
-    };
-
-    const sortedRoles = [...dataSource].sort((a, b) => {
-        const aValue = a[sortField] ?? '';
-        const bValue = b[sortField] ?? '';
-        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-        return 0;
-    });
-
-    const SortIcon = ({ field }: { field: keyof IRole }) => {
-        if (sortField !== field) return null;
-        return sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />;
-    };
 
     const handleViewRole = (role: IRole) => {
         setSelectedRole(role);
@@ -125,24 +100,22 @@ export const RoleTable: React.FC<RoleTableProps> = ({ load, page, totalPage, set
                             <th className='cursor-pointer hover:bg-base-200'>
                                 <span>STT</span>
                             </th>
-                            <th onClick={() => handleSort('name')} className='cursor-pointer hover:bg-base-200'>
+                            <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
                                     <span>Tên vai trò</span>
-                                    <SortIcon field='name' />
                                 </div>
                             </th>
 
-                            <th onClick={() => handleSort('createdAt')} className='cursor-pointer hover:bg-base-200'>
+                            <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
                                     <span>Ngày tạo</span>
-                                    <SortIcon field='createdAt' />
                                 </div>
                             </th>
                             <th>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {sortedRoles.map((record, index) => {
+                        {dataSource.map((record, index) => {
                             return (
                                 <tr key={record.id} className='hover:bg-base-300'>
                                     <td>
@@ -226,7 +199,7 @@ export const RoleTable: React.FC<RoleTableProps> = ({ load, page, totalPage, set
                 </table>
 
             </div >
-            {sortedRoles.length === 0 && <div className=''>Không có dữ liệu</div>}
+            {dataSource.length === 0 && <div className=''>Không có dữ liệu</div>}
             < Pagination page={page} totalPage={totalPage} setPage={setPage} />
 
             {/* <RoleView

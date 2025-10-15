@@ -88,6 +88,7 @@ export interface IBook {
     id: number;
     title: string;
     publisher: IPublisher;
+    supplier: ISupplier;
     price: number;
     quantity: number;
     sold: number;
@@ -133,6 +134,20 @@ export interface IAuthor {
 }
 
 export interface IPublisher {
+    id: number;
+    name: string;
+    address: string
+    phone: string
+    email: string
+    description: string
+    image: string
+    createdAt?: string;
+    updatedAt?: string;
+    createdBy?: string;
+    updatedBy?: string;
+}
+
+export interface ISupplier {
     id: number;
     name: string;
     address: string

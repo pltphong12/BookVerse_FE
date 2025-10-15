@@ -3,8 +3,8 @@ import { BookTable } from "../../components/admin/book/book.table"
 import { useAppDispatch } from "../../redux/hook";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { clearBreadcrumbs, setBreadcrumbs } from "../../redux/slide/breadcrumbs.slice";
-import { callFetchAllAuthorsApi, callFetchAllBooksWithPaginationApi, callFetchAllCategoriesApi, callFetchAllPublishersApi } from "../../services/api";
-import { IAuthorInBook, IBook, ICategoryInBook, IPublisher } from "../../types/backend";
+import { callFetchAllAuthorsApi, callFetchAllBooksWithPaginationApi, callFetchAllCategoriesApi, callFetchAllPublishersApi, callFetchAllSuppliersApi } from "../../services/api";
+import { IAuthorInBook, IBook, ICategoryInBook, IPublisher, ISupplier } from "../../types/backend";
 
 export const BookPage = () => {
     const size = 10;
@@ -19,6 +19,7 @@ export const BookPage = () => {
     const [search, setSearch] = React.useState<string>("");
     // Fetching to render at dropdown
     const [publishers, setPublishers] = React.useState<IPublisher[]>([])
+    const [suppliers, setSuppliers] = React.useState<ISupplier[]>([])
     const [authors, setAuthors] = React.useState<IAuthorInBook[]>([])
     const [categories, setCategories] = React.useState<ICategoryInBook[]>([])
     // Id to attach in url to filter
@@ -61,6 +62,14 @@ export const BookPage = () => {
         retry: false
     })
 
+    // Fetch all suppliers with pagination and filter
+    const { data: suppliersQuery } = useQuery({
+        queryKey: ['fetchAllSuppliers'],
+        queryFn: callFetchAllSuppliersApi,
+        refetchOnWindowFocus: false,
+        retry: false
+    })
+
     React.useEffect(() => {
         if (booksQuery?.data.data) {
             setDataSource(booksQuery.data.data.result);
@@ -75,7 +84,10 @@ export const BookPage = () => {
         if (publishersQuery?.data.data) {
             setPublishers(publishersQuery.data.data)
         }
-    }, [booksQuery, authorsQuery, categoriesQuery, publishersQuery]);
+        if (suppliersQuery?.data.data) {
+            setSuppliers(suppliersQuery.data.data)
+        }
+    }, [booksQuery, authorsQuery, categoriesQuery, publishersQuery, suppliersQuery]);
 
     React.useEffect(() => {
         dispatch(clearBreadcrumbs())
@@ -108,6 +120,7 @@ export const BookPage = () => {
                         search={search}
                         setSearch={setSearch}
                         publishers={publishers}
+                        suppliers={suppliers}
                         authors={authors}
                         categories={categories}
                         publisherId={publisherId}

@@ -1,4 +1,4 @@
-import { Book, KeyRound, LayoutDashboard, Library, TagsIcon, User, UserCog, UserPen } from 'lucide-react';
+import { Book, Building2, KeyRound, LayoutDashboard, Library, Shield, TagsIcon, User, UserPen } from 'lucide-react';
 import { Link, NavLink } from 'react-router-dom';
 import Logo from '../../../assets/main_logo.png';
 export const LeftSidebar = () => {
@@ -49,7 +49,7 @@ export const LeftSidebar = () => {
                     <NavLink
                         to={"/admin/roles"}
                         className="mb-2 flex items-center gap-2" >
-                        <UserCog />
+                        <Shield />
                         Vai trò
                     </NavLink>
                     <NavLink
@@ -67,12 +67,7 @@ export const LeftSidebar = () => {
                     <span>Content</span>
                 </li>
                 <li className="">
-                    <NavLink
-                        to={"/admin/authors"}
-                        className="mb-2 flex items-center gap-2" >
-                        <UserPen />
-                        Tác giả
-                    </NavLink>
+
                     <NavLink
                         to={"/admin/books"}
                         className="mb-2 flex items-center gap-2" >
@@ -80,10 +75,10 @@ export const LeftSidebar = () => {
                         Sách
                     </NavLink>
                     <NavLink
-                        to={"/admin/categories"}
+                        to={"/admin/authors"}
                         className="mb-2 flex items-center gap-2" >
-                        <TagsIcon />
-                        Thể loại
+                        <UserPen />
+                        Tác giả
                     </NavLink>
                     <NavLink
                         to={"/admin/publishers"}
@@ -91,6 +86,19 @@ export const LeftSidebar = () => {
                         <Library />
                         Nhà xuất bản
                     </NavLink>
+                    <NavLink
+                        to={"/admin/suppliers"}
+                        className="mb-2 flex items-center gap-2" >
+                        <Building2 />
+                        Nhà cung cấp
+                    </NavLink>
+                    <NavLink
+                        to={"/admin/categories"}
+                        className="mb-2 flex items-center gap-2" >
+                        <TagsIcon />
+                        Thể loại
+                    </NavLink>
+
                 </li>
             </ul>
         </div>

@@ -1,5 +1,5 @@
-import { ChevronDown, ChevronUp, Edit, Trash, View } from "lucide-react";
-import React, { useState } from "react";
+import { Edit, Trash, View } from "lucide-react";
+import React from "react";
 import { showToast, ToastType } from "../../../common/showToast";
 import { useAppDispatch, useAppSelector } from "../../../redux/hook";
 import { deleteAuthor, ICreateAuthor, resetDeleteAuthor } from "../../../redux/slide/author.slice";
@@ -37,31 +37,6 @@ export const AuthorTable: React.FC<AuthorTableProps> = ({ load, page, totalPage,
 
     const message = useAppSelector((state) => state.author.message);
     const dispatch = useAppDispatch();
-
-    const [sortField, setSortField] = React.useState<keyof IAuthor>('name');
-    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-
-    const handleSort = (field: keyof IAuthor) => {
-        if (sortField === field) {
-            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-        } else {
-            setSortField(field);
-            setSortDirection('asc');
-        }
-    };
-
-    const sortedAuthors = [...dataSource].sort((a, b) => {
-        const aValue = a[sortField] ?? '';
-        const bValue = b[sortField] ?? '';
-        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-        return 0;
-    });
-
-    const SortIcon = ({ field }: { field: keyof IAuthor }) => {
-        if (sortField !== field) return null;
-        return sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />;
-    };
 
     const handleViewAuthor = (author: IAuthor) => {
         setSelectedAuthor(author);
@@ -118,29 +93,26 @@ export const AuthorTable: React.FC<AuthorTableProps> = ({ load, page, totalPage,
                             <th className='cursor-pointer hover:bg-base-200'>
                                 <span>STT</span>
                             </th>
-                            <th onClick={() => handleSort('name')} className='cursor-pointer hover:bg-base-200'>
+                            <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
                                     <span>Tên tác giả</span>
-                                    <SortIcon field='name' />
                                 </div>
                             </th>
-                            <th onClick={() => handleSort('nationality')} className='cursor-pointer hover:bg-base-200'>
+                            <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
                                     <span>Quê quán</span>
-                                    <SortIcon field='nationality' />
                                 </div>
                             </th>
-                            <th onClick={() => handleSort('createdAt')} className='cursor-pointer hover:bg-base-200'>
+                            <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
                                     <span>Ngày tạo</span>
-                                    <SortIcon field='createdAt' />
                                 </div>
                             </th>
                             <th>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {sortedAuthors.map((record, index) => {
+                        {dataSource.map((record, index) => {
                             return (
                                 <tr key={record.id} className='hover:bg-base-300'>
                                     <td>
@@ -227,7 +199,7 @@ export const AuthorTable: React.FC<AuthorTableProps> = ({ load, page, totalPage,
                 </table>
 
             </div >
-            {sortedAuthors.length === 0 && <div className=''>Không có dữ liệu</div>}
+            {dataSource.length === 0 && <div className=''>Không có dữ liệu</div>}
             < Pagination page={page} totalPage={totalPage} setPage={setPage} />
 
             <AuthorView
