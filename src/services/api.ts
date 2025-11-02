@@ -1,4 +1,4 @@
-import { ILoginRes, IAuthor, IAuthorInBook, IBackendRes, IBook, ICategory, ICategoryInBook, IFile, IPagination, IPermission, IPublisher, IRole, IUser, ISupplier } from "../types/backend";
+import { ILoginRes, IAuthor, IAuthorInBook, IBackendRes, IBook, ICategory, ICategoryInBook, IFile, IPagination, IPermission, IPublisher, IRole, IUser, ISupplier, ICustomer } from "../types/backend";
 import axiosInstance from "./axios-customize";
 
 
@@ -38,6 +38,59 @@ export const callGetAccountApi = () => {
 export const callLogoutApi = () => {
     const url: string = 'api/v1/auth/logout'
     return axiosInstance.post<IBackendRes<null>>(url)
+}
+
+/**
+ * 
+Module Customers
+ */
+
+export const callFetchAllCustomersWithPaginationAndFilterApi = (identityCard: string, customerLevel: string, dateFrom: string, page: number, size: number) => {
+  const url = `api/v1/customers/search?identityCard=${identityCard}&customerLevel=${customerLevel}&dateFrom=${dateFrom}&page=${page}&size=${size}`
+  return axiosInstance.get<IBackendRes<IPagination<ICustomer>>>(url)
+}
+
+export const callCreateCustomerApi = (identityCard: string, username: string, password: string, fullName: string, email: string, address: string, phone: string, avatar: string, customerLevel: string) => {
+  const url = "/api/v1/customers";
+  const data = {
+    identityCard: identityCard,
+    username: username,
+    password: password,
+    fullName: fullName,
+    email: email,
+    address: address,
+    phone: phone,
+    avatar: avatar,
+    customerLevel: customerLevel
+  }
+  return axiosInstance.post<IBackendRes<ICustomer>>(url, data)
+}
+
+export const callUpdateCustomerApi = (id: number, identityCard: string, username: string, password: string, fullName: string, email: string, address: string, phone: string, avatar: string, customerLevel: string) => {
+  const url = "/api/v1/customers";
+  const data = {
+    id: id,
+    identityCard: identityCard,
+    username: null,
+    password: null,
+    fullName: fullName,
+    email: email,
+    address: address,
+    phone: phone,
+    avatar: avatar,
+    customerLevel: customerLevel
+  }
+  return axiosInstance.put<IBackendRes<ICustomer>>(url, data)
+}
+
+export const callFetchCustomerByIdApi = (id: number) => {
+  const url = `api/v1/customers/${id}`;
+  return axiosInstance.get<IBackendRes<ICustomer>>(url)
+}
+
+export const callDeleteCustomerApi = (id: number) => {
+  const url = `api/v1/customers/${id}`;
+  return axiosInstance.delete<IBackendRes<ICustomer>>(url)
 }
 
 /**

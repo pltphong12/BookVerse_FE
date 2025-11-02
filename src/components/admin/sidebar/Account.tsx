@@ -14,11 +14,11 @@ export const Account = () => {
             queryClient.clear();
             await callLogoutApi()
             localStorage.removeItem('access_token');
-            showToast('Logout successfully', ToastType.SUCCESS)
+            showToast('Đăng xuất thành công', ToastType.SUCCESS)
             navigate('/login');
         } catch (error) {
             if (error instanceof AxiosError) {
-                showToast(`Logout failed ${error.response?.data.message}`, ToastType.ERROR)
+                showToast(`Đăng xuất thất bại ${error.response?.data.message}`, ToastType.ERROR)
             }
         }
     }

@@ -23,6 +23,19 @@ export interface ILoginRes {
     accessToken: string;
 }
 
+export interface ICustomer{
+    id: number;
+    identityCard: string;
+    totalOrder: number;
+    totalSpending: number;
+    customerLevel: string;
+    user: IUser;
+    createdAt?: string;
+    updatedAt?: string;
+    createdBy?: string;
+    updatedBy?: string;
+}
+
 export interface IUser{
     id: number;
     username: string;

@@ -167,4 +167,3 @@ export const BookSearchAndFilter: React.FC<BookSearchAndFilterProps> = ({ search
         </div>
     );
 };
-

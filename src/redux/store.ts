@@ -4,11 +4,12 @@ import { breadcrumbsSlice } from './slide/breadcrumbs.slice'
 import { bookSlice } from './slide/book.slice'
 import { authorSlice } from './slide/author.slice'
 import { publisherSlice } from './slide/publisher.slice'
-import { categorySlice } from './slide/categogy.slide'
+import { categorySlice } from './slide/category.slide'
 import { permissionSlice } from './slide/permission.slice'
 import { roleSlice } from './slide/role.slide'
 import { accountSlice } from './slide/account.slide'
 import { supplierSlice } from './slide/supplier.slide'
+import { customerSlice } from './slide/customer.slide'
 
 
 export const store = configureStore({
@@ -22,7 +23,8 @@ export const store = configureStore({
     category: categorySlice.reducer,
     permission: permissionSlice.reducer,
     role: roleSlice.reducer,
-    supplier: supplierSlice.reducer
+    supplier: supplierSlice.reducer,
+    customer: customerSlice.reducer
   }
 })
 

@@ -2,83 +2,91 @@ import { Edit, Trash, View } from "lucide-react";
 import React from "react";
 import { showToast, ToastType } from "../../../common/showToast";
 import { useAppDispatch, useAppSelector } from "../../../redux/hook";
-import { deleteCategory, ICreateCategory, resetDeleteCategory } from "../../../redux/slide/category.slide";
-import { ICategory } from "../../../types/backend";
+import { deleteCustomer, resetDeleteCustomer } from "../../../redux/slide/customer.slide";
+import { ICustomer } from "../../../types/backend";
 import { Pagination } from "../../global/Pagination";
-import { CategorySearchAndFilter } from "./category.search_filter";
-import { CategoryView } from "./category.view";
-import { CategoryForm } from "./categoty.form";
+import { CustomerForm } from "./customer.form";
+import { CustomerSearchAndFilter } from "./customer.search_filter";
+import { CustomerView } from "./customer.view";
 
-
-interface CategoryTableProps {
+interface CustomerTableProps {
     load: () => Promise<void>;
     page: number;
     totalPage: number;
     setPage: React.Dispatch<React.SetStateAction<number>>;
-    dataSource: ICategory[];
-    searchWithName: string;
-    setSearchWithName: React.Dispatch<React.SetStateAction<string>>;
+    dataSource: ICustomer[];
+    search: string;
+    setSearch: React.Dispatch<React.SetStateAction<string>>;
+    customerLevel: string;
+    setCustomerLevel: React.Dispatch<React.SetStateAction<string>>;
     dateFrom: string;
     setDateFrom: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const CategoryTable: React.FC<CategoryTableProps> = ({ load, page, totalPage, setPage, dataSource, searchWithName, setSearchWithName, dateFrom, setDateFrom }) => {
+export const CustomerTable: React.FC<CustomerTableProps> = (props) => {
+    const { dataSource, load, page, totalPage, setPage, search, setSearch, customerLevel, setCustomerLevel, dateFrom, setDateFrom } = props;
+
     const [isViewModalOpen, setIsViewModalOpen] = React.useState<boolean>(false);
-    const [selectedCategory, setSelectedCategory] = React.useState<ICategory | null>(null);
+    const [selectedCustomer, setSelectedCustomer] = React.useState<ICustomer | null>(null);
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState<boolean>(false);
 
-    const isDeleteCategorySuccess = useAppSelector((state) => state.category.isDeleteCategorySuccess);
-    const isDeleteCategoryFailed = useAppSelector((state) => state.category.isDeleteCategoryFailed);
+    const isDeleteCustomerSuccess = useAppSelector((state) => state.customer.isDeleteCustomerSuccess);
+    const isDeleteCustomerFailed = useAppSelector((state) => state.customer.isDeleteCustomerFailed);
 
-    const [categoryToEdit, setCategoryToEdit] = React.useState<ICreateCategory | undefined>(undefined);
+    const [customerToEdit, setCustomerToEdit] = React.useState<ICustomer | undefined>(undefined);
     const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
-    const message = useAppSelector((state) => state.category.message);
+    const message = useAppSelector((state) => state.customer.message);
     const dispatch = useAppDispatch();
 
-    const handleViewCategory = (category: ICategory) => {
-        setSelectedCategory(category);
+    const handleViewCustomer = (customer: ICustomer) => {
+        setSelectedCustomer(customer);
         setIsViewModalOpen(true);
     };
 
-    const executeDeleteCategory = (id: number) => {
-        dispatch(deleteCategory(id));
+    const executeDeleteCustomer = (id: number) => {
+        dispatch(deleteCustomer(id));
     }
 
     React.useEffect(() => {
-        if (isDeleteCategorySuccess) {
-            showToast("Xóa tác giả thành công", ToastType.SUCCESS);
-            dispatch(resetDeleteCategory());
+        if (isDeleteCustomerSuccess) {
+            showToast("Xóa khách hàng thành công", ToastType.SUCCESS);
+            dispatch(resetDeleteCustomer());
             setPage(1)
             load()
         }
-        if (isDeleteCategoryFailed) {
-            showToast("Xóa tác giả không thành công" + message, ToastType.ERROR);
-            dispatch(resetDeleteCategory());
+        if (isDeleteCustomerFailed) {
+            showToast("Xóa khách hàng không thành công " + message, ToastType.ERROR);
+            dispatch(resetDeleteCustomer());
         }
-    }, [isDeleteCategorySuccess, isDeleteCategoryFailed, message, dispatch, setPage, load]);
+    }, [isDeleteCustomerSuccess, isDeleteCustomerFailed, message, dispatch, setPage, load]);
+
+
     return (
         <>
             <div className='flex'>
-                <CategorySearchAndFilter
-                    searchWithName={searchWithName}
-                    setSearchWithName={setSearchWithName}
+                <CustomerSearchAndFilter
+                    search={search}
+                    setSearch={setSearch}
+                    customerLevel={customerLevel}
+                    setCustomerLevel={setCustomerLevel}
                     dateFrom={dateFrom}
                     setDateFrom={setDateFrom}
+
                     setPage={setPage}
                 />
             </div>
             <div className="flex justify-between">
-                <div className="text-2xl font-bold">Quản lý thể loại</div>
+                <div className="text-2xl font-bold">Quản lý khách hàng</div>
                 <button
                     className="btn btn-neutral justify-end"
                     onClick={() => {
                         setIsModalOpen(true);
-                        setCategoryToEdit(undefined);
+                        setCustomerToEdit(undefined);
                     }}
                 >
-                    Tạo thể loại
+                    Tạo khách hàng
                 </button>
             </div>
 
@@ -92,7 +100,22 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({ load, page, totalP
                             </th>
                             <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
-                                    <span>Tên thể loại</span>
+                                    <span>Tên khách hàng</span>
+                                </div>
+                            </th>
+                            <th className='cursor-pointer hover:bg-base-200'>
+                                <div className='flex items-center gap-1'>
+                                    <span>Số căn cước công dân</span>
+                                </div>
+                            </th>
+                            <th className='cursor-pointer hover:bg-base-200'>
+                                <div className='flex items-center gap-1'>
+                                    <span>Cấp bậc khách hàng</span>
+                                </div>
+                            </th>
+                            <th className='cursor-pointer hover:bg-base-200'>
+                                <div className='flex items-center gap-1'>
+                                    <span>Tổng đơn hàng</span>
                                 </div>
                             </th>
                             <th className='cursor-pointer hover:bg-base-200'>
@@ -115,9 +138,18 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({ load, page, totalP
                                     <td>
                                         <div className="flex items-center gap-3">
                                             <div>
-                                                <div className="font-bold">{record.name}</div>
+                                                <div className="font-bold">{record.user.fullName}</div>
                                             </div>
                                         </div>
+                                    </td>
+                                    <td>
+                                        {record.identityCard}
+                                    </td>
+                                    <td>
+                                        {record.customerLevel}
+                                    </td>
+                                    <td>
+                                        {record.totalOrder}
                                     </td>
                                     <td>
                                         {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(record.createdAt as string))}
@@ -136,7 +168,7 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({ load, page, totalP
                                                 <li>
                                                     <button
                                                         className="flex items-center gap-2 text-info"
-                                                        onClick={() => handleViewCategory(record)}
+                                                        onClick={() => handleViewCustomer(record)}
                                                     >
                                                         <View className="w-4 h-4" />
                                                         <span>Xem</span>
@@ -146,7 +178,7 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({ load, page, totalP
                                                     <button
                                                         className="flex items-center gap-2 text-warning"
                                                         onClick={() => {
-                                                            setCategoryToEdit(record);
+                                                            setCustomerToEdit(record as any);
                                                             setIsModalOpen(true);
                                                         }}
                                                     >
@@ -168,7 +200,7 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({ load, page, totalP
                                                             <li className="mt-1">
                                                                 <button
                                                                     className="btn btn-error btn-sm w-full"
-                                                                    onClick={() => executeDeleteCategory(record.id)}
+                                                                    onClick={() => executeDeleteCustomer(record.id)}
                                                                 >
                                                                     Xóa
                                                                 </button>
@@ -191,17 +223,17 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({ load, page, totalP
             {dataSource.length === 0 && <div className=''>Không có dữ liệu</div>}
             < Pagination page={page} totalPage={totalPage} setPage={setPage} />
 
-            <CategoryView
+            <CustomerView
                 isOpen={isViewModalOpen}
                 setIsOpen={setIsViewModalOpen}
-                category={selectedCategory}
+                customer={selectedCustomer}
             />
 
-            <CategoryForm
+            <CustomerForm
                 isModalOpen={isModalOpen}
                 setIsModalOpen={setIsModalOpen}
                 load={load}
-                categoryToEdit={categoryToEdit}
+                customerToEdit={customerToEdit}
             />
         </>
     )

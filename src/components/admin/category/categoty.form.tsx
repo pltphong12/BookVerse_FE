@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { showToast, ToastType } from "../../../common/showToast";
 import { useAppDispatch, useAppSelector } from "../../../redux/hook";
-import { createCategory, ICreateCategory, resetCreateCategory, resetUpdateCategory, updateCategory } from "../../../redux/slide/categogy.slide";
+import { createCategory, ICreateCategory, resetCreateCategory, resetUpdateCategory, updateCategory } from "../../../redux/slide/category.slide";
 
 interface CategoryFormProps {
     load: () => Promise<void>;
@@ -16,7 +16,7 @@ interface CategoryFormProps {
 const createCategorySchema = z.object({
     name: z.string()
         .min(2, 'Tên thể loại ít nhất 2 kí tự')
-        .max(100, 'Tên thể loại tối đa 100 kí tự'),  
+        .max(100, 'Tên thể loại tối đa 100 kí tự'),
     description: z.string()
         .min(10, 'Mô tả ít nhất 10 kí tự')
         .max(500, 'Mô tả tối đa 500 kí tự'),
@@ -71,7 +71,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ isModalOpen, setIsMo
 
     const onSubmit = async (data: CreateCategoryFormData) => {
         setIsSubmitting(true);
-        const payload = { ...data};
+        const payload = { ...data };
         if (categoryToEdit) {
             dispatch(updateCategory({
                 id: categoryToEdit.id!,
@@ -194,7 +194,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ isModalOpen, setIsMo
                         )}
                     </div>
 
-                    
+
 
                     <div className="flex justify-end gap-4 mt-4">
                         <button

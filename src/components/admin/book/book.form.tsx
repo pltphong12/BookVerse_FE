@@ -116,7 +116,7 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
             setValue('publisher', bookToEdit.publisher);
             setValue('supplier', bookToEdit.supplier);
             setValue('authors', bookToEdit.authors.map(author => ({ id: author.id })));
-            setValue('category.id', bookToEdit.category.id);
+            setValue('category', bookToEdit.category);
             setValue('price', bookToEdit.price);
             setValue('discount', bookToEdit.discount);
             setValue('quantity', bookToEdit.quantity);

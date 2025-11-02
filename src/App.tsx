@@ -15,6 +15,7 @@ import { LayoutClient } from './pages/client/layout.client';
 import NotFound from './pages/error/NotFound';
 import { PrivateRoute } from './services/route-private';
 import { SupplierPage } from './pages/admin/supplier.admin';
+import { CustomerPage } from './pages/admin/customer.admin';
 
 export const router = createBrowserRouter([
   {
@@ -76,6 +77,10 @@ export const router = createBrowserRouter([
       {
         path: "/admin/suppliers",
         element: <SupplierPage />
+      },
+      {
+        path: "/admin/customers",
+        element: <CustomerPage />
       }
     ]
   },

@@ -20,7 +20,7 @@ export const AuthorView: React.FC<AuthorViewProps> = ({ isOpen, setIsOpen, autho
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                        Thông tin sách
+                        Thông tin tác giả
                     </h3>
                     <button
                         onClick={() => setIsOpen(false)}

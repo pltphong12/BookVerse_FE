@@ -1,4 +1,4 @@
-import { Book, Building2, KeyRound, LayoutDashboard, Library, Shield, TagsIcon, User, UserPen } from 'lucide-react';
+import { Book, Building2, KeyRound, LayoutDashboard, Library, Shield, TagsIcon, User, UserPen, Users } from 'lucide-react';
 import { Link, NavLink } from 'react-router-dom';
 import Logo from '../../../assets/main_logo.png';
 export const LeftSidebar = () => {
@@ -67,6 +67,12 @@ export const LeftSidebar = () => {
                     <span>Content</span>
                 </li>
                 <li className="">
+                    <NavLink
+                        to={"/admin/customers"}
+                        className="mb-2 flex items-center gap-2" >
+                        <Users />
+                        Khách hàng
+                    </NavLink>
 
                     <NavLink
                         to={"/admin/books"}
