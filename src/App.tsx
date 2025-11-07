@@ -8,7 +8,7 @@ import { PermissionPage } from './pages/admin/permission.admin';
 import { PublisherPage } from './pages/admin/publisher.admin';
 import { RolePage } from './pages/admin/role.admin';
 import { UserPage } from './pages/admin/user.admin';
-import { InternalLoginPage } from './pages/auth/login_internal';
+import { InternalLoginPage } from './pages/auth/login';
 import { RegisterPage } from './pages/auth/register';
 import { Home } from './pages/client/home';
 import { LayoutClient } from './pages/client/layout.client';

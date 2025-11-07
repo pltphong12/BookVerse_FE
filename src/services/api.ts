@@ -253,6 +253,11 @@ export const callFetchAllBooksWithPaginationApi = (title: string, publisherId: n
   return axiosInstance.get<IBackendRes<IPagination<IBook>>>(url)
 }
 
+export const callFetchTop5LatestBooksApi = () => {
+  const url = 'api/v1/books/top-5-latest'
+  return axiosInstance.get<IBackendRes<IBook[]>>(url)
+}
+
 export const callCreateBookApi = (
   title: string, 
   publisher: IPublisher, 

@@ -1,20 +1,10 @@
+import { IBook } from '../../../types/backend';
 import ProductCard from './product.card';
 import { ChevronRight } from 'lucide-react';
 
-interface Product {
-  id: number;
-  title: string;
-  author: string;
-  price: number;
-  originalPrice?: number;
-  rating: number;
-  soldCount: number;
-  imageUrl?: string;
-}
-
 interface ProductSectionProps {
   title: string;
-  products: Product[];
+  products: IBook[];
 }
 
 export default function ProductSection({ title, products }: ProductSectionProps) {

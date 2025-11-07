@@ -1,4 +1,4 @@
-import { X, User, CreditCard, ShoppingBag, DollarSign, Calendar } from 'lucide-react';
+import { DollarSign, ShoppingBag, User, X } from 'lucide-react';
 import { ICustomer } from '../../../types/backend';
 
 interface CustomerViewProps {

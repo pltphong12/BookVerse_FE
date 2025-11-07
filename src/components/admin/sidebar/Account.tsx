@@ -3,18 +3,21 @@ import { showToast, ToastType } from "../../../common/showToast";
 import { AxiosError } from "axios";
 import { callLogoutApi } from "../../../services/api";
 import { useQueryClient } from "@tanstack/react-query";
-import { useAppSelector } from "../../../redux/hook";
+import { useAppDispatch, useAppSelector } from "../../../redux/hook";
+import { resetAccount } from "../../../redux/slide/account.slide";
 
 export const Account = () => {
     const navigate = useNavigate();
     const account = useAppSelector((state) => state.account);
     const queryClient = useQueryClient();
+    const dispatch = useAppDispatch()
     const handleLogout = async() => {
         try {
             queryClient.clear();
             await callLogoutApi()
             localStorage.removeItem('access_token');
             showToast('Đăng xuất thành công', ToastType.SUCCESS)
+            dispatch(resetAccount())
             navigate('/login');
         } catch (error) {
             if (error instanceof AxiosError) {
