@@ -30,9 +30,9 @@ export const Header: React.FC = () => {
         }
     }
     return (
-        <header className="bg-white shadow-md sticky top-0 z-50">
+        <header className="bg-white shadow-md top-0 z-50">
             <div className="bg-primary-400 text-white py-2">
-                <div className="container mx-auto px-4 flex justify-between items-center text-sm">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 flex justify-between items-center text-sm">
                     <div className="flex gap-4">
                         <span>Hotline: 0767557431</span>
                         <span>Miễn phí vận chuyển đơn từ 300k</span>
@@ -44,7 +44,7 @@ export const Header: React.FC = () => {
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 py-4">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 py-4">
                 <div className="flex items-center justify-between gap-6">
                     <div className="flex items-center gap-4">
                         <Link to={'/'} className="flex items-center gap-4">

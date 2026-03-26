@@ -16,6 +16,7 @@ import NotFound from './pages/error/NotFound';
 import { PrivateRoute } from './services/route-private';
 import { SupplierPage } from './pages/admin/supplier.admin';
 import { CustomerPage } from './pages/admin/customer.admin';
+import ProductDetailPage from './pages/client/product.detail';
 
 export const router = createBrowserRouter([
   {
@@ -29,6 +30,10 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <Home />,
+      },
+      {
+        path: "/product/:id",
+        element: <ProductDetailPage />
       }
     ],
   },

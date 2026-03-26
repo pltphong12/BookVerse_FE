@@ -13,8 +13,8 @@ import { useAppDispatch } from '../../redux/hook';
 import { setAccount } from '../../redux/slide/account.slide';
 
 const loginSchema = z.object({
-    username: z.string().min(2, 'Username is required'),
-    password: z.string().min(2, 'Password is required')
+    email: z.string().email('Email không hợp lệ').min(1, 'Email là bắt buộc'),
+    password: z.string().min(1, 'Mật khẩu là bắt buộc')
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -31,7 +31,7 @@ export const InternalLoginPage = () => {
     } = useForm<LoginFormData>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
-            username: '',
+            email: '',
             password: ''
         }
     });
@@ -39,7 +39,7 @@ export const InternalLoginPage = () => {
     const onSubmit = async (data: LoginFormData) => {
         setLoading(true);
         try {
-            const res = await callLoginApi(data.username, data.password);
+            const res = await callLoginApi(data.email, data.password);
             showToast(`Đăng nhập thành công`, ToastType.SUCCESS);
             localStorage.setItem('access_token', res.data.data?.accessToken as string);
             dispatch(setAccount(res.data.data?.user as IUser));
@@ -86,17 +86,17 @@ export const InternalLoginPage = () => {
                             <div className="mb-4">
                                 <div className={`form-control w-full mt-4`}>
                                     <label className="label">
-                                        <span className={"label-text text-base-content"}>Tên đăng nhập</span>
+                                        <span className={"label-text text-base-content"}>Email</span>
                                     </label>
                                     <input
-                                        type="text"
-                                        {...register('username')}
-                                        placeholder="Nhập tên đăng nhập"
-                                        className={`input input-bordered w-full ${errors.username ? 'input-error' : ''}`}
+                                        type="email"
+                                        {...register('email')}
+                                        placeholder="Nhập email"
+                                        className={`input input-bordered w-full ${errors.email ? 'input-error' : ''}`}
                                     />
-                                    {errors.username && (
+                                    {errors.email && (
                                         <label className="label">
-                                            <span className="label-text-alt text-error">{errors.username.message}</span>
+                                            <span className="label-text-alt text-error">{errors.email.message}</span>
                                         </label>
                                     )}
                                 </div>

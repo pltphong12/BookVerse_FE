@@ -1,5 +1,5 @@
 import { IBook } from '../../../types/backend';
-import ProductCard from './product.card';
+import ProductCard from './ProductCard';
 import { ChevronRight } from 'lucide-react';
 
 interface ProductSectionProps {

@@ -5,7 +5,7 @@ import Logo from "../../assets/main_logo.png";
 export const Footer: React.FC = () => {
     return (
         <footer className="bg-gray-900 text-gray-300 mt-16">
-            <div className="container mx-auto px-4 py-12">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 py-12">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     <div>
                         <div className="flex items-center gap-2 mb-4 justify-start">

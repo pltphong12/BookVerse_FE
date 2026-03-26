@@ -38,7 +38,6 @@ export interface ICustomer{
 
 export interface IUser{
     id: number;
-    username: string;
     fullName: string;
     email: string;
     address: string;
@@ -97,22 +96,30 @@ export interface ICategoryInBook {
     updatedBy?: string;
 }
 
+export interface IBookImage {
+    id: number;
+    relativePath: string;
+    sortOrder: number;
+    primary: boolean;
+}
+
 export interface IBook {
     id: number;
     title: string;
     publisher: IPublisher;
-    supplier: ISupplier;
+    supplier: ISupplier | null;
     price: number;
     quantity: number;
     sold: number;
     discount: number;
     publishYear: number;
     weight: number;
-    size: string;
+    dimensions: string | null;
     numberOfPages: number;
     coverFormat: string;
     description: string;
     image: string;
+    images: IBookImage[];
     authors: IAuthorInBook[];
     category: ICategoryInBook;
     createdAt?: string;
@@ -190,4 +197,3 @@ export interface ICategory {
     updatedBy?: string;
 
 }
-

@@ -111,7 +111,7 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
                             </th>
                             <th className='cursor-pointer hover:bg-base-200'>
                                 <div className='flex items-center gap-1'>
-                                    <span>Tên đăng nhập</span>
+                                    <span>Email</span>
                                 </div>
                             </th>
                             <th className='cursor-pointer hover:bg-base-200'>
@@ -145,7 +145,7 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
                                     <td>
                                         <div className="flex items-center gap-3">
                                             <div>
-                                                <div className="font-bold">{record.username}</div>
+                                                <div className="font-bold">{record.email}</div>
                                             </div>
                                         </div>
                                     </td>

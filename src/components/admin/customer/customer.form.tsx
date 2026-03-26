@@ -20,9 +20,6 @@ const createCustomerSchema = z.object({
     identityCard: z.string()
         .min(10, 'Mã CCCD có ít nhất 10 kí tự')
         .max(12, 'Mã CCCD có nhiều nhất 12 kí tự'),
-    username: z.string()
-        .min(2, 'Tên đăng nhập có ít nhất 2 kí tự')
-        .max(50, 'Tên đăng nhập có nhiều nhất 50 kí tự'),
     password: z.string()
         .optional(),
     fullName: z.string()
@@ -66,7 +63,6 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ isModalOpen, setIsMo
     } = useForm<CreateCustomerFormData>({
         resolver: zodResolver(createCustomerSchema),
         defaultValues: {
-            username: '',
             password: '',
             fullName: '',
             email: '',
@@ -80,7 +76,6 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ isModalOpen, setIsMo
     useEffect(() => {
         if (customerToEdit) {
             setValue('identityCard', customerToEdit.identityCard);
-            setValue('username', customerToEdit.user.username);
             setValue('fullName', customerToEdit.user.fullName);
             setValue('email', customerToEdit.user.email);
             setValue('address', customerToEdit.user.address);
@@ -97,7 +92,6 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ isModalOpen, setIsMo
             setAvatarPreview(`${import.meta.env.VITE_BACKEND_URL}/storage/avatar/${customerToEdit.user.avatar}`);
         } else {
             reset({
-                username: '',
                 password: '',
                 fullName: '',
                 email: '',
@@ -112,7 +106,6 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ isModalOpen, setIsMo
 
     const resetForm = () => {
         reset({
-            username: '',
             password: '',
             fullName: '',
             email: '',
@@ -204,23 +197,6 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ isModalOpen, setIsMo
                         {errors.identityCard && (
                             <label className="label">
                                 <span className="label-text-alt text-error">{errors.identityCard.message}</span>
-                            </label>
-                        )}
-                    </div>
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Tên đăng nhập</span>
-                        </label>
-                        <input
-                            type="text"
-                            {...register('username')}
-                            placeholder="Nhập tên đăng nhập"
-                            className={`input input-bordered w-full ${errors.username ? 'input-error' : ''}`}
-                            disabled={!!customerToEdit}
-                        />
-                        {errors.username && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.username.message}</span>
                             </label>
                         )}
                     </div>

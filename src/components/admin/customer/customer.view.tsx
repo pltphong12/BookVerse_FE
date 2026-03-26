@@ -121,10 +121,6 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ isOpen, setIsOpen, c
 
                             <div className="space-y-3">
                                 <div>
-                                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Tên đăng nhập</p>
-                                    <p className="text-gray-900 dark:text-white ">{customer.user.username}</p>
-                                </div>
-                                <div>
                                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</p>
                                     <p className="text-gray-900 dark:text-white ">{customer.user.email}</p>
                                 </div>

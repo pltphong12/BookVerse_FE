@@ -7,16 +7,16 @@ import axiosInstance from "./axios-customize";
 Module Auth
  */
 
-export const callLoginApi = (username: string, password: string) => {
+export const callLoginApi = (email: string, password: string) => {
     const url: string = 'api/v1/auth/login'
-    const data = { username: username, password: password }
+    const data = { email: email, password: password }
     return axiosInstance.post<IBackendRes<ILoginRes>>(url, data)
 }
 
-export const callRegisterApi = (username: string, password: string, fullName: string, address: string, phone: string) => {
+export const callRegisterApi = (email: string, password: string, fullName: string, address: string, phone: string) => {
     const url: string = 'api/v1/auth/register'
     const data = {
-        username: username,
+        email: email,
         password: password,
         fullName: fullName,
         address: address,
@@ -50,11 +50,10 @@ export const callFetchAllCustomersWithPaginationAndFilterApi = (identityCard: st
   return axiosInstance.get<IBackendRes<IPagination<ICustomer>>>(url)
 }
 
-export const callCreateCustomerApi = (identityCard: string, username: string, password: string, fullName: string, email: string, address: string, phone: string, avatar: string, customerLevel: string) => {
+export const callCreateCustomerApi = (identityCard: string, password: string, fullName: string, email: string, address: string, phone: string, avatar: string, customerLevel: string) => {
   const url = "/api/v1/customers";
   const data = {
     identityCard: identityCard,
-    username: username,
     password: password,
     fullName: fullName,
     email: email,
@@ -66,12 +65,11 @@ export const callCreateCustomerApi = (identityCard: string, username: string, pa
   return axiosInstance.post<IBackendRes<ICustomer>>(url, data)
 }
 
-export const callUpdateCustomerApi = (id: number, identityCard: string, username: string, password: string, fullName: string, email: string, address: string, phone: string, avatar: string, customerLevel: string) => {
+export const callUpdateCustomerApi = (id: number, identityCard: string, fullName: string, email: string, address: string, phone: string, avatar: string, customerLevel: string) => {
   const url = "/api/v1/customers";
   const data = {
     id: id,
     identityCard: identityCard,
-    username: null,
     password: null,
     fullName: fullName,
     email: email,
@@ -98,16 +96,15 @@ export const callDeleteCustomerApi = (id: number) => {
 Module Users
  */
 
-export const callFetchAllUserWithPaginationApi = (username: string, roleId: number, dateFrom: string, page: number, size: number) => {
-    const url: string = `api/v1/users/search?page=${page}&size=${size}&username=${username}&roleId=${roleId}&dateFrom=${dateFrom}`
+export const callFetchAllUserWithPaginationApi = (email: string, roleId: number, dateFrom: string, page: number, size: number) => {
+    const url: string = `api/v1/users/search?page=${page}&size=${size}&email=${email}&roleId=${roleId}&dateFrom=${dateFrom}`
     return axiosInstance.get<IBackendRes<IPagination<IUser>>>(url)
 }
 
-export const callCreateUserApi = (username: string, password: string, fullName: string, email: string, address: string, phone: string, role: number, avatar: string) => {
+export const callCreateUserApi = (password: string, fullName: string, email: string, address: string, phone: string, role: number, avatar: string) => {
   const url = "/api/v1/users";
 
   const data = {
-    username: username,
     password: password,
     fullName: fullName,
     email: email,
@@ -124,8 +121,6 @@ export const callCreateUserApi = (username: string, password: string, fullName: 
 
 export const callUpdateUserApi = (
   id: number,
-  username: string,
-  password: string,
   fullName: string,
   email: string,
   address: string,
@@ -137,7 +132,6 @@ export const callUpdateUserApi = (
 
   const data = {
     id: id,
-    username: null,
     password: null,
     fullName: fullName,
     email: email,
@@ -272,26 +266,26 @@ export const callCreateBookApi = (
   dimensions: string,
   numberOfPages: number,
   coverFormat: string,
-  image: string, 
+  images: { relativePath: string; sortOrder: number; primary: boolean }[],
   description: string) => {
     const url = "/api/v1/books";
 
     const data = {
-      title: title,
-      publisher: publisher,
-      supplier: supplier,
-      authors: authors,
-      category: category,
-      price: price,
-      discount: discount,
-      quantity: quantity,
-      publishYear: publishYear,
-      weight: weight,
-      dimensions: dimensions,
-      numberOfPages: numberOfPages,
-      coverFormat: coverFormat,
-      image: image,
-      description: description
+      title,
+      publisher,
+      supplier,
+      authors,
+      category,
+      price,
+      discount,
+      quantity,
+      publishYear,
+      weight,
+      dimensions,
+      numberOfPages,
+      coverFormat,
+      images,
+      description
     };
 
     return axiosInstance.post<IBackendRes<IBook>>(url, data)
@@ -312,28 +306,28 @@ export const callUpdateBookApi = (
   dimensions: string,
   numberOfPages: number,
   coverFormat: string,
-  image: string, 
+  images: { relativePath: string; sortOrder: number; primary: boolean }[],
   description: string
 ) => {
   const url = "/api/v1/books";
 
   const data = {
-    id: id,
-    title: title,
-    publisher: publisher,
-    supplier: supplier,
-    authors: authors,
-    category: category,
-    price: price,
-    discount: discount,
-    quantity: quantity,
-    publishYear: publishYear,
-    weight: weight,
-    dimensions: dimensions,
-    numberOfPages: numberOfPages,
-    coverFormat: coverFormat,
-    image: image,
-    description: description
+    id,
+    title,
+    publisher,
+    supplier,
+    authors,
+    category,
+    price,
+    discount,
+    quantity,
+    publishYear,
+    weight,
+    dimensions,
+    numberOfPages,
+    coverFormat,
+    images,
+    description
   };
 
   return axiosInstance.put<IBackendRes<IBook>>(url, data)
@@ -344,6 +338,11 @@ export const callDeleteBookApi = (id: number) => {
   const res = axiosInstance.delete(url);
   return res;
 };
+
+export const callFetchBookByIdApi = (id: number) => {
+  const url = `api/v1/books/${id}`;
+  return axiosInstance.get<IBackendRes<IBook>>(url);
+}
 
 
 /**
@@ -538,6 +537,21 @@ export const callUploadSingleFile = (file: File, folderType: string) => {
   bodyFormData.append('folder', folderType);
   
   return axiosInstance.post<IBackendRes<IFile>>(url,bodyFormData, {
+    headers: {
+      "Content-Type": "multipart/form-data"
+    }
+  })
+}
+
+export const callUploadBatchFiles = (files: File[], folderType: string) => {
+  const url = 'api/v1/files/batch'
+  const bodyFormData = new FormData();
+  files.forEach(file => {
+    bodyFormData.append('files', file);
+  });
+  bodyFormData.append('folder', folderType);
+
+  return axiosInstance.post<IBackendRes<IFile[]>>(url, bodyFormData, {
     headers: {
       "Content-Type": "multipart/form-data"
     }

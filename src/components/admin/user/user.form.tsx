@@ -18,9 +18,6 @@ interface UserFormProps {
 }
 
 const createUserSchema = z.object({
-    username: z.string()
-        .min(2, 'Tên đăng nhập có ít nhất 2 kí tự')
-        .max(50, 'Tên đăng nhập có nhiều nhất 50 kí tự'),
     password: z.string()
         .optional(),
     fullName: z.string()
@@ -63,7 +60,6 @@ export const UserForm: React.FC<UserFormProps> = ({ isModalOpen, setIsModalOpen,
     } = useForm<CreateUserFormData>({
         resolver: zodResolver(createUserSchema),
         defaultValues: {
-            username: '',
             password: '',
             fullName: '',
             email: '',
@@ -76,7 +72,6 @@ export const UserForm: React.FC<UserFormProps> = ({ isModalOpen, setIsModalOpen,
 
     useEffect(() => {
         if (userToEdit) {
-            setValue('username', userToEdit.username);
             setValue('fullName', userToEdit.fullName);
             setValue('email', userToEdit.email);
             setValue('address', userToEdit.address);
@@ -85,7 +80,6 @@ export const UserForm: React.FC<UserFormProps> = ({ isModalOpen, setIsModalOpen,
             setAvatarPreview(`${import.meta.env.VITE_BACKEND_URL}/storage/avatar/${userToEdit.avatar}`);
         } else {
             reset({
-                username: '',
                 password: '',
                 fullName: '',
                 email: '',
@@ -100,7 +94,6 @@ export const UserForm: React.FC<UserFormProps> = ({ isModalOpen, setIsModalOpen,
 
     const resetForm = () => {
         reset({
-            username: '',
             password: '',
             fullName: '',
             email: '',
@@ -187,23 +180,6 @@ export const UserForm: React.FC<UserFormProps> = ({ isModalOpen, setIsModalOpen,
             <div className="modal-box">
                 <h3 className="font-bold text-lg mb-4">{userToEdit ? 'Chỉnh sửa người dùng' : 'Tạo người dùng'}</h3>
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Tên đăng nhập</span>
-                        </label>
-                        <input
-                            type="text"
-                            {...register('username')}
-                            placeholder="Nhập tên đăng nhập"
-                            className={`input input-bordered w-full ${errors.username ? 'input-error' : ''}`}
-                            disabled={!!userToEdit}
-                        />
-                        {errors.username && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.username.message}</span>
-                            </label>
-                        )}
-                    </div>
                     <div className="flex gap-4">
                         <div className="form-control w-full mt-4">
                             <label className="label">

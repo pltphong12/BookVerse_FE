@@ -1,13 +1,23 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Star, X } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import Select from 'react-select';
 import { z } from "zod";
 import { showToast, ToastType } from "../../../common/showToast";
 import { useAppDispatch, useAppSelector } from "../../../redux/hook";
-import { createBook, ICreateBook, resetCreateBook, resetUpdateBook, updateBook } from "../../../redux/slide/book.slice";
+import { createBook, ICreateBook, ICreateBookImage, resetCreateBook, resetUpdateBook, updateBook } from "../../../redux/slide/book.slice";
 import { IAuthorInBook, ICategoryInBook, IPublisher, ISupplier } from "../../../types/backend";
-import { callUploadSingleFile } from "../../../services/api";
+import { callUploadBatchFiles } from "../../../services/api";
+
+interface ImageItem {
+    uid: string;
+    file?: File;
+    previewUrl: string;
+    relativePath?: string;
+    primary: boolean;
+    sortOrder: number;
+}
 
 interface BookFormProps {
     load: () => Promise<void>;
@@ -66,15 +76,13 @@ const createBookSchema = z.object({
     description: z.string()
         .min(10, 'Mô tả ít nhất 10 kí tự')
         .max(1000, 'Mô tả tối đa 1000 kí tự'),
-    image: z.any()
-        .optional()
 });
 
 type CreateBookFormData = z.infer<typeof createBookSchema>;
 
 export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen, load, bookToEdit, publishers, authors, categories, suppliers }) => {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-    const [previewUrl, setPreviewUrl] = useState<string>('');
+    const [imageItems, setImageItems] = useState<ImageItem[]>([]);
     const dispatch = useAppDispatch();
     const isCreateBookSuccess = useAppSelector((state) => state.book.isCreateBookSuccess);
     const isCreateBookFailed = useAppSelector((state) => state.book.isCreateBookFailed);
@@ -106,7 +114,6 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
             numberOfPages: 0,
             coverFormat: 'PAPERBACK',
             description: '',
-            image: undefined
         }
     });
 
@@ -126,7 +133,24 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
             setValue('dimensions', bookToEdit.dimensions);
             setValue('numberOfPages', bookToEdit.numberOfPages);
             setValue('coverFormat', bookToEdit.coverFormat === "Bìa mềm" ? "PAPERBACK" : "HARDCOVER");
-            setPreviewUrl(`${import.meta.env.VITE_BACKEND_URL}/storage/book/${bookToEdit.image}`);
+
+            if (bookToEdit.images && bookToEdit.images.length > 0) {
+                setImageItems(bookToEdit.images.map((img, idx) => ({
+                    uid: `existing-${img.relativePath}`,
+                    previewUrl: `${import.meta.env.VITE_BACKEND_URL}/storage/book/${img.relativePath}`,
+                    relativePath: img.relativePath,
+                    primary: img.primary,
+                    sortOrder: img.sortOrder ?? idx
+                })));
+            } else if (bookToEdit.image) {
+                setImageItems([{
+                    uid: `existing-${bookToEdit.image}`,
+                    previewUrl: `${import.meta.env.VITE_BACKEND_URL}/storage/book/${bookToEdit.image}`,
+                    relativePath: bookToEdit.image,
+                    primary: true,
+                    sortOrder: 0
+                }]);
+            }
         } else {
             reset({
                 title: '',
@@ -143,11 +167,10 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
                 numberOfPages: 0,
                 coverFormat: 'PAPERBACK',
                 description: '',
-                image: undefined
             });
-            setPreviewUrl('');
+            setImageItems([]);
         }
-    }, [bookToEdit, setValue, reset, setPreviewUrl]);
+    }, [bookToEdit, setValue, reset]);
 
     const resetForm = useCallback(() => {
         reset({
@@ -166,39 +189,96 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
             coverFormat: 'PAPERBACK',
             description: '',
         });
-        setPreviewUrl('');
+        setImageItems([]);
         setIsSubmitting(false);
-    }, [reset, setPreviewUrl, setIsSubmitting]);
+    }, [reset]);
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            setValue('image', file);
-            setPreviewUrl(URL.createObjectURL(file));
+    const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            const newFiles = Array.from(e.target.files);
+            setImageItems(prev => {
+                const hasPrimary = prev.some(item => item.primary);
+                const newItems: ImageItem[] = newFiles.map((file, index) => ({
+                    uid: `${Date.now()}-${index}-${file.name}`,
+                    file,
+                    previewUrl: URL.createObjectURL(file),
+                    primary: !hasPrimary && prev.length === 0 && index === 0,
+                    sortOrder: prev.length + index
+                }));
+                return [...prev, ...newItems];
+            });
+            e.target.value = '';
         }
+    };
+
+    const handleRemoveImage = (uid: string) => {
+        setImageItems(prev => {
+            const filtered = prev.filter(item => item.uid !== uid);
+            if (filtered.length > 0 && !filtered.some(item => item.primary)) {
+                filtered[0].primary = true;
+            }
+            return filtered.map((item, idx) => ({ ...item, sortOrder: idx }));
+        });
+    };
+
+    const handleSetPrimary = (uid: string) => {
+        setImageItems(prev => prev.map(item => ({
+            ...item,
+            primary: item.uid === uid
+        })));
     };
 
     const onSubmit = async (data: CreateBookFormData) => {
         setIsSubmitting(true);
-        let imageFileName = bookToEdit?.image || '';
 
-        if (data.image && typeof data.image !== 'string') {
+        if (imageItems.length === 0) {
+            showToast("Vui lòng chọn ít nhất 1 ảnh", ToastType.ERROR);
+            setIsSubmitting(false);
+            return;
+        }
+
+        const newFiles = imageItems.filter(item => item.file);
+        let uploadedFileNames: string[] = [];
+
+        if (newFiles.length > 0) {
             try {
-                const res = await callUploadSingleFile(data.image, 'book');
-                if (res.data) {
-                    imageFileName = res.data.data?.fileName as string;
+                const res = await callUploadBatchFiles(
+                    newFiles.map(item => item.file!),
+                    'book'
+                );
+                if (res.data?.data) {
+                    uploadedFileNames = res.data.data.map(f => f.fileName);
                 }
-            } catch (error) {
-                showToast("Tải lên không thành công", ToastType.ERROR);
+            } catch {
+                showToast("Tải ảnh lên không thành công", ToastType.ERROR);
                 setIsSubmitting(false);
                 return;
             }
         }
+
+        let newFileIndex = 0;
+        const images: ICreateBookImage[] = imageItems.map((item, idx) => {
+            if (item.file) {
+                return {
+                    relativePath: uploadedFileNames[newFileIndex++],
+                    sortOrder: idx,
+                    primary: item.primary
+                };
+            }
+            return {
+                relativePath: item.relativePath!,
+                sortOrder: idx,
+                primary: item.primary
+            };
+        });
+
+        const primaryImage = images.find(img => img.primary);
         const formData = {
             ...data,
-            image: imageFileName
-        }
-        console.log(formData)
+            image: primaryImage?.relativePath || '',
+            images
+        };
+
         if (bookToEdit) {
             dispatch(updateBook({
                 id: bookToEdit.id,
@@ -254,23 +334,6 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
                             </label>
                         )}
                     </div>
-
-                    {/* <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Mã ISBN</span>
-                        </label>
-                        <input
-                            type="text"
-                            {...register('isbn')}
-                            placeholder="Nhập mã ISBN"
-                            className={`input input-bordered w-full ${errors.isbn ? 'input-error' : ''}`}
-                        />
-                        {errors.isbn && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.isbn.message}</span>
-                            </label>
-                        )}
-                    </div> */}
 
                     <div className="form-control mt-4">
                         <label className="label">
@@ -576,31 +639,60 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
                         )}
                     </div>
 
-                    <div className="form-control mt-4 space-x-2">
+                    <div className="form-control mt-4">
                         <label className="label">
                             <span className="label-text">Ảnh sách</span>
                         </label>
-                        <input
-                            type="file"
-                            id="avatar-upload"
-                            onChange={handleImageChange}
-                            accept="image/*"
-                            className="hidden"
-                        />
-
-                        {/* Nút chọn ảnh thay thế */}
-                        <label htmlFor="avatar-upload" className="btn btn-outline btn-sm w-fit">
-                            📷 Chọn ảnh
-                        </label>
-                        {errors.image && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.image.message?.toString()}</span>
+                        <div className="flex flex-wrap gap-3 mt-1">
+                            {imageItems.map((item) => (
+                                <div
+                                    key={item.uid}
+                                    className={`relative group w-24 h-24 rounded-lg overflow-hidden border-2 ${item.primary ? 'border-yellow-400' : 'border-base-300'}`}
+                                >
+                                    <img
+                                        src={item.previewUrl}
+                                        alt="preview"
+                                        className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                                        <button
+                                            type="button"
+                                            title="Đặt ảnh chính"
+                                            className={`btn btn-xs btn-circle ${item.primary ? 'btn-warning' : 'btn-ghost text-white'}`}
+                                            onClick={() => handleSetPrimary(item.uid)}
+                                        >
+                                            <Star size={14} fill={item.primary ? 'currentColor' : 'none'} />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            title="Xóa ảnh"
+                                            className="btn btn-xs btn-circle btn-error"
+                                            onClick={() => handleRemoveImage(item.uid)}
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    </div>
+                                    {item.primary && (
+                                        <span className="absolute top-0.5 left-0.5 bg-yellow-400 text-black text-[10px] px-1 rounded font-semibold">
+                                            Chính
+                                        </span>
+                                    )}
+                                </div>
+                            ))}
+                            <label className="w-24 h-24 rounded-lg border-2 border-dashed border-base-300 flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors">
+                                <span className="text-2xl leading-none">+</span>
+                                <span className="text-xs mt-1">Thêm ảnh</span>
+                                <input
+                                    type="file"
+                                    multiple
+                                    onChange={handleImagesChange}
+                                    accept="image/*"
+                                    className="hidden"
+                                />
                             </label>
-                        )}
-                        {previewUrl && (
-                            <div className="mt-2">
-                                <img src={previewUrl} alt="Avatar Preview" className="w-24 h-24" />
-                            </div>
+                        </div>
+                        {imageItems.length > 0 && (
+                            <p className="text-xs text-base-content/50 mt-1">Hover vào ảnh để đặt ảnh chính hoặc xóa. Ảnh có viền vàng là ảnh chính.</p>
                         )}
                     </div>
 

@@ -4,7 +4,6 @@ import { callCreateUserApi, callDeleteUserApi, callUpdateUserApi } from '../../s
 import { IBackendRes, IUser } from '../../types/backend'
 
 export interface ICreateUser {
-  username: string
   password: string
   fullName: string
   email: string
@@ -42,7 +41,6 @@ export const createUser = createAsyncThunk(
   async (payload: ICreateUser) => {
     try {
       const response = await callCreateUserApi(
-        payload.username, 
         payload.password, 
         payload.fullName, 
         payload.email,
@@ -80,8 +78,6 @@ export const updateUser = createAsyncThunk(
     try {
       const response = await callUpdateUserApi(
         payload.id,
-        payload.data.username,
-        payload.data.password,
         payload.data.fullName,
         payload.data.email,
         payload.data.address,

@@ -38,7 +38,7 @@ export const UserView: React.FC<UserViewProps> = ({ isOpen, setIsOpen, user }) =
                             </div>
                         </div>
                         <div>
-                            <h4 className="text-lg font-semibold">{user.username}</h4>
+                            <h4 className="text-lg font-semibold">{user.email}</h4>
                             <p className="text-sm text-gray-500 dark:text-gray-400">Vai trò: {user.role.name}</p>
                         </div>
                     </div>

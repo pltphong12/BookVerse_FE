@@ -9,22 +9,22 @@ import { showToast, ToastType } from '../../common/showToast';
 import { AxiosError } from 'axios';
 
 const registerSchema = z.object({
-    username: z.string()
-        .min(2, 'Username must be at least 2 characters')
-        .max(50, 'Username must be less than 50 characters'),
+    email: z.string()
+        .email('Email không hợp lệ')
+        .min(1, 'Email là bắt buộc'),
     password: z.string()
-        .min(6, 'Password must be at least 6 characters')
-        .max(50, 'Password must be less than 50 characters'),
+        .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
+        .max(50, 'Mật khẩu không được vượt quá 50 ký tự'),
     fullName: z.string()
-        .min(2, 'Full name must be at least 2 characters')
-        .max(100, 'Full name must be less than 100 characters'),
+        .min(2, 'Họ và tên phải có ít nhất 2 ký tự')
+        .max(100, 'Họ và tên không được vượt quá 100 ký tự'),
     address: z.string()
-        .min(5, 'Address must be at least 5 characters')
-        .max(200, 'Address must be less than 200 characters'),
+        .min(5, 'Địa chỉ phải có ít nhất 5 ký tự')
+        .max(200, 'Địa chỉ không được vượt quá 200 ký tự'),
     phone: z.string()
-        .min(10, 'Phone number must be at least 10 digits')
-        .max(15, 'Phone number must be less than 15 digits')
-        .regex(/^[0-9+\-\s()]*$/, 'Phone number can only contain digits, spaces, and special characters (+, -, (, ))')
+        .min(10, 'Số điện thoại phải có ít nhất 10 chữ số')
+        .max(15, 'Số điện thoại không được vượt quá 15 chữ số')
+        .regex(/^[0-9+\-\s()]*$/, 'Số điện thoại chỉ được chứa chữ số và ký tự đặc biệt (+, -, (, ))')
 });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
@@ -40,7 +40,7 @@ export const RegisterPage = () => {
     } = useForm<RegisterFormData>({
         resolver: zodResolver(registerSchema),
         defaultValues: {
-            username: '',
+            email: '',
             password: '',
             fullName: '',
             address: '',
@@ -52,13 +52,13 @@ export const RegisterPage = () => {
         setLoading(true);
         try {
             const res = await callRegisterApi(
-                data.username,
+                data.email,
                 data.password,
                 data.fullName,
                 data.address,
                 data.phone
             );
-            showToast(`Register successfully username: ${res.data.data?.username}`, ToastType.SUCCESS);
+            showToast(`Đăng ký thành công: ${res.data.data?.email}`, ToastType.SUCCESS);
             setTimeout(() => {
                 navigate('/login');
                 setLoading(false);
@@ -95,17 +95,17 @@ export const RegisterPage = () => {
                             <div className="mb-4">
                                 <div className="form-control w-full mt-4">
                                     <label className="label">
-                                        <span className="label-text text-base-content">Tên đăng nhập</span>
+                                        <span className="label-text text-base-content">Email</span>
                                     </label>
                                     <input
-                                        type="text"
-                                        {...register('username')}
-                                        placeholder="Nhập tên đăng nhập"
-                                        className={`input input-bordered w-full ${errors.username ? 'input-error' : ''}`}
+                                        type="email"
+                                        {...register('email')}
+                                        placeholder="Nhập email"
+                                        className={`input input-bordered w-full ${errors.email ? 'input-error' : ''}`}
                                     />
-                                    {errors.username && (
+                                    {errors.email && (
                                         <label className="label">
-                                            <span className="label-text-alt text-error">{errors.username.message}</span>
+                                            <span className="label-text-alt text-error">{errors.email.message}</span>
                                         </label>
                                     )}
                                 </div>

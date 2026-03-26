@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import CategoryGrid from "../../components/client/home/CategoryGrid"
 import HeroSlider from "../../components/client/home/HeroSlider"
 import PromoBanner from "../../components/client/home/PromoBanner"
-import ProductSection from "../../components/client/product/product.section"
+import ProductSection from "../../components/client/product/ProductSection"
 import { callFetchTop5LatestBooksApi } from "../../services/api";
 import { useEffect, useState } from "react";
 import { IBook } from "../../types/backend";
