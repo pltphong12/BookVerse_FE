@@ -2,6 +2,10 @@ import { Star, ShoppingCart, Heart, Share2 } from 'lucide-react';
 import { useState } from 'react';
 import { IBook } from '../../../../types/backend';
 import { formatPrice } from '../../../../common/formatPrice';
+import { callAddToCartApi } from '../../../../services/api';
+import { showToast, ToastType } from '../../../../common/showToast';
+import { useAppDispatch } from '../../../../redux/hook';
+import { setCartSum } from '../../../../redux/slide/cart.slice';
 
 interface ProductInfoProps {
     product: IBook;
@@ -10,11 +14,20 @@ interface ProductInfoProps {
 export default function ProductInfo({ product }: ProductInfoProps) {
     const [quantity, setQuantity] = useState(1);
     const [isWishlisted, setIsWishlisted] = useState(false);
-    const [showToast, setShowToast] = useState(false);
+    const dispatch = useAppDispatch();
 
-    const handleAddToCart = () => {
-        setShowToast(true);
-        setTimeout(() => setShowToast(false), 2000);
+    const handleAddToCart = async () => {
+        try {
+            const res = await callAddToCartApi(product.id, quantity);
+            if (res.data?.data) {
+                dispatch(setCartSum(res.data.data.sum));
+                showToast("Thêm vào giỏ hàng thành công", ToastType.SUCCESS);
+            }
+        } catch (error: any) {
+            const errorMessage = error?.response?.data?.message
+                || "Thêm vào giỏ hàng thất bại";
+            showToast(errorMessage, ToastType.ERROR);
+        }
     };
 
     return (
@@ -63,7 +76,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
             <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="border rounded-lg p-3">
                     <p className="text-gray-500 mb-1">Nhà cung cấp</p>
-                    <p className="font-semibold">{product.supplier.name}</p>
+                    <p className="font-semibold">{product.supplier?.name}</p>
                 </div>
                 <div className="border rounded-lg p-3">
                     <p className="text-gray-500 mb-1">Năm xuất bản</p>
@@ -106,15 +119,15 @@ export default function ProductInfo({ product }: ProductInfoProps) {
                 </div>
 
                 <div className="flex gap-3">
-                    <button onClick={handleAddToCart} className="flex-1 btn btn-primary gap-2 btn-lg">
+                    <button onClick={handleAddToCart} className="flex-1 btn bg-primary-500 text-white gap-2 btn-lg hover:bg-primary-600">
                         <ShoppingCart className="w-5 h-5" />
                         Thêm vào giỏ hàng
                     </button>
                     <button
                         onClick={() => setIsWishlisted(!isWishlisted)}
                         className={`btn btn-lg border-2 ${isWishlisted
-                                ? 'bg-red-50 border-red-500 text-red-600'
-                                : 'border-gray-300 text-gray-600 hover:border-red-500'
+                            ? 'bg-red-50 border-red-500 text-red-600'
+                            : 'border-gray-300 text-gray-600 hover:border-red-500'
                             }`}
                     >
                         <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
@@ -133,13 +146,6 @@ export default function ProductInfo({ product }: ProductInfoProps) {
                     <li>✓ Bảo vệ 100% an toàn thanh toán</li>
                 </ul>
             </div>
-
-            {showToast && (
-                <div className="fixed bottom-6 right-6 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-fade-in">
-                    <ShoppingCart className="w-5 h-5" />
-                    <span>Đã thêm vào giỏ hàng thành công!</span>
-                </div>
-            )}
         </div>
     );
 }

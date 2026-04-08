@@ -10,6 +10,8 @@ import { roleSlice } from './slide/role.slide'
 import { accountSlice } from './slide/account.slide'
 import { supplierSlice } from './slide/supplier.slide'
 import { customerSlice } from './slide/customer.slide'
+import { cartSlice } from './slide/cart.slice'
+import { orderSlice } from './slide/order.slide'
 
 
 export const store = configureStore({
@@ -24,7 +26,9 @@ export const store = configureStore({
     permission: permissionSlice.reducer,
     role: roleSlice.reducer,
     supplier: supplierSlice.reducer,
-    customer: customerSlice.reducer
+    customer: customerSlice.reducer,
+    cart: cartSlice.reducer,
+    order: orderSlice.reducer
   }
 })
 

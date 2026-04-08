@@ -66,7 +66,7 @@ export const Pagination = (props: PaginationProps) => {
     const pageNumbers = getPageNumbers();
 
     return (
-        <div className="join justify-center">
+        <div className="join justify-center flex">
             {/* Nút Previous */}
             <button
                 className="join-item btn btn-md"

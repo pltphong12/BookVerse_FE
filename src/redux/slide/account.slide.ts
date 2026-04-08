@@ -4,6 +4,7 @@ export interface IAccount {
     fullName: string;
     avatar: string;
     email: string;
+    role: string;
 }
 
 interface IAccountState {
@@ -20,7 +21,8 @@ const initialState: IAccountState = {
     account: {
         fullName: "",
         avatar: "",
-        email: ""
+        email: "",
+        role: ""
     }
 }
 
@@ -35,6 +37,7 @@ export const accountSlice = createSlice({
             state.account.fullName = action.payload.fullName
             state.account.avatar = action.payload.avatar
             state.account.email = action.payload.email
+            state.account.role = action.payload.role
         },
         resetAccount: (state) => {
             state.isAuthenticated = false
@@ -43,6 +46,7 @@ export const accountSlice = createSlice({
             state.account.fullName = ""
             state.account.avatar = ""
             state.account.email = ""
+            state.account.role = ""
         },
         setRefreshToken: (state) => {
             state.isRefreshToken = true

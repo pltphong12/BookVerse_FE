@@ -42,6 +42,7 @@ export const InternalLoginPage = () => {
             const res = await callLoginApi(data.email, data.password);
             showToast(`Đăng nhập thành công`, ToastType.SUCCESS);
             localStorage.setItem('access_token', res.data.data?.accessToken as string);
+            localStorage.setItem('role', res.data.data?.user?.role?.name as string);
             dispatch(setAccount(res.data.data?.user as IUser));
             if (res.data.data?.user?.role?.name === 'CUSTOMER') {
                 setTimeout(() => {

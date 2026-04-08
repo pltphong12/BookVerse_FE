@@ -51,7 +51,7 @@ export default function ProductDetailPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
           <div className="lg:col-span-1">
-            <ProductImageGallery title={product.data.data?.title || ''} imageUrl={product.data.data?.image || ''} />
+            <ProductImageGallery title={product.data.data?.title || ''} images={product.data.data?.images || []} />
           </div>
 
           <div className="lg:col-span-2">

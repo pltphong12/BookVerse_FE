@@ -181,9 +181,49 @@ export interface ISupplier {
     updatedBy?: string;
 }
 
+export interface IBookFilterCriteria {
+    title?: string;
+    categoryId?: number[];
+    publisherId?: number[];
+    publishYear?: number[];
+    coverFormat?: string[];
+    minPrice?: number;
+    maxPrice?: number;
+    sortType?: string;
+}
+
 export interface IFile {
     fileName: string;
     uploadTime: string;
+}
+
+export interface ICartBookInfo {
+    id: number;
+    title: string;
+    authors: IAuthorInBook[];
+    publisher: string;
+    price: number;
+    discount: number;
+    quantity: number;
+    description: string;
+    image: string;
+}
+
+export interface ICartDetail {
+    id: number;
+    price: number;
+    quantity: number;
+    book: ICartBookInfo;
+}
+
+export interface ICart {
+    id: number;
+    sum: number;
+    cartDetails: ICartDetail[];
+    createdAt?: string;
+    updatedAt?: string;
+    createdBy?: string;
+    updatedBy?: string;
 }
 
 export interface ICategory {
@@ -196,4 +236,53 @@ export interface ICategory {
     createdBy?: string;
     updatedBy?: string;
 
+}
+
+export interface IOrderDetail {
+    id: number;
+    price: number;
+    quantity: number;
+    book: IBook;
+}
+
+export interface IOrder {
+    id: number;
+    orderCode: string;
+    totalPrice: number;
+    subtotal: number;
+    shippingFee?: number;
+    discountTotal?: number;
+    receiverName: string;
+    receiverAddress?: string;
+    receiverPhone: string;
+    receiverEmail?: string;
+    status: string;
+    paymentMethod: string;
+    paymentStatus: string;
+    paidAt?: string | null;
+    customerId: number;
+    orderDetails?: IOrderDetail[];
+    createdAt?: string;
+    updatedAt?: string;
+    createdBy?: string;
+    updatedBy?: string;
+}
+
+export interface IReqOrderLine {
+    bookId: number;
+    quantity: number;
+}
+
+export interface ICreateOrderReq {
+    receiverName: string;
+    receiverAddress: string;
+    receiverPhone: string;
+    receiverEmail?: string;
+    paymentMethod: 'COD' | 'VNPAY';
+    items: IReqOrderLine[];
+    note?: string;
+}
+
+export interface ICreateOrderRes extends IOrder {
+    paymentUrl?: string;
 }

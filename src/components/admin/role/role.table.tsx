@@ -46,7 +46,7 @@ export const RoleTable: React.FC<RoleTableProps> = ({ load, page, totalPage, set
             case 'ADMIN': return 'badge badge-error';
             case 'MANAGER': return 'badge badge-info';
             case 'CUSTOMER': return 'badge badge-success';
-            case 'EDITOR': return 'badge badge-warning';
+            case 'STAFF': return 'badge badge-warning';
             default: return 'badge';
         }
     };

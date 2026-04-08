@@ -1,4 +1,4 @@
-import { Book, Building2, KeyRound, LayoutDashboard, Library, Shield, TagsIcon, User, UserPen, Users } from 'lucide-react';
+import { Book, Building2, KeyRound, LayoutDashboard, Library, Shield, ShoppingCart, TagsIcon, User, UserPen, Users } from 'lucide-react';
 import { Link, NavLink } from 'react-router-dom';
 import Logo from '../../../assets/main_logo.png';
 export const LeftSidebar = () => {
@@ -104,7 +104,16 @@ export const LeftSidebar = () => {
                         <TagsIcon />
                         Thể loại
                     </NavLink>
-
+                    {/*Đơn hàng*/}
+                    <li className="menu-title">
+                        <span>Commerce</span>
+                    </li>
+                    <NavLink
+                        to={"/admin/orders"}
+                        className="mb-2 flex items-center gap-2" >
+                        <ShoppingCart />
+                        Đơn hàng
+                    </NavLink>
                 </li>
             </ul>
         </div>

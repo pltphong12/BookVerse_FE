@@ -16,94 +16,119 @@ import NotFound from './pages/error/NotFound';
 import { PrivateRoute } from './services/route-private';
 import { SupplierPage } from './pages/admin/supplier.admin';
 import { CustomerPage } from './pages/admin/customer.admin';
+import { OrderPage } from './pages/admin/order.admin';
 import ProductDetailPage from './pages/client/product.detail';
+import AllProductsPage from './pages/client/products';
+import CartPage from './pages/client/cart';
+import CheckoutPage from './pages/client/checkout';
+import OrderSuccessPage from './pages/client/order-success';
 
 export const router = createBrowserRouter([
-  {
-    path: "/",
-    element:
-      <App>
-        <LayoutClient />
-      </App>,
-    errorElement: <NotFound />,
-    children: [
-      {
-        index: true,
-        element: <Home />,
-      },
-      {
-        path: "/product/:id",
-        element: <ProductDetailPage />
-      }
-    ],
-  },
-  {
-    path: "/admin",
-    element:
-      <PrivateRoute>
-        <App>
-          <LayoutAdmin />
-        </App>
-      </PrivateRoute>,
-    errorElement: <NotFound />,
-    children: [
-      {
-        index: true,
-        element: <DashboardAdmin />
-      },
-      {
-        path: "/admin/users",
-        element: <UserPage />
-      },
-      {
-        path: "/admin/books",
-        element: <BookPage />
-      },
-      {
-        path: "/admin/authors",
-        element: <AuthorPage />
-      },
-      {
-        path: "/admin/publishers",
-        element: <PublisherPage />
-      },
-      {
-        path: "/admin/categories",
-        element: <CategoryPage />
-      },
-      {
-        path: "/admin/permissions",
-        element: <PermissionPage />
-      },
-      {
-        path: "/admin/roles",
-        element: <RolePage />
-      },
-      {
-        path: "/admin/suppliers",
-        element: <SupplierPage />
-      },
-      {
-        path: "/admin/customers",
-        element: <CustomerPage />
-      }
-    ]
-  },
-  {
-    path: "/login",
-    element: <InternalLoginPage />,
-  },
-  {
-    path: "/register",
-    element: <RegisterPage />,
-  },
+    {
+        path: "/",
+        element:
+            <App>
+                <LayoutClient />
+            </App>,
+        errorElement: <NotFound />,
+        children: [
+            {
+                index: true,
+                element: <Home />,
+            },
+            {
+                path: "/products",
+                element: <AllProductsPage />
+            },
+            {
+                path: "/product/:id",
+                element: <ProductDetailPage />
+            },
+            {
+                path: "/cart",
+                element: <CartPage />
+            },
+            {
+                path: "/checkout",
+                element: <CheckoutPage />
+            },
+            {
+                path: "/order-success",
+                element: <OrderSuccessPage />
+            }
+        ],
+    },
+    {
+        path: "/admin",
+        element:
+            <PrivateRoute>
+                <App>
+                    <LayoutAdmin />
+                </App>
+            </PrivateRoute>,
+        errorElement: <NotFound />,
+        children: [
+            {
+                index: true,
+                element: <DashboardAdmin />
+            },
+            {
+                path: "/admin/users",
+                element: <UserPage />
+            },
+            {
+                path: "/admin/books",
+                element: <BookPage />
+            },
+            {
+                path: "/admin/authors",
+                element: <AuthorPage />
+            },
+            {
+                path: "/admin/publishers",
+                element: <PublisherPage />
+            },
+            {
+                path: "/admin/categories",
+                element: <CategoryPage />
+            },
+            {
+                path: "/admin/permissions",
+                element: <PermissionPage />
+            },
+            {
+                path: "/admin/roles",
+                element: <RolePage />
+            },
+            {
+                path: "/admin/suppliers",
+                element: <SupplierPage />
+            },
+            {
+                path: "/admin/customers",
+                element: <CustomerPage />
+            },
+            {
+                path: "/admin/orders",
+                element: <OrderPage />
+            }
+        ]
+    },
+    {
+        path: "/login",
+        element: <InternalLoginPage />,
+    },
+    {
+        path: "/register",
+        element: <RegisterPage />,
+    },
 ]);
 
 export function App(props: { children: React.ReactNode }) {
 
-  return (
-    <>
-      {props.children}
-    </>
-  )
+    return (
+        <>
+            {props.children}
+        </>
+    )
 }
