@@ -163,7 +163,7 @@ export default function CheckoutPage() {
                 }
 
                 showToast('Đặt hàng thành công!', ToastType.SUCCESS);
-                navigate('/order-success', { state: { orderCode: order?.orderCode } });
+                navigate(`/payment/success?orderCode=${order?.orderCode}&method=${data.paymentMethod}`);
             }
         } catch (error: any) {
             const msg =
