@@ -22,6 +22,7 @@ import AllProductsPage from './pages/client/products';
 import CartPage from './pages/client/cart';
 import CheckoutPage from './pages/client/checkout';
 import PaymentResultPage from './pages/client/payment-result';
+import OrderHistoryPage from './pages/client/order-history';
 
 export const router = createBrowserRouter([
     {
@@ -59,6 +60,10 @@ export const router = createBrowserRouter([
             {
                 path: "/payment/failure",
                 element: <PaymentResultPage />
+            },
+            {
+                path: "/order-history",
+                element: <OrderHistoryPage />
             }
         ],
     },

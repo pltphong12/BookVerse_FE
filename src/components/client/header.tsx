@@ -109,7 +109,7 @@ export const Header: React.FC = () => {
                         <span>Miễn phí vận chuyển đơn từ 300k</span>
                     </div>
                     <div className="flex gap-4">
-                        <a href="#" className="hover:underline">Theo dõi đơn hàng</a>
+                        <Link to="/order-history" className="hover:underline">Theo dõi đơn hàng</Link>
                         <a href="#" className="hover:underline">Hỗ trợ</a>
                     </div>
                 </div>
@@ -235,6 +235,7 @@ export const Header: React.FC = () => {
                                 {account.isAuthenticated ? (
                                     <>
                                         <li><button>Thông tin tài khoản</button></li>
+                                        <li><button onClick={() => navigate('/order-history')}>Lịch sử đơn hàng</button></li>
                                         <li><button>Đổi mật khẩu</button></li>
                                         <li><button onClick={handleLogout}>Đăng xuất</button></li>
                                     </>

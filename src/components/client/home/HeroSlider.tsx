@@ -1,32 +1,36 @@
 import { useEffect, useState } from 'react';
+import Banner1 from '../../../assets/banner/banner_1.png'
+import Banner2 from '../../../assets/banner/banner_2.png'
+import Banner3 from '../../../assets/banner/banner_3.png'
+import Banner4 from '../../../assets/banner/banner_4.png'
 
 const slides = [
     {
         id: 1,
         title: 'Sách mới 2024',
         subtitle: 'Khám phá những đầu sách hot nhất',
-        image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1200&h=600&fit=crop',
+        image: Banner1,
         bgColor: 'bg-gradient-to-r from-primary-100 to-primary-200',
     },
     {
         id: 2,
         title: 'Giảm giá đến 50%',
         subtitle: 'Đừng bỏ lỡ cơ hội tuyệt vời',
-        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&h=600&fit=crop',
+        image: Banner2,
         bgColor: 'bg-gradient-to-r from-blue-100 to-blue-200',
     },
     {
         id: 3,
         title: 'Miễn phí vận chuyển',
         subtitle: 'Cho đơn hàng từ 300.000đ',
-        image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=1200&h=600&fit=crop',
+        image: Banner3,
         bgColor: 'bg-gradient-to-r from-cyan-100 to-cyan-200',
     },
     {
         id: 4,
         title: 'Best Seller',
         subtitle: 'Những cuốn sách được yêu thích nhất',
-        image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=1200&h=600&fit=crop',
+        image: Banner4,
         bgColor: 'bg-gradient-to-r from-purple-100 to-purple-200',
     },
 ];

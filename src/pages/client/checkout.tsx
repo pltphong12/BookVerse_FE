@@ -26,6 +26,8 @@ import { callFetchCartApi, callCreateOrderApi } from '../../services/api';
 import { formatPrice } from '../../common/formatPrice';
 import { showToast, ToastType } from '../../common/showToast';
 import { RootState } from '../../redux/store';
+import { resetCart } from '../../redux/slide/cart.slice';
+import { useAppDispatch } from '../../redux/hook';
 
 // ------ Zod Schema ------
 const checkoutSchema = z.object({
@@ -58,6 +60,7 @@ type PaymentMethodType = 'COD' | 'VNPAY';
 
 export default function CheckoutPage() {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
     const account = useSelector((state: RootState) => state.account.account);
 
     const [cartItems, setCartItems] = useState<ICartDetail[]>([]);
@@ -163,6 +166,7 @@ export default function CheckoutPage() {
                 }
 
                 showToast('Đặt hàng thành công!', ToastType.SUCCESS);
+                dispatch(resetCart());
                 navigate(`/payment/success?orderCode=${order?.orderCode}&method=${data.paymentMethod}`);
             }
         } catch (error: any) {

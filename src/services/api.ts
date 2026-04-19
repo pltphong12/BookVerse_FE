@@ -663,4 +663,9 @@ export const callUpdateOrderApi = (
 export const callCreateOrderApi = (data: ICreateOrderReq) => {
     const url = '/api/v1/orders'
     return axiosInstance.post<IBackendRes<ICreateOrderRes>>(url, data)
-}
+}
+
+export const callFetchMyOrdersApi = (page: number, size: number) => {
+    const url = `api/v1/orders/me?page=${page}&size=${size}`
+    return axiosInstance.get<IBackendRes<IPagination<IOrder>>>(url)
+}

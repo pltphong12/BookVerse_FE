@@ -238,11 +238,22 @@ export interface ICategory {
 
 }
 
+export interface IOrderBookInfo {
+    id: number;
+    title: string;
+    authors: IAuthorInBook[];
+    publisher: string;
+    price: number;
+    quantity: number;
+    description: string;
+    image: string;
+}
+
 export interface IOrderDetail {
     id: number;
     price: number;
     quantity: number;
-    book: IBook;
+    book: IOrderBookInfo;
 }
 
 export interface IOrder {
@@ -261,6 +272,7 @@ export interface IOrder {
     paymentStatus: string;
     paidAt?: string | null;
     customerId: number;
+    paymentUrl?: string | null;
     orderDetails?: IOrderDetail[];
     createdAt?: string;
     updatedAt?: string;
