@@ -1,11 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useCallback, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { showToast, ToastType } from "../../../common/showToast";
 import { useAppDispatch, useAppSelector } from "../../../redux/hook";
 import { createAuthor, ICreateAuthor, resetCreateAuthor, resetUpdateAuthor, updateAuthor } from "../../../redux/slide/author.slice";
 import { callUploadSingleFile } from "../../../services/api";
+import { Modal, Input, DatePicker, Upload, Button, Form, Image, Space } from 'antd';
+import { UploadOutlined, SaveOutlined, UserOutlined, EnvironmentOutlined, CalendarOutlined } from '@ant-design/icons';
+import type { UploadFile } from 'antd';
+import dayjs from 'dayjs';
 
 interface AuthorFormProps {
     load: () => Promise<void>;
@@ -32,6 +36,7 @@ type CreateAuthorFormData = z.infer<typeof createAuthorSchema>;
 export const AuthorForm: React.FC<AuthorFormProps> = ({ isModalOpen, setIsModalOpen, load, authorToEdit }) => {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [previewURL, setPreviewUrl] = useState<string>('');
+    const [fileList, setFileList] = useState<UploadFile[]>([]);
     const dispatch = useAppDispatch();
     const isCreateAuthorSuccess = useAppSelector((state) => state.author.isCreateAuthorSuccess);
     const isCreateAuthorFailed = useAppSelector((state) => state.author.isCreateAuthorFailed);
@@ -40,7 +45,7 @@ export const AuthorForm: React.FC<AuthorFormProps> = ({ isModalOpen, setIsModalO
     const message = useAppSelector((state) => state.author.message);
 
     const {
-        register,
+        control,
         handleSubmit,
         reset,
         setValue,
@@ -60,7 +65,9 @@ export const AuthorForm: React.FC<AuthorFormProps> = ({ isModalOpen, setIsModalO
             setValue('name', authorToEdit.name);
             setValue('birthday', authorToEdit.birthday.slice(0, 10));
             setValue('nationality', authorToEdit.nationality);
-            setPreviewUrl(`${import.meta.env.VITE_BACKEND_URL}/storage/author/${authorToEdit.avatar}`)
+            const url = `${import.meta.env.VITE_BACKEND_URL}/storage/author/${authorToEdit.avatar}`;
+            setPreviewUrl(url);
+            setFileList([]);
         } else {
             reset({
                 name: '',
@@ -68,6 +75,8 @@ export const AuthorForm: React.FC<AuthorFormProps> = ({ isModalOpen, setIsModalO
                 nationality: '',
                 avatar: undefined
             });
+            setPreviewUrl('');
+            setFileList([]);
         }
     }, [authorToEdit, setValue, reset]);
 
@@ -77,17 +86,10 @@ export const AuthorForm: React.FC<AuthorFormProps> = ({ isModalOpen, setIsModalO
             birthday: '',
             nationality: '',
         });
-        setPreviewUrl('')
+        setPreviewUrl('');
+        setFileList([]);
         setIsSubmitting(false);
     }, [reset]);
-
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            setValue('avatar', file);
-            setPreviewUrl(URL.createObjectURL(file));
-        }
-    };
 
     const onSubmit = async (data: CreateAuthorFormData) => {
         setIsSubmitting(true);
@@ -99,7 +101,7 @@ export const AuthorForm: React.FC<AuthorFormProps> = ({ isModalOpen, setIsModalO
                 if (res.data) {
                     imageFileName = res.data.data?.fileName as string;
                 }
-            } catch (error) {
+            } catch {
                 showToast("Tải lên không thành công", ToastType.ERROR);
                 setIsSubmitting(false);
                 return;
@@ -140,111 +142,160 @@ export const AuthorForm: React.FC<AuthorFormProps> = ({ isModalOpen, setIsModalO
     }, [isCreateAuthorSuccess, isCreateAuthorFailed, isUpdateAuthorSuccess, isUpdateAuthorFailed, dispatch, load, message, authorToEdit, handleClose]);
 
     return (
-        <dialog id="author_modal" className={`modal ${isModalOpen ? 'modal-open' : ''} modal-bottom sm:modal-middle w-full`}>
-            <div className="modal-box">
-                <h3 className="font-bold text-lg mb-4">{authorToEdit ? 'Chỉnh sửa tác giả' : 'Tạo tác giả'}</h3>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Tên tác giả</span>
-                        </label>
-                        <input
-                            type="text"
-                            {...register('name')}
-                            placeholder="Nhập tên tác giả"
-                            className={`input input-bordered w-full ${errors.name ? 'input-error' : ''}`}
+        <Modal
+            title={
+                <span style={{ fontSize: 18, fontWeight: 600 }}>
+                    {authorToEdit ? 'Chỉnh sửa tác giả' : 'Tạo tác giả mới'}
+                </span>
+            }
+            open={isModalOpen}
+            onCancel={handleClose}
+            footer={null}
+            width={520}
+            destroyOnHidden
+            centered
+        >
+            <form onSubmit={handleSubmit(onSubmit)}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 20, marginTop: 16 }}>
+                    {/* Name */}
+                    <Form.Item
+                        label={<><UserOutlined /> Tên tác giả</>}
+                        validateStatus={errors.name ? 'error' : ''}
+                        help={errors.name?.message}
+                        required
+                        layout="vertical"
+                        style={{ marginBottom: 0 }}
+                    >
+                        <Controller
+                            name="name"
+                            control={control}
+                            render={({ field }) => (
+                                <Input
+                                    {...field}
+                                    placeholder="Nhập tên tác giả"
+                                    size="large"
+                                />
+                            )}
                         />
-                        {errors.name && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.name.message}</span>
-                            </label>
-                        )}
-                    </div>
+                    </Form.Item>
 
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Quê quán</span>
-                        </label>
-                        <input
-                            type="text"
-                            {...register('nationality')}
-                            placeholder="Nhập quê quán"
-                            className={`input input-bordered w-full ${errors.nationality ? 'input-error' : ''}`}
+                    {/* Nationality */}
+                    <Form.Item
+                        label={<><EnvironmentOutlined /> Quê quán</>}
+                        validateStatus={errors.nationality ? 'error' : ''}
+                        help={errors.nationality?.message}
+                        required
+                        layout="vertical"
+                        style={{ marginBottom: 0 }}
+                    >
+                        <Controller
+                            name="nationality"
+                            control={control}
+                            render={({ field }) => (
+                                <Input
+                                    {...field}
+                                    placeholder="Nhập quê quán"
+                                    size="large"
+                                />
+                            )}
                         />
-                        {errors.nationality && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.nationality.message}</span>
-                            </label>
-                        )}
-                    </div>
+                    </Form.Item>
 
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Ngày sinh</span>
-                        </label>
-                        <input
-                            type="date"
-                            {...register('birthday')}
-                            className={`input input-bordered w-full ${errors.birthday ? 'input-error' : ''}`}
+                    {/* Birthday */}
+                    <Form.Item
+                        label={<><CalendarOutlined /> Ngày sinh</>}
+                        validateStatus={errors.birthday ? 'error' : ''}
+                        help={errors.birthday?.message}
+                        required
+                        layout="vertical"
+                        style={{ marginBottom: 0 }}
+                    >
+                        <Controller
+                            name="birthday"
+                            control={control}
+                            render={({ field }) => (
+                                <DatePicker
+                                    value={field.value ? dayjs(field.value) : null}
+                                    onChange={(_date, dateString) => {
+                                        field.onChange(dateString);
+                                    }}
+                                    style={{ width: '100%' }}
+                                    size="large"
+                                    format="YYYY-MM-DD"
+                                    placeholder="Chọn ngày sinh"
+                                />
+                            )}
                         />
-                        {errors.birthday && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.birthday.message}</span>
-                            </label>
-                        )}
-                    </div>
+                    </Form.Item>
 
-                    <div className="form-control mt-4 space-x-2">
-                        <label className="label">
-                            <span className="label-text">Ảnh sách</span>
-                        </label>
-                        <input
-                            type="file"
-                            id="avatar-upload"
-                            onChange={handleImageChange}
+                    {/* Avatar Upload */}
+                    <Form.Item
+                        label="Ảnh đại diện"
+                        layout="vertical"
+                        style={{ marginBottom: 0 }}
+                    >
+                        <Upload
+                            listType="picture"
+                            maxCount={1}
+                            fileList={fileList}
+                            beforeUpload={(file) => {
+                                setValue('avatar', file);
+                                setPreviewUrl(URL.createObjectURL(file));
+                                setFileList([{
+                                    uid: '-1',
+                                    name: file.name,
+                                    status: 'done',
+                                    originFileObj: file,
+                                }]);
+                                return false; // Prevent auto upload
+                            }}
+                            onRemove={() => {
+                                setValue('avatar', undefined);
+                                setPreviewUrl('');
+                                setFileList([]);
+                            }}
                             accept="image/*"
-                            className="hidden"
-                        />
+                        >
+                            <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
+                        </Upload>
 
-                        {/* Nút chọn ảnh thay thế */}
-                        <label htmlFor="avatar-upload" className="btn btn-outline btn-sm w-fit">
-                            📷 Chọn ảnh
-                        </label>
-                        {errors.avatar && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.avatar.message?.toString()}</span>
-                            </label>
-                        )}
-                        {previewURL && (
-                            <div className="mt-2">
-                                <img src={previewURL} alt="Avatar Preview" className="w-24 h-24" />
+                        {/* Preview for edit mode (old image) */}
+                        {previewURL && fileList.length === 0 && (
+                            <div style={{ marginTop: 12 }}>
+                                <Image
+                                    src={previewURL}
+                                    alt="Avatar Preview"
+                                    width={96}
+                                    height={96}
+                                    style={{ objectFit: 'cover', borderRadius: 8 }}
+                                />
                             </div>
                         )}
-                    </div>
+                    </Form.Item>
+                </div>
 
-                    <div className="flex justify-end gap-4 mt-4">
-                        <button
-                            type="submit"
-                            className="btn btn-neutral"
-                            disabled={isSubmitting}
-                        >
-                            {isSubmitting ? (
-                                <span className="loading loading-spinner loading-sm"></span>
-                            ) : (
-                                authorToEdit ? 'Cập nhật' : 'Tạo'
-                            )}
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-error"
-                            onClick={handleClose}
-                            disabled={isSubmitting}
-                        >
-                            Đóng
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </dialog>
+                {/* Footer Actions */}
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    gap: 8,
+                    marginTop: 24,
+                    paddingTop: 16,
+                    borderTop: '1px solid #f0f0f0',
+                }}>
+                    <Button onClick={handleClose} disabled={isSubmitting}>
+                        Đóng
+                    </Button>
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        icon={<SaveOutlined />}
+                        loading={isSubmitting}
+                    >
+                        {authorToEdit ? 'Cập nhật' : 'Tạo mới'}
+                    </Button>
+                </div>
+            </form>
+        </Modal>
     );
 };

@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
+import { Spin } from "antd";
 import { CategoryTable } from "../../components/admin/category/categoty.table";
 import { useAppDispatch } from "../../redux/hook";
 import { clearBreadcrumbs, setBreadcrumbs } from "../../redux/slide/breadcrumbs.slice";
@@ -28,14 +29,11 @@ export const CategoryPage = () => {
         retry: false
     });
 
-    
-
     React.useEffect(() => {
         if (categoriesQuery?.data.data) {
             setDataSource(categoriesQuery.data.data.result);
             setTotalPage(categoriesQuery.data.data.meta.pages)
         }
-        
     }, [categoriesQuery]);
 
     React.useEffect(() => {
@@ -51,34 +49,19 @@ export const CategoryPage = () => {
         await queryClient.invalidateQueries({ queryKey: ['fetchingCategories'] });
     };
 
-    const getTable = () => {
-        if (isPending) return (
-            <>
-                <div>Đang tải...</div>
-            </>
-        )
-        else {
-            return (
-                <>
-                    <CategoryTable
-                        load={load}
-                        dataSource={dataSource}
-                        page={page}
-                        totalPage={totalPage}
-                        setPage={setPage}
-                        searchWithName={searchWithName}
-                        setSearchWithName={setSearchWithName}                     
-                        dateFrom={dateFrom}
-                        setDateFrom={setDateFrom}
-                    />
-                </>
-            )
-        }
-    }
-
     return (
-        <>
-            {getTable()}
-        </>
+        <Spin spinning={isPending} tip="Đang tải..." size="large">
+            <CategoryTable
+                load={load}
+                dataSource={dataSource}
+                page={page}
+                totalPage={totalPage}
+                setPage={setPage}
+                searchWithName={searchWithName}
+                setSearchWithName={setSearchWithName}
+                dateFrom={dateFrom}
+                setDateFrom={setDateFrom}
+            />
+        </Spin>
     );
 }

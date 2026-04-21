@@ -1,5 +1,9 @@
-import { X } from 'lucide-react';
+import React from 'react';
+import { Drawer, Descriptions, Tag, Typography, Divider, List, Empty } from 'antd';
+import { TagOutlined, CalendarOutlined, BookOutlined, FileTextOutlined } from '@ant-design/icons';
 import { ICategory } from '../../../types/backend';
+
+const { Title, Text, Paragraph } = Typography;
 
 interface CategoryViewProps {
     isOpen: boolean;
@@ -8,66 +12,115 @@ interface CategoryViewProps {
 }
 
 export const CategoryView: React.FC<CategoryViewProps> = ({ isOpen, setIsOpen, category }) => {
-    if (!isOpen || !category) return null;
+    if (!category) return null;
+
+    const formatDateTime = (dateStr?: string) => {
+        if (!dateStr) return '—';
+        return new Intl.DateTimeFormat('vi-VN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+        }).format(new Date(dateStr));
+    };
 
     return (
-        <div className="fixed inset-0 z-999 flex items-center justify-center">
-            {/* Backdrop */}
-            <div className="fixed inset-0 bg-black opacity-50" onClick={() => setIsOpen(false)}></div>
-
-            {/* Modal */}
-            <div className="relative z-50 w-full max-w-2xl rounded-lg bg-white p-6 dark:bg-gray-800">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                        Thông tin thể loại
-                    </h3>
-                    <button
-                        onClick={() => setIsOpen(false)}
-                        className="btn btn-sm btn-circle btn-ghost hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                        <X size={24} />
-                    </button>
+        <Drawer
+            title={
+                <span style={{ fontSize: 18, fontWeight: 600 }}>
+                    <TagOutlined /> Thông tin thể loại
+                </span>
+            }
+            placement="right"
+            width={520}
+            onClose={() => setIsOpen(false)}
+            open={isOpen}
+            styles={{ body: { padding: '24px' } }}
+        >
+            {/* Category Name Header */}
+            <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                <div style={{
+                    width: 80, height: 80, borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #667eea, #764ba2)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    margin: '0 auto 12px',
+                }}>
+                    <TagOutlined style={{ fontSize: 32, color: '#fff' }} />
                 </div>
-
-                {/* Content */}
-                <div className="space-y-4">
-                    <div className="items-center space-x-4">
-                        <h4 className="text-lg font-semibold">Thể loại: </h4>
-                        <p>{category.name}</p>
-                    </div>
-                    <div className="items-center space-x-4">
-                        <h4 className="text-lg font-semibold">Sách: {' '}</h4>
-                        <p>
-                            {category.infoBookInCategory && category.infoBookInCategory.length > 0
-                                ? category.infoBookInCategory.map(book => book.title).join(', ')
-                                : 'Không có sách thể loại này'
-                            }
-                        </p>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="col-span-2">
-                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Ngày tạo</p>
-                            <p className="text-gray-900 dark:text-white">
-                                {category.createdAt && new Intl.DateTimeFormat('en-US', {
-                                    year: 'numeric',
-                                    month: '2-digit',
-                                    day: '2-digit',
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                    second: '2-digit'
-                                }).format(new Date(category.createdAt))}
-                            </p>
-                        </div>
-                        <div className="col-span-2">
-                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Mô tả</p>
-                            <p className="text-gray-900 dark:text-white">{category.description}</p>
-                        </div>
-
-
-                    </div>
-                </div>
+                <Title level={4} style={{ marginBottom: 4 }}>{category.name}</Title>
+                <Tag color="purple">
+                    {category.infoBookInCategory?.length || 0} sách
+                </Tag>
             </div>
-        </div>
+
+            <Divider />
+
+            {/* Details */}
+            <Descriptions
+                column={1}
+                bordered
+                size="small"
+                labelStyle={{ fontWeight: 600, width: 130, whiteSpace: 'nowrap' }}
+            >
+                <Descriptions.Item label={<><TagOutlined /> Tên</>}>
+                    {category.name}
+                </Descriptions.Item>
+                <Descriptions.Item label={<><CalendarOutlined /> Ngày tạo</>}>
+                    {formatDateTime(category.createdAt)}
+                </Descriptions.Item>
+                {category.updatedAt && (
+                    <Descriptions.Item label={<><CalendarOutlined /> Cập nhật</>}>
+                        {formatDateTime(category.updatedAt)}
+                    </Descriptions.Item>
+                )}
+                {category.createdBy && (
+                    <Descriptions.Item label="Người tạo">
+                        <Text>{category.createdBy}</Text>
+                    </Descriptions.Item>
+                )}
+            </Descriptions>
+
+            {/* Description */}
+            <Divider />
+            <Title level={5} style={{ marginBottom: 8 }}>
+                <FileTextOutlined /> Mô tả
+            </Title>
+            <Paragraph type="secondary" style={{ whiteSpace: 'pre-wrap' }}>
+                {category.description || 'Chưa có mô tả.'}
+            </Paragraph>
+
+            {/* Books in Category */}
+            <Divider />
+            <Title level={5} style={{ marginBottom: 12 }}>
+                <BookOutlined /> Danh sách sách ({category.infoBookInCategory?.length || 0})
+            </Title>
+
+            {category.infoBookInCategory && category.infoBookInCategory.length > 0 ? (
+                <List
+                    size="small"
+                    bordered
+                    dataSource={category.infoBookInCategory}
+                    renderItem={(book, index) => (
+                        <List.Item>
+                            <List.Item.Meta
+                                avatar={
+                                    <Tag color="geekblue" style={{ minWidth: 28, textAlign: 'center' }}>
+                                        {index + 1}
+                                    </Tag>
+                                }
+                                title={<Text strong>{book.title}</Text>}
+                            />
+                        </List.Item>
+                    )}
+                />
+            ) : (
+                <Empty
+                    description="Không có sách thuộc thể loại này"
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                />
+            )}
+        </Drawer>
     );
 };

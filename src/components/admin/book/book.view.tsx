@@ -1,6 +1,13 @@
-import { X } from 'lucide-react';
+import React from 'react';
+import { Drawer, Descriptions, Image, Tag, Typography, Divider, Space, Badge } from 'antd';
+import {
+    BookOutlined, CalendarOutlined, TagOutlined,
+    DollarOutlined, InboxOutlined, PercentageOutlined, UserOutlined
+} from '@ant-design/icons';
 import { IBook } from '../../../types/backend';
 import { formatPrice } from '../../../common/formatPrice';
+
+const { Title, Text, Paragraph } = Typography;
 
 interface BookViewProps {
     isOpen: boolean;
@@ -9,170 +16,201 @@ interface BookViewProps {
 }
 
 export const BookView: React.FC<BookViewProps> = ({ isOpen, setIsOpen, book }) => {
-    if (!isOpen || !book) return null;
+    if (!book) return null;
+
+    const imageUrl = book.image
+        ? `${import.meta.env.VITE_BACKEND_URL}/storage/book/${book.image}`
+        : undefined;
+
+    const formatDateTime = (dateStr?: string) => {
+        if (!dateStr) return '—';
+        return new Intl.DateTimeFormat('vi-VN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+        }).format(new Date(dateStr));
+    };
+
+    const discountedPrice = book.discount > 0
+        ? book.price * (1 - book.discount / 100)
+        : book.price;
 
     return (
-        <div className="fixed inset-0 z-999 flex items-center justify-center p-4">
-            {/* Backdrop */}
-            <div className="fixed inset-0 bg-black opacity-50" onClick={() => setIsOpen(false)}></div>
-
-            {/* Modal */}
-            <div className="relative z-50 w-full max-w-4xl max-h-[90vh] rounded-lg bg-white dark:bg-gray-800 flex flex-col">
-                {/* Header - Fixed */}
-                <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                        Thông tin sách
-                    </h3>
-                    <button
-                        onClick={() => setIsOpen(false)}
-                        className="btn btn-sm btn-circle btn-ghost hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                        <X size={24} />
-                    </button>
-                </div>
-
-                {/* Content - Scrollable */}
-                <div className="flex-1 overflow-y-scroll [scrollbar-width:none] p-6">
-                    <div className="flex flex-col lg:flex-row gap-8">
-                        {/* Book Cover */}
-                        <div className="flex-shrink-0">
-                            <div className="w-64 h-96 bg-gradient-to-b from-blue-900 to-blue-700 rounded-lg shadow-lg overflow-hidden relative">
-                                {book.image ? (
-                                    <img
-                                        src={`${import.meta.env.VITE_BACKEND_URL}/storage/book/${book.image}`}
-                                        alt={book.title}
-                                        className="w-full h-full"
-                                    />
-                                ) : (
-                                    <div className="absolute inset-0 bg-gradient-to-br from-blue-800 to-blue-900">
-                                        {/* Default Book Cover Design */}
-                                        <div className="p-6 h-full flex flex-col justify-between text-white">
-                                            <div>
-                                                <h3 className="text-xl   text-yellow-400 mb-2 line-clamp-2">
-                                                    {book.title.toUpperCase()}
-                                                </h3>
-                                            </div>
-
-                                            {/* Abstract design */}
-                                            <div className="flex-1 flex items-center justify-center">
-                                                <div className="relative">
-                                                    <div className="w-20 h-12 bg-blue-600 rounded-full opacity-80"></div>
-                                                    <div className="absolute top-2 left-6 w-2 h-2 bg-cyan-300 rounded-full"></div>
-                                                    <div className="absolute top-2 right-6 w-2 h-2 bg-cyan-300 rounded-full"></div>
-                                                    <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-1 bg-red-500 rounded-full"></div>
-                                                </div>
-                                            </div>
-
-                                            {/* Decorative elements */}
-                                            <div className="flex items-end justify-center space-x-1 mb-4">
-                                                <div className="w-1 h-8 bg-yellow-400 opacity-70"></div>
-                                                <div className="w-1 h-6 bg-yellow-400 opacity-70"></div>
-                                                <div className="w-1 h-10 bg-yellow-400 opacity-70"></div>
-                                                <div className="w-1 h-4 bg-yellow-400 opacity-70"></div>
-                                                <div className="w-1 h-12 bg-yellow-400 opacity-70"></div>
-                                            </div>
-
-                                            <div className="text-center">
-                                                <p className="text-sm font-semibold line-clamp-2">
-                                                    {book.authors && book.authors.length > 0
-                                                        ? book.authors.map(author => author.name).join(', ').toUpperCase()
-                                                        : 'UNKNOWN AUTHOR'
-                                                    }
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Book Details */}
-                        <div className="flex-1 space-y-6">
-                            {/* Title */}
-                            <div>
-                                <h1 className="text-3xl   text-gray-800 dark:text-white mb-2">{book.title}</h1>
-                            </div>
-
-                            {/* Details Grid */}
-                            <div className="space-y-4">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-gray-600 dark:text-gray-400 font-medium">Nhà xuất bản:</span>
-                                    <span className="text-gray-800 dark:text-white font-semibold">{book.publisher.name}</span>
-                                </div>
-
-                                <div className="flex justify-between items-start">
-                                    <span className="text-gray-600 dark:text-gray-400 font-medium">Tác giả:</span>
-                                    <div className="text-right">
-                                        {book.authors && book.authors.length > 0 ? (
-                                            book.authors.map((author, index) => (
-                                                <div key={author.id} className="text-gray-800 dark:text-white font-semibold">
-                                                    {author.name}
-                                                    {index < book.authors.length - 1 && ', '}
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <span className="text-gray-400">Chưa có tác giả</span>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="flex justify-between items-center">
-                                    <span className="text-gray-600 dark:text-gray-400 font-medium">Thể loại:</span>
-                                    <span className="text-gray-800 dark:text-white font-semibold">{book.category.name}</span>
-                                </div>
-
-                                <div className="flex justify-between items-center">
-                                    <span className="text-gray-600 dark:text-gray-400 font-medium">Giá:</span>
-                                    <span className="text-2xl  ">{formatPrice(book.price)}</span>
-                                </div>
-
-                                <div className="flex justify-between items-center">
-                                    <span className="text-gray-600 dark:text-gray-400 font-medium">Số lượng:</span>
-                                    <span className="text-xl   text-gray-800 dark:text-white">{book.quantity} cuốn</span>
-                                </div>
-
-                                <div className="flex justify-between items-center">
-                                    <span className="text-gray-600 dark:text-gray-400 font-medium">Đã bán:</span>
-                                    <span className="text-xl   text-gray-800 dark:text-white">{book.sold} cuốn</span>
-                                </div>
-
-                                <div className="flex justify-between items-center">
-                                    <span className="text-gray-600 dark:text-gray-400 font-medium">Giảm giá:</span>
-                                    <span className="text-xl   text-gray-800 dark:text-white">{book.discount} %</span>
-                                </div>
-
-                                <div className="flex justify-between items-center">
-                                    <span className="text-gray-600 dark:text-gray-400 font-medium">Ngày tạo:</span>
-                                    <span className="text-gray-800 dark:text-white font-semibold">
-                                        {book.createdAt && new Intl.DateTimeFormat('en-US', {
-                                            year: 'numeric',
-                                            month: '2-digit',
-                                            day: '2-digit',
-                                            hour: '2-digit',
-                                            minute: '2-digit',
-                                            second: '2-digit'
-                                        }).format(new Date(book.createdAt))}
-                                    </span>
-                                </div>
-                            </div>
-
-                        </div>
+        <Drawer
+            title={
+                <span style={{ fontSize: 18, fontWeight: 600 }}>
+                    <BookOutlined /> Thông tin sách
+                </span>
+            }
+            placement="right"
+            width={640}
+            onClose={() => setIsOpen(false)}
+            open={isOpen}
+            styles={{ body: { padding: '24px' } }}
+        >
+            {/* Book Cover + Title Header */}
+            <div style={{ display: 'flex', gap: 20, marginBottom: 24 }}>
+                {imageUrl ? (
+                    <Image
+                        src={imageUrl}
+                        alt={book.title}
+                        width={140}
+                        height={200}
+                        style={{
+                            objectFit: 'cover',
+                            borderRadius: 8,
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                            flexShrink: 0,
+                        }}
+                        fallback="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTQwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEyIiBmaWxsPSIjYmZiZmJmIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4="
+                    />
+                ) : (
+                    <div style={{
+                        width: 140, height: 200, borderRadius: 8, flexShrink: 0,
+                        background: 'linear-gradient(135deg, #1e3a5f, #2d5a87)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                        <BookOutlined style={{ fontSize: 48, color: '#fff', opacity: 0.5 }} />
                     </div>
-
-                    {/* Description Section */}
-                    <div className='pt-6'>
-                        <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-3">Mô tả</h3>
-                            <h4 className="text-md font-semibold text-gray-800 dark:text-white mb-3">{book.title}</h4>
-                            <div className="max-h-48 overflow-y-auto">
-                                <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
-                                    {book.description || 'Chưa có mô tả cho cuốn sách này.'}
-                                </p>
-                            </div>
-                        </div>
+                )}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                    <Title level={4} style={{ marginBottom: 8 }}>{book.title}</Title>
+                    <Space wrap size={[4, 8]}>
+                        <Tag icon={<TagOutlined />} color="blue">{book.category.name}</Tag>
+                        <Tag color="cyan">{book.coverFormat}</Tag>
+                        {book.discount > 0 && (
+                            <Tag color="red">-{book.discount}%</Tag>
+                        )}
+                    </Space>
+                    <div style={{ marginTop: 12 }}>
+                        {book.discount > 0 ? (
+                            <Space align="baseline">
+                                <Text strong style={{ fontSize: 22, color: '#cf1322' }}>
+                                    {formatPrice(discountedPrice)}
+                                </Text>
+                                <Text delete type="secondary" style={{ fontSize: 14 }}>
+                                    {formatPrice(book.price)}
+                                </Text>
+                            </Space>
+                        ) : (
+                            <Text strong style={{ fontSize: 22, color: '#1677ff' }}>
+                                {formatPrice(book.price)}
+                            </Text>
+                        )}
                     </div>
                 </div>
             </div>
-        </div>
+
+            <Divider />
+
+            {/* Main Details — single column to avoid narrow cells */}
+            <Descriptions
+                column={1}
+                bordered
+                size="small"
+                labelStyle={{ fontWeight: 600, width: 130, whiteSpace: 'nowrap' }}
+                contentStyle={{ wordBreak: 'break-word' }}
+            >
+                <Descriptions.Item label={<><BookOutlined /> NXB</>}>
+                    {book.publisher.name}
+                </Descriptions.Item>
+                <Descriptions.Item label={<><InboxOutlined /> NCC</>}>
+                    {book.supplier?.name || '—'}
+                </Descriptions.Item>
+                <Descriptions.Item label={<><UserOutlined /> Tác giả</>}>
+                    <Space wrap>
+                        {book.authors?.map(a => (
+                            <Tag key={a.id} color="geekblue">{a.name}</Tag>
+                        ))}
+                        {(!book.authors || book.authors.length === 0) && <Text type="secondary">Chưa có</Text>}
+                    </Space>
+                </Descriptions.Item>
+                <Descriptions.Item label={<><DollarOutlined /> Giá gốc</>}>
+                    {formatPrice(book.price)}
+                </Descriptions.Item>
+                <Descriptions.Item label={<><PercentageOutlined /> Giảm giá</>}>
+                    <Badge
+                        count={`${book.discount}%`}
+                        style={{ backgroundColor: book.discount > 0 ? '#ff4d4f' : '#d9d9d9' }}
+                    />
+                </Descriptions.Item>
+                <Descriptions.Item label="Số lượng">
+                    <Text strong>{book.quantity}</Text> cuốn
+                </Descriptions.Item>
+                <Descriptions.Item label="Đã bán">
+                    <Text strong type="success">{book.sold}</Text> cuốn
+                </Descriptions.Item>
+            </Descriptions>
+
+            <div style={{ height: 16 }} />
+
+            {/* Secondary details */}
+            <Descriptions
+                column={2}
+                bordered
+                size="small"
+                labelStyle={{ fontWeight: 600, whiteSpace: 'nowrap' }}
+            >
+                <Descriptions.Item label="Năm XB">{book.publishYear}</Descriptions.Item>
+                <Descriptions.Item label="Trọng lượng">{book.weight}g</Descriptions.Item>
+                <Descriptions.Item label="Kích thước">{book.dimensions || '—'}</Descriptions.Item>
+                <Descriptions.Item label="Số trang">{book.numberOfPages}</Descriptions.Item>
+            </Descriptions>
+
+            <div style={{ height: 16 }} />
+
+            <Descriptions
+                column={1}
+                bordered
+                size="small"
+                labelStyle={{ fontWeight: 600, width: 130, whiteSpace: 'nowrap' }}
+            >
+                <Descriptions.Item label={<><CalendarOutlined /> Ngày tạo</>}>
+                    {formatDateTime(book.createdAt)}
+                </Descriptions.Item>
+                {book.updatedAt && (
+                    <Descriptions.Item label={<><CalendarOutlined /> Cập nhật</>}>
+                        {formatDateTime(book.updatedAt)}
+                    </Descriptions.Item>
+                )}
+            </Descriptions>
+
+            {/* Book Images Gallery */}
+            {book.images && book.images.length > 1 && (
+                <>
+                    <Divider />
+                    <Title level={5} style={{ marginBottom: 12 }}>Ảnh sách</Title>
+                    <Image.PreviewGroup>
+                        <Space wrap>
+                            {book.images.map((img) => (
+                                <Image
+                                    key={img.id}
+                                    src={`${import.meta.env.VITE_BACKEND_URL}/storage/book/${img.relativePath}`}
+                                    width={80}
+                                    height={80}
+                                    style={{
+                                        objectFit: 'cover',
+                                        borderRadius: 6,
+                                        border: img.primary ? '2px solid #faad14' : '1px solid #f0f0f0',
+                                    }}
+                                />
+                            ))}
+                        </Space>
+                    </Image.PreviewGroup>
+                </>
+            )}
+
+            {/* Description */}
+            <Divider />
+            <Title level={5} style={{ marginBottom: 8 }}>Mô tả</Title>
+            <Paragraph
+                type="secondary"
+                style={{ whiteSpace: 'pre-wrap', maxHeight: 200, overflow: 'auto' }}
+            >
+                {book.description || 'Chưa có mô tả cho cuốn sách này.'}
+            </Paragraph>
+        </Drawer>
     );
 };

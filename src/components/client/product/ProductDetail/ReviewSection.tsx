@@ -106,7 +106,7 @@ export default function ReviewSection() {
                 </div>
             </div>
 
-            <button className="btn btn-outline btn-primary w-full md:w-auto">Viết đánh giá</button>
+            <button className="border-2 border-primary-500 text-primary-500 px-6 py-2.5 rounded-xl hover:bg-primary-50 transition-colors font-semibold text-base w-full md:w-auto">Viết đánh giá</button>
 
             <div className="space-y-4">
                 <h4 className="font-bold text-gray-900">Đánh giá chi tiết</h4>

@@ -1,10 +1,31 @@
-import { Edit, View } from "lucide-react";
 import React from "react";
+import { Table, Button, Space, Tooltip, Tag, Card, Typography } from "antd";
+import { EditOutlined, EyeOutlined, ShoppingOutlined } from '@ant-design/icons';
+import type { ColumnsType } from 'antd/es/table';
 import { IOrder } from "../../../types/backend";
-import { Pagination } from "../../global/Pagination";
 import { OrderSearchAndFilter } from "./order.search_filter";
 import { OrderView } from "./order.view";
 import { OrderForm } from "./order.form";
+
+const { Title, Text } = Typography;
+
+const statusColorMap: Record<string, string> = {
+    PENDING: 'orange', CONFIRMED: 'blue', SHIPPING: 'geekblue',
+    DELIVERED: 'green', CANCELLED: 'red',
+};
+const statusLabelMap: Record<string, string> = {
+    PENDING: 'Chờ xác nhận', CONFIRMED: 'Đã xác nhận', SHIPPING: 'Đang giao',
+    DELIVERED: 'Đã giao', CANCELLED: 'Đã hủy',
+};
+const paymentStatusColorMap: Record<string, string> = {
+    PENDING: 'orange', PAID: 'green', FAILED: 'red', REFUNDED: 'purple',
+};
+const paymentStatusLabelMap: Record<string, string> = {
+    PENDING: 'Chờ TT', PAID: 'Đã TT', FAILED: 'Thất bại', REFUNDED: 'Hoàn tiền',
+};
+
+const formatCurrency = (value: number) =>
+    new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
 
 interface OrderTableProps {
     load: () => Promise<void>;
@@ -24,44 +45,16 @@ interface OrderTableProps {
     setDateFrom: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const getStatusBadge = (status: string) => {
-    const map: Record<string, { label: string; className: string }> = {
-        PENDING: { label: 'Chờ xác nhận', className: 'badge-warning' },
-        CONFIRMED: { label: 'Đã xác nhận', className: 'badge-info' },
-        SHIPPING: { label: 'Đang giao', className: 'badge-primary' },
-        DELIVERED: { label: 'Đã giao', className: 'badge-success' },
-        CANCELLED: { label: 'Đã hủy', className: 'badge-error' },
-    };
-    const info = map[status] || { label: status, className: 'badge-ghost' };
-    return <span className={`badge ${info.className} badge-sm`}>{info.label}</span>;
-};
-
-const getPaymentStatusBadge = (status: string) => {
-    const map: Record<string, { label: string; className: string }> = {
-        PENDING: { label: 'Chờ thanh toán', className: 'badge-warning' },
-        PAID: { label: 'Đã thanh toán', className: 'badge-success' },
-        FAILED: { label: 'Thất bại', className: 'badge-error' },
-        REFUNDED: { label: 'Đã hoàn tiền', className: 'badge-info' },
-    };
-    const info = map[status] || { label: status, className: 'badge-ghost' };
-    return <span className={`badge ${info.className} badge-sm`}>{info.label}</span>;
-};
-
-const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
-};
-
 export const OrderTable: React.FC<OrderTableProps> = ({
     load, page, totalPage, setPage, dataSource,
     orderCode, setOrderCode,
     status, setStatus,
     paymentMethod, setPaymentMethod,
     paymentStatus, setPaymentStatus,
-    dateFrom, setDateFrom
+    dateFrom, setDateFrom,
 }) => {
     const [isViewModalOpen, setIsViewModalOpen] = React.useState<boolean>(false);
     const [selectedOrderId, setSelectedOrderId] = React.useState<number | null>(null);
-
     const [isEditModalOpen, setIsEditModalOpen] = React.useState<boolean>(false);
     const [editOrderId, setEditOrderId] = React.useState<number | null>(null);
 
@@ -75,147 +68,169 @@ export const OrderTable: React.FC<OrderTableProps> = ({
         setIsEditModalOpen(true);
     };
 
+    const columns: ColumnsType<IOrder> = [
+        {
+            title: 'STT',
+            key: 'index',
+            width: 55,
+            align: 'center',
+            render: (_text, _record, index) => (
+                <span style={{ fontWeight: 500 }}>
+                    {index + (page - 1) * 10 + 1}
+                </span>
+            ),
+        },
+        {
+            title: 'Mã đơn hàng',
+            key: 'orderCode',
+            width: 150,
+            render: (_text, record) => (
+                <Text code style={{ color: '#1677ff', fontSize: 12 }}>{record.orderCode}</Text>
+            ),
+        },
+        {
+            title: 'Khách hàng',
+            key: 'customer',
+            render: (_text, record) => (
+                <div>
+                    <div style={{ fontWeight: 600, fontSize: 13 }}>{record.receiverName}</div>
+                    <div style={{ fontSize: 11, color: '#8c8c8c' }}>{record.receiverPhone}</div>
+                </div>
+            ),
+        },
+        {
+            title: 'Tổng tiền',
+            key: 'totalPrice',
+            width: 140,
+            align: 'right',
+            render: (_text, record) => (
+                <Text strong style={{ color: '#1677ff' }}>{formatCurrency(record.totalPrice)}</Text>
+            ),
+        },
+        {
+            title: 'Trạng thái',
+            key: 'status',
+            width: 120,
+            align: 'center',
+            render: (_text, record) => (
+                <Tag color={statusColorMap[record.status] || 'default'}>
+                    {statusLabelMap[record.status] || record.status}
+                </Tag>
+            ),
+        },
+        {
+            title: 'Thanh toán',
+            key: 'payment',
+            width: 100,
+            align: 'center',
+            responsive: ['md'],
+            render: (_text, record) => (
+                <Tag bordered={false}>{record.paymentMethod}</Tag>
+            ),
+        },
+        {
+            title: 'TT thanh toán',
+            key: 'paymentStatus',
+            width: 110,
+            align: 'center',
+            responsive: ['lg'],
+            render: (_text, record) => (
+                <Tag color={paymentStatusColorMap[record.paymentStatus] || 'default'}>
+                    {paymentStatusLabelMap[record.paymentStatus] || record.paymentStatus}
+                </Tag>
+            ),
+        },
+        {
+            title: 'Ngày tạo',
+            key: 'createdAt',
+            width: 110,
+            responsive: ['xl'],
+            render: (_text, record) => (
+                <span style={{ fontSize: 12, color: '#595959' }}>
+                    {record.createdAt
+                        ? new Intl.DateTimeFormat('vi-VN', {
+                            year: 'numeric', month: '2-digit', day: '2-digit',
+                        }).format(new Date(record.createdAt))
+                        : '—'
+                    }
+                </span>
+            ),
+        },
+        {
+            title: 'Thao tác',
+            key: 'action',
+            width: 100,
+            align: 'center',
+            fixed: 'right',
+            render: (_text, record) => (
+                <Space size="small">
+                    <Tooltip title="Xem chi tiết">
+                        <Button
+                            type="text"
+                            icon={<EyeOutlined />}
+                            style={{ color: '#1677ff' }}
+                            onClick={() => handleViewOrder(record)}
+                        />
+                    </Tooltip>
+                    <Tooltip title="Chỉnh sửa">
+                        <Button
+                            type="text"
+                            icon={<EditOutlined />}
+                            style={{ color: '#faad14' }}
+                            onClick={() => handleEditOrder(record)}
+                        />
+                    </Tooltip>
+                </Space>
+            ),
+        },
+    ];
+
     return (
         <>
-            <div className='flex'>
-                <OrderSearchAndFilter
-                    orderCode={orderCode}
-                    setOrderCode={setOrderCode}
-                    status={status}
-                    setStatus={setStatus}
-                    paymentMethod={paymentMethod}
-                    setPaymentMethod={setPaymentMethod}
-                    paymentStatus={paymentStatus}
-                    setPaymentStatus={setPaymentStatus}
-                    dateFrom={dateFrom}
-                    setDateFrom={setDateFrom}
-                    setPage={setPage}
-                />
-            </div>
-            <div className="flex justify-between mt-1">
-                <div className="text-2xl font-bold">Quản lý đơn hàng</div>
-            </div>
+            <OrderSearchAndFilter
+                orderCode={orderCode}
+                setOrderCode={setOrderCode}
+                status={status}
+                setStatus={setStatus}
+                paymentMethod={paymentMethod}
+                setPaymentMethod={setPaymentMethod}
+                paymentStatus={paymentStatus}
+                setPaymentStatus={setPaymentStatus}
+                dateFrom={dateFrom}
+                setDateFrom={setDateFrom}
+                setPage={setPage}
+            />
 
-            <div className="rounded-box border border-base-content/5 bg-base-100">
-                <table className="table">
-                    <thead>
-                        <tr>
-                            <th className='cursor-pointer hover:bg-base-200'>
-                                <span>STT</span>
-                            </th>
-                            <th className='cursor-pointer hover:bg-base-200'>
-                                <div className='flex items-center gap-1'>
-                                    <span>Mã đơn hàng</span>
-                                </div>
-                            </th>
-                            <th className='cursor-pointer hover:bg-base-200'>
-                                <div className='flex items-center gap-1'>
-                                    <span>Khách hàng</span>
-                                </div>
-                            </th>
-                            <th className='cursor-pointer hover:bg-base-200'>
-                                <div className='flex items-center gap-1'>
-                                    <span>Tổng tiền</span>
-                                </div>
-                            </th>
-                            <th className='cursor-pointer hover:bg-base-200'>
-                                <div className='flex items-center gap-1'>
-                                    <span>Trạng thái</span>
-                                </div>
-                            </th>
-                            <th className='cursor-pointer hover:bg-base-200'>
-                                <div className='flex items-center gap-1'>
-                                    <span>Thanh toán</span>
-                                </div>
-                            </th>
-                            <th className='cursor-pointer hover:bg-base-200'>
-                                <div className='flex items-center gap-1'>
-                                    <span>TT Thanh toán</span>
-                                </div>
-                            </th>
-                            <th className='cursor-pointer hover:bg-base-200'>
-                                <div className='flex items-center gap-1'>
-                                    <span>Ngày tạo</span>
-                                </div>
-                            </th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {dataSource.map((record, index) => {
-                            return (
-                                <tr key={record.id} className='hover:bg-base-300'>
-                                    <td>
-                                        <div>
-                                            {index + (page - 1) * 10 + 1}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="font-mono text-sm font-medium text-blue-600">
-                                            {record.orderCode}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div>
-                                            <div className="font-bold text-sm">{record.receiverName}</div>
-                                            <div className="text-xs text-gray-400">{record.receiverPhone}</div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="font-semibold text-sm">
-                                            {formatCurrency(record.totalPrice)}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        {getStatusBadge(record.status)}
-                                    </td>
-                                    <td>
-                                        <span className="badge badge-outline badge-sm">{record.paymentMethod}</span>
-                                    </td>
-                                    <td>
-                                        {getPaymentStatusBadge(record.paymentStatus)}
-                                    </td>
-                                    <td>
-                                        {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(record.createdAt as string))}
-                                    </td>
-                                    <td className="w-[1%]">
-                                        <div className="dropdown dropdown-left">
-                                            <button tabIndex={0} className="btn btn-ghost btn-sm">
-                                                ⋮
-                                            </button>
-                                            <ul
-                                                tabIndex={0}
-                                                className="dropdown-content menu bg-base-100 rounded-box z-[10] w-36 p-2 shadow-lg border border-base-content/20"
-                                            >
-                                                <li>
-                                                    <button
-                                                        className="flex items-center gap-2 text-info"
-                                                        onClick={() => handleViewOrder(record)}
-                                                    >
-                                                        <View className="w-4 h-4" />
-                                                        <span>Xem chi tiết</span>
-                                                    </button>
-                                                </li>
-                                                <li>
-                                                    <button
-                                                        className="flex items-center gap-2 text-warning"
-                                                        onClick={() => handleEditOrder(record)}
-                                                    >
-                                                        <Edit className="w-4 h-4" />
-                                                        <span>Sửa</span>
-                                                    </button>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-                            )
-                        })}
-                    </tbody>
-                </table>
-            </div>
-            {dataSource.length === 0 && <div className=''>Không có dữ liệu</div>}
-            <Pagination page={page} totalPage={totalPage} setPage={setPage} />
+            <Card styles={{ body: { padding: 0 } }}>
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '16px 24px',
+                    borderBottom: '1px solid #f0f0f0',
+                }}>
+                    <Title level={4} style={{ margin: 0 }}>
+                        <ShoppingOutlined /> Quản lý đơn hàng
+                    </Title>
+                </div>
+
+                <Table
+                    columns={columns}
+                    dataSource={dataSource}
+                    rowKey="id"
+                    pagination={{
+                        current: page,
+                        total: totalPage * 10,
+                        pageSize: 10,
+                        onChange: (p) => setPage(p),
+                        showSizeChanger: false,
+                        showTotal: (total) => `Tổng ${total} đơn hàng`,
+                        style: { padding: '0 16px' },
+                    }}
+                    size="middle"
+                    scroll={{ x: 800 }}
+                />
+            </Card>
 
             <OrderView
                 isOpen={isViewModalOpen}
@@ -230,5 +245,5 @@ export const OrderTable: React.FC<OrderTableProps> = ({
                 orderIdToEdit={editOrderId}
             />
         </>
-    )
-}
+    );
+};

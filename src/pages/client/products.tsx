@@ -210,7 +210,7 @@ export default function AllProductsPage() {
                                             coverTypes: [],
                                         })
                                     }
-                                    className="btn btn-primary"
+                                    className="bg-primary-500 text-white px-6 py-2.5 rounded-xl hover:bg-primary-600 transition-colors font-semibold shadow-md"
                                 >
                                     Xóa bộ lọc
                                 </button>

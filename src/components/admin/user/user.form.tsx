@@ -2,12 +2,17 @@ import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../redux/hook";
 import { createUser, ICreateUser, resetCreateUser, updateUser, resetUpdateUser } from "../../../redux/slide/user.slice";
 import { showToast, ToastType } from "../../../common/showToast";
-import { z } from "zod"
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
 import { IUser, IRole } from "../../../types/backend";
-import Select from 'react-select';
 import { callUploadSingleFile } from "../../../services/api";
+import {
+    Modal, Input, Form, Button, Select, Row, Col, Divider, Avatar, Image, Typography
+} from 'antd';
+import { SaveOutlined, UserOutlined, CameraOutlined } from '@ant-design/icons';
+
+const { Title } = Typography;
 
 interface UserFormProps {
     load: () => Promise<void>;
@@ -17,25 +22,25 @@ interface UserFormProps {
     roles: IRole[];
 }
 
+const roleColorMap: Record<string, string> = {
+    ADMIN: 'red', MANAGER: 'blue', CUSTOMER: 'green', STAFF: 'orange',
+};
+
 const createUserSchema = z.object({
-    password: z.string()
-        .optional(),
+    password: z.string().optional(),
     fullName: z.string()
         .min(2, 'Họ và tên có ít nhất 2 kí tự')
-        .max(100, 'Họ và tên có nhiều nhất 50 kí tự'),
-    email: z.string()
-        .email('Email không hợp lệ'),
+        .max(100, 'Họ và tên có nhiều nhất 100 kí tự'),
+    email: z.string().email('Email không hợp lệ'),
     address: z.string()
-        .min(5, 'Địa chỉ có ít nhất 2 kí tự')
-        .max(200, 'Địa chỉ có nhiều nhất 50 kí tự'),
+        .min(5, 'Địa chỉ có ít nhất 5 kí tự')
+        .max(200, 'Địa chỉ có nhiều nhất 200 kí tự'),
     phone: z.string()
-        .min(10, 'Số điện thoại có ít nhất 2 kí tự')
-        .max(15, 'Số điện thoại có nhiều nhất 50 kí tự')
+        .min(10, 'Số điện thoại có ít nhất 10 số')
+        .max(15, 'Số điện thoại có nhiều nhất 15 số')
         .regex(/^[0-9+\-\s()]*$/, ''),
-    role: z.object({
-        id: z.string()
-    }),
-    avatar: z.any().optional()
+    role: z.object({ id: z.string() }),
+    avatar: z.any().optional(),
 });
 
 type CreateUserFormData = z.infer<typeof createUserSchema>;
@@ -51,22 +56,12 @@ export const UserForm: React.FC<UserFormProps> = ({ isModalOpen, setIsModalOpen,
     const message = useAppSelector((state) => state.user.message);
 
     const {
-        register,
-        handleSubmit,
-        reset,
-        setValue,
-        formState: { errors },
-        control
+        handleSubmit, reset, setValue, formState: { errors }, control,
     } = useForm<CreateUserFormData>({
         resolver: zodResolver(createUserSchema),
         defaultValues: {
-            password: '',
-            fullName: '',
-            email: '',
-            address: '',
-            phone: '',
-            role: { id: '1' },
-            avatar: undefined
+            password: '', fullName: '', email: '', address: '',
+            phone: '', role: { id: '1' }, avatar: undefined,
         }
     });
 
@@ -79,29 +74,13 @@ export const UserForm: React.FC<UserFormProps> = ({ isModalOpen, setIsModalOpen,
             setValue('role.id', userToEdit.role.id.toString());
             setAvatarPreview(`${import.meta.env.VITE_BACKEND_URL}/storage/avatar/${userToEdit.avatar}`);
         } else {
-            reset({
-                password: '',
-                fullName: '',
-                email: '',
-                address: '',
-                phone: '',
-                role: { id: '1' },
-                avatar: undefined
-            });
-            setAvatarPreview('')
+            reset({ password: '', fullName: '', email: '', address: '', phone: '', role: { id: '1' }, avatar: undefined });
+            setAvatarPreview('');
         }
-    }, [userToEdit, setValue, reset, setAvatarPreview]);
+    }, [userToEdit, setValue, reset]);
 
     const resetForm = () => {
-        reset({
-            password: '',
-            fullName: '',
-            email: '',
-            address: '',
-            phone: '',
-            role: { id: '1' },
-            avatar: undefined
-        });
+        reset({ password: '', fullName: '', email: '', address: '', phone: '', role: { id: '1' }, avatar: undefined });
         setAvatarPreview('');
         setIsSubmitting(false);
     };
@@ -133,31 +112,21 @@ export const UserForm: React.FC<UserFormProps> = ({ isModalOpen, setIsModalOpen,
 
         const formData = {
             ...data,
-            role: {
-                id: Number(data.role.id)
-            },
+            role: { id: Number(data.role.id) },
             password: data.password || '',
             avatar: avatarFileName,
         };
 
         if (userToEdit) {
-            dispatch(updateUser({
-                id: userToEdit.id,
-                data: formData
-            }));
+            dispatch(updateUser({ id: userToEdit.id, data: formData }));
         } else {
             dispatch(createUser(formData as ICreateUser));
         }
-
     };
 
     const handleClose = () => {
-        if (userToEdit !== undefined) {
-            setIsModalOpen(false);
-        } else {
-            setIsModalOpen(false);
-            resetForm();
-        }
+        setIsModalOpen(false);
+        if (!userToEdit) resetForm();
     };
 
     useEffect(() => {
@@ -176,155 +145,178 @@ export const UserForm: React.FC<UserFormProps> = ({ isModalOpen, setIsModalOpen,
     }, [isCreateUserSuccess, isCreateUserFailed, isUpdateUserSuccess, isUpdateUserFailed, dispatch, load, message, userToEdit]);
 
     return (
-        <dialog id="user_modal" className={`modal ${isModalOpen ? 'modal-open' : ''} modal-bottom sm:modal-middle w-full`}>
-            <div className="modal-box">
-                <h3 className="font-bold text-lg mb-4">{userToEdit ? 'Chỉnh sửa người dùng' : 'Tạo người dùng'}</h3>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="flex gap-4">
-                        <div className="form-control w-full mt-4">
-                            <label className="label">
-                                <span className="label-text">Họ và tên</span>
-                            </label>
-                            <input type="text" {...register('fullName')} placeholder="Nhập họ và tên" className={`input input-bordered w-full ${errors.fullName ? 'input-error' : ''}`} />
-                            {errors.fullName && (
-                                <label className="label">
-                                    <span className="label-text-alt text-error">{errors.fullName.message}</span>
-                                </label>
-                            )}
-                        </div>
-                        <div className="form-control w-full mt-4">
-                            <label className="label">
-                                <span className="label-text">Địa chỉ</span>
-                            </label>
-                            <input type="text" {...register('address')} placeholder="Nhập địa chỉ" className={`input input-bordered w-full ${errors.address ? 'input-error' : ''}`} />
-                            {errors.address && (
-                                <label className="label">
-                                    <span className="label-text-alt text-error">{errors.address.message}</span>
-                                </label>
-                            )}
-                        </div>
-                    </div>
-                    {!userToEdit && (
-                        <div className="form-control w-full mt-4">
-                            <label className="label">
-                                <span className="label-text">Mật khẩu</span>
-                            </label>
-                            <input type="password" {...register('password')} placeholder="Nhập mật khẩu" className={`input input-bordered w-full ${errors.password ? 'input-error' : ''}`} />
-                            {errors.password && (
-                                <label className="label">
-                                    <span className="label-text-alt text-error">{errors.password.message}</span>
-                                </label>
-                            )}
-                        </div>
-                    )}
-                    <div className="form-control w-full mt-4">
-                        <label className="label">
-                            <span className="label-text">Email</span>
-                        </label>
-                        <input type="email" {...register('email')} placeholder="Nhập email" className={`input input-bordered w-full ${errors.email ? 'input-error' : ''}`} />
-                        {errors.email && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.email.message}</span>
-                            </label>
+        <Modal
+            title={
+                <Title level={4} style={{ margin: 0 }}>
+                    <UserOutlined /> {userToEdit ? 'Chỉnh sửa người dùng' : 'Tạo người dùng mới'}
+                </Title>
+            }
+            open={isModalOpen}
+            onCancel={handleClose}
+            footer={null}
+            width={640}
+            destroyOnHidden
+            centered
+            styles={{ body: { maxHeight: '80vh', overflowY: 'auto', padding: '16px 24px' } }}
+        >
+            <form onSubmit={handleSubmit(onSubmit)}>
+                {/* Avatar Upload */}
+                <div style={{ textAlign: 'center', marginBottom: 20 }}>
+                    <div style={{ position: 'relative', display: 'inline-block' }}>
+                        {avatarPreview ? (
+                            <Image
+                                src={avatarPreview}
+                                width={80} height={80}
+                                style={{ borderRadius: '50%', objectFit: 'cover' }}
+                                preview={false}
+                            />
+                        ) : (
+                            <Avatar size={80} icon={<UserOutlined />} style={{ background: '#1677ff' }} />
                         )}
+                        <label style={{
+                            position: 'absolute', bottom: 0, right: -4,
+                            background: '#1677ff', borderRadius: '50%',
+                            width: 28, height: 28,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            cursor: 'pointer', border: '2px solid #fff',
+                        }}>
+                            <CameraOutlined style={{ color: '#fff', fontSize: 14 }} />
+                            <input
+                                type="file"
+                                onChange={handleAvatarChange}
+                                accept="image/*"
+                                style={{ display: 'none' }}
+                            />
+                        </label>
                     </div>
-                    <div className="flex gap-4">
-                        <div className="form-control w-full mt-4">
-                            <label className="label">
-                                <span className="label-text">Số điện thoại</span>
-                            </label>
-                            <input type="text" {...register('phone')} placeholder="Nhập số điện thoại" className={`input input-bordered w-full ${errors.phone ? 'input-error' : ''}`} />
-                            {errors.phone && (
-                                <label className="label">
-                                    <span className="label-text-alt text-error">{errors.phone.message}</span>
-                                </label>
-                            )}
-                        </div>
-                        <div className="form-control w-full mt-4">
-                            <label className="label">
-                                <span className="label-text">Vai trò</span>
-                            </label>
+                </div>
+
+                {/* FullName + Address */}
+                <Row gutter={16}>
+                    <Col xs={24} md={12}>
+                        <Form.Item
+                            label="Họ và tên"
+                            validateStatus={errors.fullName ? 'error' : ''}
+                            help={errors.fullName?.message}
+                            required layout="vertical"
+                        >
+                            <Controller name="fullName" control={control}
+                                render={({ field }) => <Input {...field} placeholder="Nhập họ và tên" />}
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} md={12}>
+                        <Form.Item
+                            label="Địa chỉ"
+                            validateStatus={errors.address ? 'error' : ''}
+                            help={errors.address?.message}
+                            required layout="vertical"
+                        >
+                            <Controller name="address" control={control}
+                                render={({ field }) => <Input {...field} placeholder="Nhập địa chỉ" />}
+                            />
+                        </Form.Item>
+                    </Col>
+                </Row>
+
+                {/* Password (only when creating) */}
+                {!userToEdit && (
+                    <Form.Item
+                        label="Mật khẩu"
+                        validateStatus={errors.password ? 'error' : ''}
+                        help={errors.password?.message}
+                        layout="vertical"
+                    >
+                        <Controller name="password" control={control}
+                            render={({ field }) => <Input.Password {...field} placeholder="Nhập mật khẩu" />}
+                        />
+                    </Form.Item>
+                )}
+
+                {/* Email */}
+                <Form.Item
+                    label="Email"
+                    validateStatus={errors.email ? 'error' : ''}
+                    help={errors.email?.message}
+                    required layout="vertical"
+                >
+                    <Controller name="email" control={control}
+                        render={({ field }) => <Input {...field} placeholder="Nhập email" type="email" />}
+                    />
+                </Form.Item>
+
+                <Divider style={{ margin: '8px 0 16px' }} />
+
+                {/* Phone + Role */}
+                <Row gutter={16}>
+                    <Col xs={24} md={12}>
+                        <Form.Item
+                            label="Số điện thoại"
+                            validateStatus={errors.phone ? 'error' : ''}
+                            help={errors.phone?.message}
+                            required layout="vertical"
+                        >
+                            <Controller name="phone" control={control}
+                                render={({ field }) => <Input {...field} placeholder="Nhập SĐT" />}
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} md={12}>
+                        <Form.Item
+                            label="Vai trò"
+                            validateStatus={errors.role ? 'error' : ''}
+                            help={errors.role?.message}
+                            required layout="vertical"
+                        >
                             <Controller
                                 name="role.id"
                                 control={control}
                                 render={({ field }) => (
                                     <Select
                                         {...field}
+                                        style={{ width: '100%' }}
+                                        placeholder="Chọn vai trò"
+                                        getPopupContainer={(trigger) => trigger.parentElement!}
                                         options={roles.map(role => ({
                                             value: role.id.toString(),
-                                            label: role.name
+                                            label: role.name,
                                         }))}
-                                        value={roles
-                                            .filter(role => role.id.toString() === field.value)
-                                            .map(role => ({
-                                                value: role.id.toString(),
-                                                label: role.name
-                                            }))[0]}
-                                        onChange={(selected) => {
-                                            field.onChange(selected?.value || '1');
-                                        }}
-                                        className={`${errors.role ? 'border-error' : ''}`}
-                                        placeholder="Chọn vai trò"
+                                        optionRender={(option) => (
+                                            <span>
+                                                <span style={{
+                                                    display: 'inline-block',
+                                                    width: 8, height: 8, borderRadius: '50%',
+                                                    background: roleColorMap[option.label as string] || '#d9d9d9',
+                                                    marginRight: 8,
+                                                }} />
+                                                {option.label}
+                                            </span>
+                                        )}
                                     />
                                 )}
                             />
-                            {errors.role && (
-                                <label className="label">
-                                    <span className="label-text-alt text-error">{errors.role?.message}</span>
-                                </label>
-                            )}
-                        </div>
-                    </div>
-                    <div className="form-control mt-4 space-x-2">
-                        <label className="label">
-                            <span className="label-text">Ảnh đại diện</span>
-                        </label>
-                        <input
-                            type="file"
-                            id="avatar-upload"
-                            onChange={handleAvatarChange}
-                            accept="image/*"
-                            className="hidden"
-                        />
+                        </Form.Item>
+                    </Col>
+                </Row>
 
-                        {/* Nút chọn ảnh thay thế */}
-                        <label htmlFor="avatar-upload" className="btn btn-outline btn-sm w-fit">
-                            📷 Chọn ảnh
-                        </label>
-                        {errors.avatar && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.avatar.message?.toString()}</span>
-                            </label>
-                        )}
-                        {avatarPreview && (
-                            <div className="mt-2">
-                                <img src={avatarPreview} alt="Avatar Preview" className="w-24 h-24" />
-                            </div>
-                        )}
-                    </div>
-                    <div className="flex justify-end gap-4 mt-4">
-                        <button
-                            type="submit"
-                            className="btn btn-neutral"
-                            disabled={isSubmitting}
-                        >
-                            {isSubmitting ? (
-                                <span className="loading loading-spinner loading-sm"></span>
-                            ) : (
-                                userToEdit ? 'Cập nhật' : 'Tạo người dùng'
-                            )}
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-error"
-                            onClick={handleClose}
-                            disabled={isSubmitting}
-                        >
-                            Đóng
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </dialog>
+                {/* Footer */}
+                <div style={{
+                    display: 'flex', justifyContent: 'flex-end', gap: 8,
+                    paddingTop: 16, borderTop: '1px solid #f0f0f0',
+                }}>
+                    <Button onClick={handleClose} disabled={isSubmitting}>
+                        Đóng
+                    </Button>
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        icon={<SaveOutlined />}
+                        loading={isSubmitting}
+                    >
+                        {userToEdit ? 'Cập nhật' : 'Tạo mới'}
+                    </Button>
+                </div>
+            </form>
+        </Modal>
     );
 };

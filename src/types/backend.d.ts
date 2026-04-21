@@ -298,3 +298,33 @@ export interface ICreateOrderReq {
 export interface ICreateOrderRes extends IOrder {
     paymentUrl?: string;
 }
+
+// Dashboard types
+export interface IDashboardSummary {
+    revenue: number;
+    orders: number;
+    customersNew: number;
+    productsSold: number;
+    aov: number;
+    cancelRate: number;
+}
+
+export interface IRevenueSeries {
+    label: string;
+    revenue: number;
+    orders: number;
+}
+
+export interface ITopProduct {
+    productId: number;
+    title: string;
+    soldQty: number;
+    revenue: number;
+}
+
+export interface IDashboardData {
+    summary: IDashboardSummary;
+    orderStatusBreakdown: Record<string, number>;
+    revenueSeries: IRevenueSeries[];
+    topProducts: ITopProduct[];
+}

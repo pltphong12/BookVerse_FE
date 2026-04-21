@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
+import { Spin } from "antd";
 import { useAppDispatch } from "../../redux/hook";
 import { clearBreadcrumbs, setBreadcrumbs } from "../../redux/slide/breadcrumbs.slice";
 import { callFetchAllCustomersWithPaginationAndFilterApi } from "../../services/api";
@@ -30,8 +31,6 @@ export const CustomerPage = () => {
         retry: false
     });
 
-    
-
     React.useEffect(() => {
         if (customersQuery?.data.data) {
             setDataSource(customersQuery.data.data.result);
@@ -52,37 +51,21 @@ export const CustomerPage = () => {
         await queryClient.invalidateQueries({ queryKey: ['fetchingCustomers'] });
     };
 
-    const getTable = () => {
-        if (isPending) return (
-            <>
-                <div>Đang tải...</div>
-            </>
-        )
-        else {
-            return (
-                <>
-                    <CustomerTable
-                        load={load}
-                        dataSource={dataSource}
-                        page={page}
-                        totalPage={totalPage}
-                        setPage={setPage}
-                        search={search}
-                        setSearch={setSearch}
-                        customerLevel={customerLevel}
-                        setCustomerLevel={setCustomerLevel}
-                        dateFrom={dateFrom}
-                        setDateFrom={setDateFrom}
-                    />
-                </>
-            )
-        }
-    }
-
     return (
-        <>
-            {getTable()}
-        </>
+        <Spin spinning={isPending} tip="Đang tải..." size="large">
+            <CustomerTable
+                load={load}
+                dataSource={dataSource}
+                page={page}
+                totalPage={totalPage}
+                setPage={setPage}
+                search={search}
+                setSearch={setSearch}
+                customerLevel={customerLevel}
+                setCustomerLevel={setCustomerLevel}
+                dateFrom={dateFrom}
+                setDateFrom={setDateFrom}
+            />
+        </Spin>
     );
 }
-

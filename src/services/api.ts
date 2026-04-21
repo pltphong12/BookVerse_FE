@@ -1,4 +1,4 @@
-import { ILoginRes, IAuthor, IAuthorInBook, IBackendRes, IBook, IBookFilterCriteria, ICart, ICategory, ICategoryInBook, ICreateOrderReq, ICreateOrderRes, IFile, IPagination, IPermission, IPublisher, IRole, IUser, ISupplier, ICustomer, IOrder } from "../types/backend";
+import { ILoginRes, IAuthor, IAuthorInBook, IBackendRes, IBook, IBookFilterCriteria, ICart, ICategory, ICategoryInBook, ICreateOrderReq, ICreateOrderRes, IDashboardData, IFile, IPagination, IPermission, IPublisher, IRole, IUser, ISupplier, ICustomer, IOrder } from "../types/backend";
 import axiosInstance from "./axios-customize";
 
 
@@ -668,4 +668,19 @@ export const callCreateOrderApi = (data: ICreateOrderReq) => {
 export const callFetchMyOrdersApi = (page: number, size: number) => {
     const url = `api/v1/orders/me?page=${page}&size=${size}`
     return axiosInstance.get<IBackendRes<IPagination<IOrder>>>(url)
+}
+
+/**
+ * 
+Module Dashboard
+ */
+
+export const callFetchDashboardApi = (fromDate?: string, toDate?: string, groupBy?: string, topN?: number) => {
+    const params = new URLSearchParams();
+    if (fromDate) params.append('fromDate', fromDate);
+    if (toDate) params.append('toDate', toDate);
+    if (groupBy) params.append('groupBy', groupBy);
+    if (topN) params.append('topN', topN.toString());
+    const url = `api/v1/dashboard/overview?${params.toString()}`
+    return axiosInstance.get<IBackendRes<IDashboardData>>(url)
 }

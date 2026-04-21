@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
+import { Spin } from "antd";
 import { AuthorTable } from "../../components/admin/author/author.table";
 import { useAppDispatch } from "../../redux/hook";
 import { clearBreadcrumbs, setBreadcrumbs } from "../../redux/slide/breadcrumbs.slice";
@@ -21,7 +22,7 @@ export const AuthorPage = () => {
     const [dateFrom, setDateFrom] = React.useState<string>("")
 
     // Fetch all with pagination and filter
-    const { data: authorsQuery, isPending} = useQuery({
+    const { data: authorsQuery, isPending } = useQuery({
         queryKey: ['fetchingAuthors', searchWithName, searchWithNationality, dateFrom, page],
         queryFn: () => callFetchAllAuthorsWithPaginationAndFilterApi(searchWithName, searchWithNationality, dateFrom, page, size),
         refetchOnWindowFocus: false,
@@ -29,14 +30,11 @@ export const AuthorPage = () => {
         retry: false
     });
 
-    
-
     React.useEffect(() => {
         if (authorsQuery?.data.data) {
             setDataSource(authorsQuery.data.data.result);
             setTotalPage(authorsQuery.data.data.meta.pages)
         }
-        
     }, [authorsQuery]);
 
     React.useEffect(() => {
@@ -52,37 +50,21 @@ export const AuthorPage = () => {
         await queryClient.invalidateQueries({ queryKey: ['fetchingAuthors'] });
     };
 
-    const getTable = () => {
-        if (isPending) return (
-            <>
-                <div>Đang tải...</div>
-            </>
-        )
-        else {
-            return (
-                <>
-                    <AuthorTable
-                        load={load}
-                        dataSource={dataSource}
-                        page={page}
-                        totalPage={totalPage}
-                        setPage={setPage}
-                        searchWithName={searchWithName}
-                        setSearchWithName={setSearchWithName}
-                        searchWithNationality={searchWithNationality}
-                        setSearchWithNationality={setSearchWithNationality}                        
-                        dateFrom={dateFrom}
-                        setDateFrom={setDateFrom}
-                    />
-                </>
-            )
-        }
-    }
-
     return (
-        <>
-            {getTable()}
-        </>
+        <Spin spinning={isPending} tip="Đang tải..." size="large">
+            <AuthorTable
+                load={load}
+                dataSource={dataSource}
+                page={page}
+                totalPage={totalPage}
+                setPage={setPage}
+                searchWithName={searchWithName}
+                setSearchWithName={setSearchWithName}
+                searchWithNationality={searchWithNationality}
+                setSearchWithNationality={setSearchWithNationality}
+                dateFrom={dateFrom}
+                setDateFrom={setDateFrom}
+            />
+        </Spin>
     );
 }
-

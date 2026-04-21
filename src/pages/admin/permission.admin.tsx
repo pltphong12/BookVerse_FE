@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
+import { Spin } from "antd";
 import { PermissionTable } from "../../components/admin/role/permission/permission.table";
 import { useAppDispatch } from "../../redux/hook";
 import { clearBreadcrumbs, setBreadcrumbs } from "../../redux/slide/breadcrumbs.slice";
@@ -19,30 +20,24 @@ export const PermissionPage = () => {
     const [search, setSearch] = React.useState<string>("");
     const [method, setMethod] = React.useState<string>("");
     const [domain, setDomain] = React.useState<string>("");
-
-    // Fetching to render at dropdown
-    const [dateFrom, setDateFrom] = React.useState<string>("")
+    const [dateFrom, setDateFrom] = React.useState<string>("");
 
     // Fetch all permissions to get domains
     const { data: allPermissionsQuery } = useQuery({
         queryKey: ['fetchAllPermissions'],
         queryFn: callFetchAllPermissionsApi,
         refetchOnWindowFocus: false,
-        staleTime: 5 * 60 * 1000, // 5 minutes
-        retry: false
+        staleTime: 5 * 60 * 1000,
+        retry: false,
     });
 
     // Extract unique domains from all permissions
     const domains = React.useMemo(() => {
         if (!allPermissionsQuery?.data?.data) return [];
-
         const uniqueDomains = new Set<string>();
         allPermissionsQuery.data.data.forEach((permission: IPermission) => {
-            if (permission.domain) {
-                uniqueDomains.add(permission.domain);
-            }
+            if (permission.domain) uniqueDomains.add(permission.domain);
         });
-
         return Array.from(uniqueDomains).sort();
     }, [allPermissionsQuery]);
 
@@ -52,23 +47,22 @@ export const PermissionPage = () => {
         queryFn: () => callFetchAllPermissionsWithPaginationAndFilterApi(search, method, domain, dateFrom, page, size),
         refetchOnWindowFocus: false,
         placeholderData: (previousData) => previousData,
-        retry: false
+        retry: false,
     });
 
     React.useEffect(() => {
         if (permissionsQuery?.data.data) {
             setDataSource(permissionsQuery.data.data.result);
-            setTotalPage(permissionsQuery.data.data.meta.pages)
+            setTotalPage(permissionsQuery.data.data.meta.pages);
         }
-
     }, [permissionsQuery]);
 
     React.useEffect(() => {
-        dispatch(clearBreadcrumbs())
+        dispatch(clearBreadcrumbs());
         dispatch(setBreadcrumbs([
             { label: "Quản lý", path: "/admin" },
             { label: "Quyền hạn", path: "/admin/permissions" },
-            { label: "Danh sách" }
+            { label: "Danh sách" },
         ]));
     }, [dispatch]);
 
@@ -76,40 +70,24 @@ export const PermissionPage = () => {
         await queryClient.invalidateQueries({ queryKey: ['fetchingPermissions'] });
     };
 
-    const getTable = () => {
-        if (isPending) return (
-            <>
-                <div>Loading...</div>
-            </>
-        )
-        else {
-            return (
-                <>
-                    <PermissionTable
-                        load={load}
-                        dataSource={dataSource}
-                        page={page}
-                        totalPage={totalPage}
-                        setPage={setPage}
-                        search={search}
-                        setSearch={setSearch}
-                        method={method}
-                        setMethod={setMethod}
-                        domain={domain}
-                        setDomain={setDomain}
-                        domains={domains}
-                        dateFrom={dateFrom}
-                        setDateFrom={setDateFrom}
-                    />
-                </>
-            )
-        }
-    }
-
     return (
-        <>
-            {getTable()}
-        </>
+        <Spin spinning={isPending} tip="Đang tải..." size="large">
+            <PermissionTable
+                load={load}
+                dataSource={dataSource}
+                page={page}
+                totalPage={totalPage}
+                setPage={setPage}
+                search={search}
+                setSearch={setSearch}
+                method={method}
+                setMethod={setMethod}
+                domain={domain}
+                setDomain={setDomain}
+                domains={domains}
+                dateFrom={dateFrom}
+                setDateFrom={setDateFrom}
+            />
+        </Spin>
     );
-}
-
+};

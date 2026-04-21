@@ -1,5 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Search, Filter, RotateCcw } from 'lucide-react';
+import React from 'react';
+import { Input, DatePicker, Card, Row, Col, Button, Space, Select } from 'antd';
+import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
 
 interface OrderSearchAndFilterProps {
     orderCode: string;
@@ -15,8 +17,7 @@ interface OrderSearchAndFilterProps {
     setPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const ORDER_STATUSES = [
-    { value: '', label: 'Tất cả' },
+const ORDER_STATUS_OPTIONS = [
     { value: 'PENDING', label: 'Chờ xác nhận' },
     { value: 'CONFIRMED', label: 'Đã xác nhận' },
     { value: 'SHIPPING', label: 'Đang giao' },
@@ -24,14 +25,12 @@ const ORDER_STATUSES = [
     { value: 'CANCELLED', label: 'Đã hủy' },
 ];
 
-const PAYMENT_METHODS = [
-    { value: '', label: 'Tất cả' },
+const PAYMENT_METHOD_OPTIONS = [
     { value: 'COD', label: 'COD' },
     { value: 'VNPAY', label: 'VNPAY' },
 ];
 
-const PAYMENT_STATUSES = [
-    { value: '', label: 'Tất cả' },
+const PAYMENT_STATUS_OPTIONS = [
     { value: 'PENDING', label: 'Chờ thanh toán' },
     { value: 'PAID', label: 'Đã thanh toán' },
     { value: 'FAILED', label: 'Thất bại' },
@@ -44,19 +43,8 @@ export const OrderSearchAndFilter: React.FC<OrderSearchAndFilterProps> = ({
     paymentMethod, setPaymentMethod,
     paymentStatus, setPaymentStatus,
     dateFrom, setDateFrom,
-    setPage
+    setPage,
 }) => {
-    const [isExpanded, setIsExpanded] = useState<boolean>(false);
-    const searchRef = useRef<HTMLInputElement>(null);
-
-    const activeFilterCount = [status, paymentMethod, paymentStatus, dateFrom].filter(v => v !== '').length;
-
-    useEffect(() => {
-        if (searchRef.current) {
-            searchRef.current.focus();
-        }
-    }, []);
-
     const handleReset = () => {
         setOrderCode('');
         setStatus('');
@@ -67,130 +55,74 @@ export const OrderSearchAndFilter: React.FC<OrderSearchAndFilterProps> = ({
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 transition-all duration-300 w-full">
-            <div className="p-4 sm:flex items-center justify-between">
-                <div className="relative flex-1 sm:max-w-md mb-4 sm:mb-0">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                        <Search size={18} />
-                    </div>
-                    <input
-                        type="text"
-                        ref={searchRef}
-                        name="orderCode"
+        <Card
+            size="small"
+            style={{ marginBottom: 16, width: '100%' }}
+            styles={{ body: { padding: '16px' } }}
+        >
+            <Row gutter={[12, 12]} align="middle">
+                <Col xs={24} sm={12} md={5}>
+                    <Input
+                        placeholder="Mã đơn hàng..."
+                        prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
                         value={orderCode}
                         onChange={(e) => {
-                            e.preventDefault();
                             setOrderCode(e.target.value);
                             setPage(1);
                         }}
-                        placeholder="Nhập mã đơn hàng..."
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                        allowClear
                     />
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <button
-                        onClick={() => setIsExpanded(!isExpanded)}
-                        className="relative flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
-                    >
-                        <Filter size={16} />
-                        <span>Bộ lọc</span>
-                        {activeFilterCount > 0 && (
-                            <span className="absolute -top-2 -right-2 w-5 h-5 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center">
-                                {activeFilterCount}
-                            </span>
-                        )}
-                    </button>
-                    {activeFilterCount > 0 && (
-                        <button
-                            onClick={handleReset}
-                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors duration-200"
-                            title="Xóa bộ lọc"
-                        >
-                            <RotateCcw size={16} />
-                            <span>Xóa lọc</span>
-                        </button>
-                    )}
-                </div>
-            </div>
-
-            {isExpanded && (
-                <div className="p-4 border-t border-gray-200 grid sm:grid-cols-2 md:grid-cols-4 gap-4 animate-fadeIn">
-                    <div className="space-y-2">
-                        <label htmlFor="orderStatus" className="block text-sm font-medium text-gray-700">
-                            Trạng thái đơn hàng
-                        </label>
-                        <select
-                            id="orderStatus"
-                            value={status}
-                            onChange={(e) => {
-                                setStatus(e.target.value);
-                                setPage(1);
-                            }}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                        >
-                            {ORDER_STATUSES.map(s => (
-                                <option key={s.value} value={s.value}>{s.label}</option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className="space-y-2">
-                        <label htmlFor="paymentMethod" className="block text-sm font-medium text-gray-700">
-                            Phương thức thanh toán
-                        </label>
-                        <select
-                            id="paymentMethod"
-                            value={paymentMethod}
-                            onChange={(e) => {
-                                setPaymentMethod(e.target.value);
-                                setPage(1);
-                            }}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                        >
-                            {PAYMENT_METHODS.map(m => (
-                                <option key={m.value} value={m.value}>{m.label}</option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className="space-y-2">
-                        <label htmlFor="paymentStatus" className="block text-sm font-medium text-gray-700">
-                            Trạng thái thanh toán
-                        </label>
-                        <select
-                            id="paymentStatus"
-                            value={paymentStatus}
-                            onChange={(e) => {
-                                setPaymentStatus(e.target.value);
-                                setPage(1);
-                            }}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                        >
-                            {PAYMENT_STATUSES.map(ps => (
-                                <option key={ps.value} value={ps.value}>{ps.label}</option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className="space-y-2">
-                        <label htmlFor="dateFrom" className="block text-sm font-medium text-gray-700">
-                            Ngày tạo
-                        </label>
-                        <input
-                            type="date"
-                            id="dateFrom"
-                            name="dateFrom"
-                            value={dateFrom}
-                            onChange={(e) => {
-                                setDateFrom(e.target.value);
-                                setPage(1);
-                            }}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                        />
-                    </div>
-                </div>
-            )}
-        </div>
+                </Col>
+                <Col xs={24} sm={12} md={4}>
+                    <Select
+                        placeholder="Trạng thái"
+                        style={{ width: '100%' }}
+                        value={status || undefined}
+                        onChange={(val) => { setStatus(val || ''); setPage(1); }}
+                        allowClear
+                        options={ORDER_STATUS_OPTIONS}
+                    />
+                </Col>
+                <Col xs={24} sm={12} md={4}>
+                    <Select
+                        placeholder="Thanh toán"
+                        style={{ width: '100%' }}
+                        value={paymentMethod || undefined}
+                        onChange={(val) => { setPaymentMethod(val || ''); setPage(1); }}
+                        allowClear
+                        options={PAYMENT_METHOD_OPTIONS}
+                    />
+                </Col>
+                <Col xs={24} sm={12} md={4}>
+                    <Select
+                        placeholder="TT thanh toán"
+                        style={{ width: '100%' }}
+                        value={paymentStatus || undefined}
+                        onChange={(val) => { setPaymentStatus(val || ''); setPage(1); }}
+                        allowClear
+                        options={PAYMENT_STATUS_OPTIONS}
+                    />
+                </Col>
+                <Col xs={24} sm={12} md={4}>
+                    <DatePicker
+                        placeholder="Từ ngày"
+                        style={{ width: '100%' }}
+                        value={dateFrom ? dayjs(dateFrom) : null}
+                        onChange={(_date, dateString) => {
+                            setDateFrom(dateString as string);
+                            setPage(1);
+                        }}
+                        format="YYYY-MM-DD"
+                    />
+                </Col>
+                <Col xs={24} sm={12} md={3}>
+                    <Space>
+                        <Button icon={<ReloadOutlined />} onClick={handleReset}>
+                            Đặt lại
+                        </Button>
+                    </Space>
+                </Col>
+            </Row>
+        </Card>
     );
 };

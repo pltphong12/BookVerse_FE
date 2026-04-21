@@ -27,7 +27,7 @@ export default function ProductDetailPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Sản phẩm không tìm thấy</h1>
           <button
             onClick={() => navigate('/')}
-            className="btn btn-primary"
+            className="bg-primary-500 text-white px-6 py-3 rounded-xl hover:bg-primary-600 transition-colors font-semibold shadow-md"
           >
             Quay lại trang chủ
           </button>

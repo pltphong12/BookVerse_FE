@@ -1,4 +1,5 @@
 import React from "react";
+import { Spin } from "antd";
 import { BookTable } from "../../components/admin/book/book.table"
 import { useAppDispatch } from "../../redux/hook";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -102,45 +103,29 @@ export const BookPage = () => {
         await queryClient.invalidateQueries({ queryKey: ['fetchingBooks'] });
     };
 
-    const getTable = () => {
-        if (isPending) return (
-            <>
-                <div>Đang tải...</div>
-            </>
-        )
-        else {
-            return (
-                <>
-                    <BookTable
-                        load={load}
-                        dataSource={dataSource}
-                        page={page}
-                        totalPage={totalPage}
-                        setPage={setPage}
-                        search={search}
-                        setSearch={setSearch}
-                        publishers={publishers}
-                        suppliers={suppliers}
-                        authors={authors}
-                        categories={categories}
-                        publisherId={publisherId}
-                        setPublisherId={setPublisherId}
-                        authorId={authorId}
-                        setAuthorId={setAuthorId}
-                        categoryId={categoryId}
-                        setCategoryId={setCategoryId}
-                        dateFrom={dateFrom}
-                        setDateFrom={setDateFrom}
-                    />
-                </>
-            )
-        }
-    }
-
     return (
-        <>
-            {getTable()}
-        </>
+        <Spin spinning={isPending} tip="Đang tải..." size="large">
+            <BookTable
+                load={load}
+                dataSource={dataSource}
+                page={page}
+                totalPage={totalPage}
+                setPage={setPage}
+                search={search}
+                setSearch={setSearch}
+                publishers={publishers}
+                suppliers={suppliers}
+                authors={authors}
+                categories={categories}
+                publisherId={publisherId}
+                setPublisherId={setPublisherId}
+                authorId={authorId}
+                setAuthorId={setAuthorId}
+                categoryId={categoryId}
+                setCategoryId={setCategoryId}
+                dateFrom={dateFrom}
+                setDateFrom={setDateFrom}
+            />
+        </Spin>
     );
 }
-

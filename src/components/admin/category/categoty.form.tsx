@@ -1,10 +1,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useCallback, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { showToast, ToastType } from "../../../common/showToast";
 import { useAppDispatch, useAppSelector } from "../../../redux/hook";
 import { createCategory, ICreateCategory, resetCreateCategory, resetUpdateCategory, updateCategory } from "../../../redux/slide/category.slide";
+import { Modal, Input, Form, Button } from 'antd';
+import { SaveOutlined, TagOutlined, FileTextOutlined } from '@ant-design/icons';
+
+const { TextArea } = Input;
 
 interface CategoryFormProps {
     load: () => Promise<void>;
@@ -26,7 +30,6 @@ type CreateCategoryFormData = z.infer<typeof createCategorySchema>;
 
 export const CategoryForm: React.FC<CategoryFormProps> = ({ isModalOpen, setIsModalOpen, load, categoryToEdit }) => {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-    // const [previewUrl, setPreviewUrl] = useState<string>('');
     const dispatch = useAppDispatch();
     const isCreateCategorySuccess = useAppSelector((state) => state.category.isCreateCategorySuccess);
     const isCreateCategoryFailed = useAppSelector((state) => state.category.isCreateCategoryFailed);
@@ -35,11 +38,11 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ isModalOpen, setIsMo
     const message = useAppSelector((state) => state.category.message);
 
     const {
-        register,
         handleSubmit,
         reset,
         setValue,
         formState: { errors },
+        control,
     } = useForm<CreateCategoryFormData>({
         resolver: zodResolver(createCategorySchema),
         defaultValues: {
@@ -53,21 +56,14 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ isModalOpen, setIsMo
             setValue('name', categoryToEdit.name);
             setValue('description', categoryToEdit.description);
         } else {
-            reset({
-                name: '',
-                description: '',
-            });
+            reset({ name: '', description: '' });
         }
     }, [categoryToEdit, setValue, reset]);
 
     const resetForm = useCallback(() => {
-        reset({
-            name: '',
-            description: '',
-        });
+        reset({ name: '', description: '' });
         setIsSubmitting(false);
     }, [reset]);
-
 
     const onSubmit = async (data: CreateCategoryFormData) => {
         setIsSubmitting(true);
@@ -105,120 +101,79 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ isModalOpen, setIsMo
     }, [isCreateCategorySuccess, isCreateCategoryFailed, isUpdateCategorySuccess, isUpdateCategoryFailed, dispatch, load, message, categoryToEdit, handleClose]);
 
     return (
-        <dialog id="publisher_modal" className={`modal ${isModalOpen ? 'modal-open' : ''} modal-bottom sm:modal-middle w-full`}>
-            <div className="modal-box">
-                <h3 className="font-bold text-lg mb-4">{categoryToEdit ? 'Chỉnh sửa nhà xuất bản' : 'Tạo nhà xuất bản'}</h3>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Tên thể loại</span>
-                        </label>
-                        <input
-                            type="text"
-                            {...register('name')}
-                            placeholder="Nhập tên nhà xuất bản"
-                            className={`input input-bordered w-full ${errors.name ? 'input-error' : ''}`}
-                        />
-                        {errors.name && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.name.message}</span>
-                            </label>
-                        )}
-                    </div>
-
-                    {/* <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Địa chỉ</span>
-                        </label>
-                        <input
-                            type="text"
-                            {...register('address')}
-                            placeholder="Nhập địa chỉ"
-                            className={`input input-bordered w-full ${errors.address ? 'input-error' : ''}`}
-                        />
-                        {errors.address && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.address.message}</span>
-                            </label>
-                        )}
-                    </div>
-
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Số điện thoại</span>
-                        </label>
-                        <input
-                            type="tel"
-                            {...register('phone')}
-                            placeholder="Nhập số điện thoại"
-                            className={`input input-bordered w-full ${errors.phone ? 'input-error' : ''}`}
-                        />
-                        {errors.phone && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.phone.message}</span>
-                            </label>
-                        )}
-                    </div>
-
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Email</span>
-                        </label>
-                        <input
-                            type="email"
-                            {...register('email')}
-                            placeholder="Nhập email"
-                            className={`input input-bordered w-full ${errors.email ? 'input-error' : ''}`}
-                        />
-                        {errors.email && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.email.message}</span>
-                            </label>
-                        )}
-                    </div> */}
-
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Mô tả</span>
-                        </label>
-                        <textarea
-                            {...register('description')}
-                            placeholder="Nhập mô tả"
-                            className={`textarea textarea-bordered w-full ${errors.description ? 'textarea-error' : ''}`}
-                            rows={3}
-                        />
-                        {errors.description && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.description.message}</span>
-                            </label>
-                        )}
-                    </div>
-
-
-
-                    <div className="flex justify-end gap-4 mt-4">
-                        <button
-                            type="submit"
-                            className="btn btn-neutral"
-                            disabled={isSubmitting}
-                        >
-                            {isSubmitting ? (
-                                <span className="loading loading-spinner loading-sm"></span>
-                            ) : (
-                                categoryToEdit ? 'Cập nhật' : 'Lưu'
+        <Modal
+            title={
+                <span style={{ fontSize: 18, fontWeight: 600 }}>
+                    {categoryToEdit ? 'Chỉnh sửa thể loại' : 'Tạo thể loại mới'}
+                </span>
+            }
+            open={isModalOpen}
+            onCancel={handleClose}
+            footer={null}
+            width={520}
+            destroyOnHidden
+            centered
+        >
+            <form onSubmit={handleSubmit(onSubmit)}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 20, marginTop: 16 }}>
+                    <Form.Item
+                        label={<><TagOutlined /> Tên thể loại</>}
+                        validateStatus={errors.name ? 'error' : ''}
+                        help={errors.name?.message}
+                        required
+                        layout="vertical"
+                        style={{ marginBottom: 0 }}
+                    >
+                        <Controller
+                            name="name"
+                            control={control}
+                            render={({ field }) => (
+                                <Input {...field} placeholder="Nhập tên thể loại" size="large" />
                             )}
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-error"
-                            onClick={handleClose}
-                            disabled={isSubmitting}
-                        >
-                            Đóng
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </dialog>
+                        />
+                    </Form.Item>
+
+                    <Form.Item
+                        label={<><FileTextOutlined /> Mô tả</>}
+                        validateStatus={errors.description ? 'error' : ''}
+                        help={errors.description?.message}
+                        required
+                        layout="vertical"
+                        style={{ marginBottom: 0 }}
+                    >
+                        <Controller
+                            name="description"
+                            control={control}
+                            render={({ field }) => (
+                                <TextArea
+                                    {...field}
+                                    rows={4}
+                                    placeholder="Nhập mô tả thể loại"
+                                    showCount
+                                    maxLength={500}
+                                />
+                            )}
+                        />
+                    </Form.Item>
+                </div>
+
+                <div style={{
+                    display: 'flex', justifyContent: 'flex-end', gap: 8,
+                    marginTop: 24, paddingTop: 16, borderTop: '1px solid #f0f0f0',
+                }}>
+                    <Button onClick={handleClose} disabled={isSubmitting}>
+                        Đóng
+                    </Button>
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        icon={<SaveOutlined />}
+                        loading={isSubmitting}
+                    >
+                        {categoryToEdit ? 'Cập nhật' : 'Tạo mới'}
+                    </Button>
+                </div>
+            </form>
+        </Modal>
     );
 };

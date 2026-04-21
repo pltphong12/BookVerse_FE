@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
+import { Spin } from "antd";
 import { RoleTable } from "../../components/admin/role/role.table";
 import { useAppDispatch } from "../../redux/hook";
 import { clearBreadcrumbs, setBreadcrumbs } from "../../redux/slide/breadcrumbs.slice";
@@ -17,9 +18,7 @@ export const RolePage = () => {
     const [totalPage, setTotalPage] = React.useState<number>(0);
     // Filter
     const [search, setSearch] = React.useState<string>("");
-
-    // Fetching to render at dropdown
-    const [dateFrom, setDateFrom] = React.useState<string>("")
+    const [dateFrom, setDateFrom] = React.useState<string>("");
 
     // Fetch all with pagination and filter
     const { data: rolesQuery, isPending } = useQuery({
@@ -27,23 +26,22 @@ export const RolePage = () => {
         queryFn: () => callFetchAllRolesWithPaginationAndFilterApi(search, dateFrom, page, size),
         refetchOnWindowFocus: false,
         placeholderData: (previousData) => previousData,
-        retry: false
+        retry: false,
     });
 
     React.useEffect(() => {
         if (rolesQuery?.data.data) {
             setDataSource(rolesQuery.data.data.result);
-            setTotalPage(rolesQuery.data.data.meta.pages)
+            setTotalPage(rolesQuery.data.data.meta.pages);
         }
-        
     }, [rolesQuery]);
 
     React.useEffect(() => {
-        dispatch(clearBreadcrumbs())
+        dispatch(clearBreadcrumbs());
         dispatch(setBreadcrumbs([
             { label: "Quản lý", path: "/admin" },
             { label: "Vai Trò", path: "/admin/roles" },
-            { label: "Danh sách" }
+            { label: "Danh sách" },
         ]));
     }, [dispatch]);
 
@@ -51,34 +49,19 @@ export const RolePage = () => {
         await queryClient.invalidateQueries({ queryKey: ['fetchingRoles'] });
     };
 
-    const getTable = () => {
-        if (isPending) return (
-            <>
-                <div>Loading...</div>
-            </>
-        )
-        else {
-            return (
-                <>
-                    <RoleTable
-                        load={load}
-                        dataSource={dataSource}
-                        page={page}
-                        totalPage={totalPage}
-                        setPage={setPage}
-                        search={search}
-                        setSearch={setSearch}        
-                        dateFrom={dateFrom}
-                        setDateFrom={setDateFrom}
-                    />
-                </>
-            )
-        }
-    }
-
     return (
-        <>
-            {getTable()}
-        </>
+        <Spin spinning={isPending} tip="Đang tải..." size="large">
+            <RoleTable
+                load={load}
+                dataSource={dataSource}
+                page={page}
+                totalPage={totalPage}
+                setPage={setPage}
+                search={search}
+                setSearch={setSearch}
+                dateFrom={dateFrom}
+                setDateFrom={setDateFrom}
+            />
+        </Spin>
     );
-}
+};

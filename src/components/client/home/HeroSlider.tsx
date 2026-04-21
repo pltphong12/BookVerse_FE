@@ -63,7 +63,7 @@ export default function HeroSlider() {
                         <div className="container mx-auto px-4 h-full flex flex-col justify-center text-white">
                             <h2 className="text-5xl font-bold text-white mb-4">{slide.title}</h2>
                             <p className="text-2xl text-white mb-6">{slide.subtitle}</p>
-                            <button className="btn btn-primary w-fit">Khám phá ngay</button>
+                            <button className="bg-primary-500 text-white px-6 py-3 rounded-xl hover:bg-primary-600 transition-colors font-semibold text-base shadow-md w-fit">Khám phá ngay</button>
                         </div>
                     </div>
                 </div>

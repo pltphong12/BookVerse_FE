@@ -1,12 +1,23 @@
-import { Edit, Trash } from "lucide-react";
 import React from "react";
+import { Table, Button, Space, Popconfirm, Tooltip, Tag, Card, Typography } from "antd";
+import { EditOutlined, DeleteOutlined, EyeOutlined, PlusOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
+import type { ColumnsType } from 'antd/es/table';
 import { showToast, ToastType } from "../../../common/showToast";
 import { useAppDispatch, useAppSelector } from "../../../redux/hook";
 import { deleteRole, ICreateRole, resetDeleteRole } from "../../../redux/slide/role.slide";
 import { IRole } from "../../../types/backend";
-import { Pagination } from "../../global/Pagination";
 import { RoleForm } from "./role.form";
 import { RoleSearchAndFilter } from "./role.search_filter";
+import { RoleView } from "./role.view";
+
+const { Title } = Typography;
+
+const roleColorMap: Record<string, string> = {
+    ADMIN: 'red',
+    MANAGER: 'blue',
+    CUSTOMER: 'green',
+    STAFF: 'orange',
+};
 
 interface RoleTableProps {
     load: () => Promise<void>;
@@ -20,200 +31,204 @@ interface RoleTableProps {
     setDateFrom: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const RoleTable: React.FC<RoleTableProps> = ({ load, page, totalPage, setPage, dataSource, search, setSearch, dateFrom, setDateFrom }) => {
+export const RoleTable: React.FC<RoleTableProps> = ({
+    load, page, totalPage, setPage, dataSource,
+    search, setSearch, dateFrom, setDateFrom,
+}) => {
     const [isViewModalOpen, setIsViewModalOpen] = React.useState<boolean>(false);
     const [selectedRole, setSelectedRole] = React.useState<IRole | null>(null);
-
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState<boolean>(false);
-
-    const isDeleteRoleSuccess = useAppSelector((state) => state.role.isDeleteRoleSuccess);
-    const isDeleteRoleFailed = useAppSelector((state) => state.role.isDeleteRoleFailed);
-
     const [roleToEdit, setRoleToEdit] = React.useState<ICreateRole | undefined>(undefined);
     const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
+    const isDeleteRoleSuccess = useAppSelector((state) => state.role.isDeleteRoleSuccess);
+    const isDeleteRoleFailed = useAppSelector((state) => state.role.isDeleteRoleFailed);
     const message = useAppSelector((state) => state.role.message);
     const dispatch = useAppDispatch();
-
 
     const handleViewRole = (role: IRole) => {
         setSelectedRole(role);
         setIsViewModalOpen(true);
     };
 
-    const getRoleClass = (role: string) => {
-        switch (role) {
-            case 'ADMIN': return 'badge badge-error';
-            case 'MANAGER': return 'badge badge-info';
-            case 'CUSTOMER': return 'badge badge-success';
-            case 'STAFF': return 'badge badge-warning';
-            default: return 'badge';
-        }
-    };
-
     const executeDeleteRole = (id: number) => {
         dispatch(deleteRole(id));
-    }
+    };
 
     React.useEffect(() => {
         if (isDeleteRoleSuccess) {
-            showToast("Xóa quyền hạn thành công", ToastType.SUCCESS);
+            showToast("Xóa vai trò thành công", ToastType.SUCCESS);
             dispatch(resetDeleteRole());
-            load()
-            setPage(1)
+            load();
+            setPage(1);
         }
         if (isDeleteRoleFailed) {
-            showToast("Xóa quyền hạn không thành công " + message, ToastType.ERROR);
+            showToast("Xóa vai trò không thành công " + message, ToastType.ERROR);
             dispatch(resetDeleteRole());
         }
     }, [isDeleteRoleSuccess, isDeleteRoleFailed, message, dispatch, setPage, load]);
 
+    const columns: ColumnsType<IRole> = [
+        {
+            title: 'STT',
+            key: 'index',
+            width: 60,
+            align: 'center',
+            render: (_text, _record, index) => (
+                <span style={{ fontWeight: 500 }}>
+                    {index + (page - 1) * 10 + 1}
+                </span>
+            ),
+        },
+        {
+            title: 'Tên vai trò',
+            key: 'name',
+            render: (_text, record) => (
+                <Tag color={roleColorMap[record.name] || 'default'} style={{ fontSize: 13 }}>
+                    {record.name}
+                </Tag>
+            ),
+        },
+        {
+            title: 'Mô tả',
+            key: 'description',
+            responsive: ['md'],
+            render: (_text, record) => (
+                <span style={{ fontSize: 13, color: '#595959' }}>{record.description || '—'}</span>
+            ),
+        },
+        {
+            title: 'Quyền hạn',
+            key: 'permissions',
+            width: 100,
+            align: 'center',
+            responsive: ['lg'],
+            render: (_text, record) => (
+                <Tag>{record.permissions?.length || 0} quyền</Tag>
+            ),
+        },
+        {
+            title: 'Ngày tạo',
+            key: 'createdAt',
+            width: 120,
+            responsive: ['xl'],
+            render: (_text, record) => (
+                <span style={{ fontSize: 12, color: '#595959' }}>
+                    {record.createdAt
+                        ? new Intl.DateTimeFormat('vi-VN', {
+                            year: 'numeric', month: '2-digit', day: '2-digit',
+                        }).format(new Date(record.createdAt))
+                        : '—'
+                    }
+                </span>
+            ),
+        },
+        {
+            title: 'Thao tác',
+            key: 'action',
+            width: 140,
+            align: 'center',
+            fixed: 'right',
+            render: (_text, record) => (
+                <Space size="small">
+                    <Tooltip title="Xem chi tiết">
+                        <Button
+                            type="text"
+                            icon={<EyeOutlined />}
+                            style={{ color: '#1677ff' }}
+                            onClick={() => handleViewRole(record)}
+                        />
+                    </Tooltip>
+                    <Tooltip title="Chỉnh sửa">
+                        <Button
+                            type="text"
+                            icon={<EditOutlined />}
+                            style={{ color: '#faad14' }}
+                            onClick={() => {
+                                setRoleToEdit(record);
+                                setIsModalOpen(true);
+                            }}
+                        />
+                    </Tooltip>
+                    <Popconfirm
+                        title="Xóa vai trò"
+                        description="Bạn có chắc chắn muốn xóa vai trò này?"
+                        onConfirm={() => executeDeleteRole(record.id)}
+                        okText="Xóa"
+                        cancelText="Hủy"
+                        okButtonProps={{ danger: true }}
+                    >
+                        <Tooltip title="Xóa">
+                            <Button type="text" danger icon={<DeleteOutlined />} />
+                        </Tooltip>
+                    </Popconfirm>
+                </Space>
+            ),
+        },
+    ];
+
     return (
         <>
-            <div className='flex'>
-                <RoleSearchAndFilter
-                    searchWithName={search}
-                    setSearchWithName={setSearch}
-                    dateFrom={dateFrom}
-                    setDateFrom={setDateFrom}
-                    setPage={setPage}
-                />
-            </div>
-            <div className="flex justify-between">
-                <div className="text-2xl font-bold">Quản lý vai trò</div>
-                <button
-                    className="btn btn-neutral justify-end"
-                    onClick={() => {
-                        setIsModalOpen(true);
-                        setRoleToEdit(undefined);
+            <RoleSearchAndFilter
+                searchWithName={search}
+                setSearchWithName={setSearch}
+                dateFrom={dateFrom}
+                setDateFrom={setDateFrom}
+                setPage={setPage}
+            />
+
+            <Card styles={{ body: { padding: 0 } }}>
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '16px 24px',
+                    borderBottom: '1px solid #f0f0f0',
+                }}>
+                    <Title level={4} style={{ margin: 0 }}>
+                        <SafetyCertificateOutlined /> Quản lý vai trò
+                    </Title>
+                    <Button
+                        type="primary"
+                        icon={<PlusOutlined />}
+                        onClick={() => {
+                            setIsModalOpen(true);
+                            setRoleToEdit(undefined);
+                        }}
+                    >
+                        Tạo vai trò
+                    </Button>
+                </div>
+
+                <Table
+                    columns={columns}
+                    dataSource={dataSource}
+                    rowKey="id"
+                    pagination={{
+                        current: page,
+                        total: totalPage * 10,
+                        pageSize: 10,
+                        onChange: (p) => setPage(p),
+                        showSizeChanger: false,
+                        showTotal: (total) => `Tổng ${total} vai trò`,
+                        style: { padding: '0 16px' },
                     }}
-                >
-                    Tạo vai trò
-                </button>
-            </div>
+                    size="middle"
+                    scroll={{ x: 500 }}
+                />
+            </Card>
 
-            <div className="rounded-box border border-base-content/5 bg-base-100">
-                <table className="table">
-                    {/* head */}
-                    <thead>
-                        <tr>
-                            <th className='cursor-pointer hover:bg-base-200'>
-                                <span>STT</span>
-                            </th>
-                            <th className='cursor-pointer hover:bg-base-200'>
-                                <div className='flex items-center gap-1'>
-                                    <span>Tên vai trò</span>
-                                </div>
-                            </th>
-
-                            <th className='cursor-pointer hover:bg-base-200'>
-                                <div className='flex items-center gap-1'>
-                                    <span>Ngày tạo</span>
-                                </div>
-                            </th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {dataSource.map((record, index) => {
-                            return (
-                                <tr key={record.id} className='hover:bg-base-300'>
-                                    <td>
-                                        <div className=''>
-                                            {index + (page - 1) * 10 + 1}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className={getRoleClass(record.name)}>
-                                            {record.name}
-                                        </span>
-                                    </td>
-
-
-                                    <td>
-                                        {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(record.createdAt as string))}
-                                    </td>
-                                    <td className="w-[1%]">
-                                        <div className="dropdown dropdown-left">
-                                            <button tabIndex={0} className="btn btn-ghost btn-sm" onMouseDown={() => {
-                                                setIsDeleteModalOpen(false)
-                                            }}>
-                                                ⋮
-                                            </button>
-                                            <ul
-                                                tabIndex={0}
-                                                className="dropdown-content menu bg-base-100 rounded-box z-[10] w-36 p-2 shadow-lg border border-base-content/20"
-                                            >
-                                                {/* <li>
-                                                    <button
-                                                        className="flex items-center gap-2 text-info"
-                                                        onClick={() => handleViewRole(record)}
-                                                    >
-                                                        <View className="w-4 h-4" />
-                                                        <span>Xem</span>
-                                                    </button>
-                                                </li> */}
-                                                <li>
-                                                    <button
-                                                        className="flex items-center gap-2 text-warning"
-                                                        onClick={() => {
-                                                            setRoleToEdit(record);
-                                                            setIsModalOpen(true);
-                                                        }}
-                                                    >
-                                                        <Edit className="w-4 h-4" />
-                                                        <span>Sửa</span>
-                                                    </button>
-                                                </li>
-                                                <li>
-                                                    <button tabIndex={0} className="flex items-center gap-2 text-error"
-                                                        onClick={() => {
-                                                            setIsDeleteModalOpen(true)
-                                                        }}>
-                                                        <Trash className="w-4 h-4" />
-                                                        <span>Xóa</span>
-                                                    </button>
-                                                    {isDeleteModalOpen && (
-                                                        <ul tabIndex={0} className="dropdown-content menu bg-base-200 rounded-box z-[10] w-52 p-2 shadow-lg border border-base-content/20">
-                                                            <li className='w-full'>Bạn có chắn chắn muốn xóa</li>
-                                                            <li className="mt-1">
-                                                                <button
-                                                                    className="btn btn-error btn-sm w-full"
-                                                                    onClick={() => executeDeleteRole(record.id)}
-                                                                >
-                                                                    Xóa
-                                                                </button>
-                                                            </li>
-
-                                                        </ul>
-                                                    )}
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-                            )
-                        })}
-                    </tbody>
-
-                </table>
-
-            </div >
-            {dataSource.length === 0 && <div className=''>Không có dữ liệu</div>}
-            < Pagination page={page} totalPage={totalPage} setPage={setPage} />
-
-            {/* <RoleView
+            <RoleView
                 isOpen={isViewModalOpen}
                 setIsOpen={setIsViewModalOpen}
                 role={selectedRole}
-            /> */}
+            />
 
-            < RoleForm
+            <RoleForm
                 isModalOpen={isModalOpen}
                 setIsModalOpen={setIsModalOpen}
                 load={load}
                 roleToEdit={roleToEdit}
             />
         </>
-    )
-}
+    );
+};

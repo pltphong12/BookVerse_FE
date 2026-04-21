@@ -5,7 +5,12 @@ import { z } from "zod";
 import { showToast, ToastType } from "../../../../common/showToast";
 import { useAppDispatch, useAppSelector } from "../../../../redux/hook";
 import { createPermission, ICreatePermission, resetCreatePermission, resetUpdatePermission, updatePermission } from "../../../../redux/slide/permission.slice";
-import Select from 'react-select';
+import {
+    Modal, Input, Form, Button, Select, Row, Col, Typography
+} from 'antd';
+import { SaveOutlined, ApiOutlined } from '@ant-design/icons';
+
+const { Title } = Typography;
 
 interface PermissionFormProps {
     load: () => Promise<void>;
@@ -14,49 +19,49 @@ interface PermissionFormProps {
     permissionToEdit?: ICreatePermission | undefined;
 }
 
+const METHOD_OPTIONS = [
+    { value: 'GET', label: 'GET' },
+    { value: 'POST', label: 'POST' },
+    { value: 'PUT', label: 'PUT' },
+    { value: 'DELETE', label: 'DELETE' },
+];
+
 const createPermissionSchema = z.object({
     name: z.string()
-        .min(2, 'Tên thể loại ít nhất 2 kí tự')
-        .max(100, 'Tên thể loại tối đa 100 kí tự'),
+        .min(2, 'Tên quyền hạn ít nhất 2 kí tự')
+        .max(100, 'Tên quyền hạn tối đa 100 kí tự'),
     apiPath: z.string()
-        .min(2, 'Tên đường dẫn ít nhất 2 kí tự')
-        .max(100, 'Tên đường dẫn tối đa 100 kí tự'),
+        .min(2, 'Đường dẫn ít nhất 2 kí tự')
+        .max(100, 'Đường dẫn tối đa 100 kí tự'),
     domain: z.string()
-        .min(2, 'Tên phương thức nhất 2 kí tự')
-        .max(100, 'Tên phương thức tối đa 100 kí tự'),
+        .min(2, 'Tên domain ít nhất 2 kí tự')
+        .max(100, 'Tên domain tối đa 100 kí tự'),
     method: z.string()
-        .min(2, 'Tên phương thức nhất 2 kí tự')
-        .max(100, 'Tên phương thức tối đa 100 kí tự'),
+        .min(2, 'Vui lòng chọn phương thức')
+        .max(100, 'Phương thức tối đa 100 kí tự'),
 });
 
 type CreatePermissionFormData = z.infer<typeof createPermissionSchema>;
 
 export const PermissionForm: React.FC<PermissionFormProps> = ({ isModalOpen, setIsModalOpen, load, permissionToEdit }) => {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-    // const [previewUrl, setPreviewUrl] = useState<string>('');
     const dispatch = useAppDispatch();
     const isCreatePermissionSuccess = useAppSelector((state) => state.permission.isCreatePermissionSuccess);
     const isCreatePermissionFailed = useAppSelector((state) => state.permission.isCreatePermissionFailed);
     const isUpdatePermissionSuccess = useAppSelector((state) => state.permission.isUpdatePermissionSuccess);
     const isUpdatePermissionFailed = useAppSelector((state) => state.permission.isUpdatePermissionFailed);
     const message = useAppSelector((state) => state.permission.message);
-    const methodList = ['GET', 'POST', 'PUT', 'DELETE']
-
 
     const {
-        register,
         handleSubmit,
         reset,
-        control,
         setValue,
         formState: { errors },
+        control,
     } = useForm<CreatePermissionFormData>({
         resolver: zodResolver(createPermissionSchema),
         defaultValues: {
-            name: '',
-            apiPath: '',
-            domain: '',
-            method: '',
+            name: '', apiPath: '', domain: '', method: '',
         }
     });
 
@@ -67,32 +72,20 @@ export const PermissionForm: React.FC<PermissionFormProps> = ({ isModalOpen, set
             setValue('domain', permissionToEdit.domain);
             setValue('method', permissionToEdit.method);
         } else {
-            reset({
-                name: '',
-                apiPath: '',
-                method: '',
-            });
+            reset({ name: '', apiPath: '', domain: '', method: '' });
         }
     }, [permissionToEdit, setValue, reset]);
 
     const resetForm = useCallback(() => {
-        reset({
-            name: '',
-            apiPath: '',
-            method: '',
-        });
+        reset({ name: '', apiPath: '', domain: '', method: '' });
         setIsSubmitting(false);
     }, [reset]);
-
 
     const onSubmit = async (data: CreatePermissionFormData) => {
         setIsSubmitting(true);
         const payload = { ...data };
         if (permissionToEdit) {
-            dispatch(updatePermission({
-                id: permissionToEdit.id!,
-                data: payload as ICreatePermission
-            }));
+            dispatch(updatePermission({ id: permissionToEdit.id!, data: payload as ICreatePermission }));
         } else {
             dispatch(createPermission(payload as ICreatePermission));
         }
@@ -101,14 +94,12 @@ export const PermissionForm: React.FC<PermissionFormProps> = ({ isModalOpen, set
 
     const handleClose = useCallback(() => {
         setIsModalOpen(false);
-        if (!permissionToEdit) {
-            resetForm();
-        }
+        if (!permissionToEdit) resetForm();
     }, [permissionToEdit, setIsModalOpen, resetForm]);
 
     useEffect(() => {
         if (isCreatePermissionSuccess || isUpdatePermissionSuccess) {
-            showToast(`${permissionToEdit ? 'Cập nhật' : 'Tạo'}  quyền hạn thành công`, ToastType.SUCCESS);
+            showToast(`${permissionToEdit ? 'Cập nhật' : 'Tạo'} quyền hạn thành công`, ToastType.SUCCESS);
             dispatch(permissionToEdit ? resetUpdatePermission() : resetCreatePermission());
             load();
             handleClose();
@@ -121,125 +112,118 @@ export const PermissionForm: React.FC<PermissionFormProps> = ({ isModalOpen, set
     }, [isCreatePermissionSuccess, isCreatePermissionFailed, isUpdatePermissionSuccess, isUpdatePermissionFailed, dispatch, load, message, permissionToEdit, handleClose]);
 
     return (
-        <dialog id="publisher_modal" className={`modal ${isModalOpen ? 'modal-open' : ''} modal-bottom sm:modal-middle w-full`}>
-            <div className="modal-box">
-                <h3 className="font-bold text-lg mb-4">{permissionToEdit ? 'Chỉnh sửa quyền hạn' : 'Tạo quyền hạn'}</h3>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Tên quyền hạn</span>
-                        </label>
-                        <input
-                            type="text"
-                            {...register('name')}
-                            placeholder="Nhập tên quyền hạn"
-                            className={`input input-bordered w-full ${errors.name ? 'input-error' : ''}`}
-                        />
-                        {errors.name && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.name.message}</span>
-                            </label>
+        <Modal
+            title={
+                <Title level={4} style={{ margin: 0 }}>
+                    <ApiOutlined /> {permissionToEdit ? 'Chỉnh sửa quyền hạn' : 'Tạo quyền hạn mới'}
+                </Title>
+            }
+            open={isModalOpen}
+            onCancel={handleClose}
+            footer={null}
+            width={560}
+            destroyOnHidden
+            centered
+            styles={{ body: { padding: '16px 24px' } }}
+        >
+            <form onSubmit={handleSubmit(onSubmit)}>
+                {/* Name */}
+                <Form.Item
+                    label="Tên quyền hạn"
+                    validateStatus={errors.name ? 'error' : ''}
+                    help={errors.name?.message}
+                    required
+                    layout="vertical"
+                >
+                    <Controller
+                        name="name"
+                        control={control}
+                        render={({ field }) => (
+                            <Input {...field} placeholder="Nhập tên quyền hạn" />
                         )}
-                    </div>
+                    />
+                </Form.Item>
 
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Tên đường dẫn</span>
-                        </label>
-                        <input
-                            type="text"
-                            {...register('apiPath')}
-                            placeholder="Nhập tên đường dẫn"
-                            className={`input input-bordered w-full ${errors.apiPath ? 'input-error' : ''}`}
-                        />
-                        {errors.apiPath && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.apiPath.message}</span>
-                            </label>
+                {/* API Path */}
+                <Form.Item
+                    label="Đường dẫn API"
+                    validateStatus={errors.apiPath ? 'error' : ''}
+                    help={errors.apiPath?.message}
+                    required
+                    layout="vertical"
+                >
+                    <Controller
+                        name="apiPath"
+                        control={control}
+                        render={({ field }) => (
+                            <Input {...field} placeholder="/api/v1/..." style={{ fontFamily: 'monospace' }} />
                         )}
-                    </div>
+                    />
+                </Form.Item>
 
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Tên đối tượng</span>
-                        </label>
-                        <input
-                            type="text"
-                            {...register('domain')}
-                            placeholder="Nhập tên đối tượng"
-                            className={`input input-bordered w-full ${errors.domain ? 'input-error' : ''}`}
-                        />
-                        {errors.domain && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.domain.message}</span>
-                            </label>
-                        )}
-                    </div>
-
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Phương thức</span>
-                        </label>
-                        <Controller
-                            name="method"
-                            control={control}
-                            render={({ field }) => (
-                                <Select
-                                    {...field}
-                                    options={methodList.map(method => ({
-                                        value: method,
-                                        label: method
-                                    }))}
-                                    value={methodList
-                                        .filter(method => method === field.value)
-                                        .map(method => ({
-                                            value: method,
-                                            label: method
-                                        }))[0]}
-                                    onChange={(selected) => {
-                                        field.onChange(selected?.value || 0);
-                                    }}
-                                    className={`${errors.method ? 'border-error' : ''}`}
-                                    placeholder="Chọn phương thức"
-                                    menuPortalTarget={document.body}
-                                    styles={{
-                                        menuPortal: (base) => ({ ...base, zIndex: 1000 })
-                                    }}
-                                />
-                            )}
-                        />
-                        {errors.method && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.method.message}</span>
-                            </label>
-                        )}
-                    </div>
-
-
-
-                    <div className="flex justify-end gap-4 mt-4">
-                        <button
-                            type="submit"
-                            className="btn btn-neutral"
-                            disabled={isSubmitting}
+                <Row gutter={16}>
+                    <Col xs={24} md={12}>
+                        {/* Domain */}
+                        <Form.Item
+                            label="Domain"
+                            validateStatus={errors.domain ? 'error' : ''}
+                            help={errors.domain?.message}
+                            required
+                            layout="vertical"
                         >
-                            {isSubmitting ? (
-                                <span className="loading loading-spinner loading-sm"></span>
-                            ) : (
-                                permissionToEdit ? 'Cập nhật' : 'Lưu'
-                            )}
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-error"
-                            onClick={handleClose}
-                            disabled={isSubmitting}
+                            <Controller
+                                name="domain"
+                                control={control}
+                                render={({ field }) => (
+                                    <Input {...field} placeholder="Nhập tên domain" />
+                                )}
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} md={12}>
+                        {/* Method */}
+                        <Form.Item
+                            label="Phương thức HTTP"
+                            validateStatus={errors.method ? 'error' : ''}
+                            help={errors.method?.message}
+                            required
+                            layout="vertical"
                         >
-                            Đóng
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </dialog>
+                            <Controller
+                                name="method"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        {...field}
+                                        style={{ width: '100%' }}
+                                        placeholder="Chọn phương thức"
+                                        options={METHOD_OPTIONS}
+                                        getPopupContainer={(trigger) => trigger.parentElement!}
+                                    />
+                                )}
+                            />
+                        </Form.Item>
+                    </Col>
+                </Row>
+
+                {/* Footer */}
+                <div style={{
+                    display: 'flex', justifyContent: 'flex-end', gap: 8,
+                    paddingTop: 16, borderTop: '1px solid #f0f0f0',
+                }}>
+                    <Button onClick={handleClose} disabled={isSubmitting}>
+                        Đóng
+                    </Button>
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        icon={<SaveOutlined />}
+                        loading={isSubmitting}
+                    >
+                        {permissionToEdit ? 'Cập nhật' : 'Tạo mới'}
+                    </Button>
+                </div>
+            </form>
+        </Modal>
     );
 };

@@ -118,22 +118,22 @@ export default function ProductInfo({ product }: ProductInfoProps) {
                     </div>
                 </div>
 
-                <div className="flex gap-3">
-                    <button onClick={handleAddToCart} className="flex-1 btn bg-primary-500 text-white gap-2 btn-lg hover:bg-primary-600">
-                        <ShoppingCart className="w-5 h-5" />
+                <div className="flex gap-3 h-14">
+                    <button onClick={handleAddToCart} className="flex-1 flex items-center justify-center gap-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-colors font-semibold text-base hover:shadow-lg">
+                        <ShoppingCart className="w-5 h-5 mr-1" />
                         Thêm vào giỏ hàng
                     </button>
                     <button
                         onClick={() => setIsWishlisted(!isWishlisted)}
-                        className={`btn btn-lg border-2 ${isWishlisted
+                        className={`w-14 h-14 flex items-center justify-center rounded-xl border-2 transition-colors ${isWishlisted
                             ? 'bg-red-50 border-red-500 text-red-600'
-                            : 'border-gray-300 text-gray-600 hover:border-red-500'
+                            : 'border-gray-300 text-gray-600 hover:border-red-500 hover:text-red-500'
                             }`}
                     >
-                        <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
+                        <Heart className={`w-6 h-6 ${isWishlisted ? 'fill-current' : ''}`} />
                     </button>
-                    <button className="btn btn-lg border-2 border-gray-300 text-gray-600">
-                        <Share2 className="w-5 h-5" />
+                    <button className="w-14 h-14 flex items-center justify-center rounded-xl border-2 border-gray-300 text-gray-600 hover:border-blue-500 hover:text-blue-500 transition-colors">
+                        <Share2 className="w-6 h-6" />
                     </button>
                 </div>
             </div>

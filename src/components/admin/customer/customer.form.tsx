@@ -1,13 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import Select from 'react-select';
 import { z } from "zod";
 import { showToast, ToastType } from "../../../common/showToast";
 import { useAppDispatch, useAppSelector } from "../../../redux/hook";
 import { createCustomer, ICreateCustomer, resetCreateCustomer, resetUpdateCustomer, updateCustomer } from "../../../redux/slide/customer.slide";
 import { callUploadSingleFile } from "../../../services/api";
 import { ICustomer } from "../../../types/backend";
+import {
+    Modal, Input, Form, Button, Select, Row, Col, Divider, Avatar, Typography, Image
+} from 'antd';
+import { SaveOutlined, UserOutlined, CameraOutlined } from '@ant-design/icons';
+
+const { Title } = Typography;
 
 interface CustomerFormProps {
     load: () => Promise<void>;
@@ -24,15 +29,15 @@ const createCustomerSchema = z.object({
         .optional(),
     fullName: z.string()
         .min(2, 'Họ và tên có ít nhất 2 kí tự')
-        .max(100, 'Họ và tên có nhiều nhất 50 kí tự'),
+        .max(100, 'Họ và tên có nhiều nhất 100 kí tự'),
     email: z.string()
         .email('Email không hợp lệ'),
     address: z.string()
-        .min(5, 'Địa chỉ có ít nhất 2 kí tự')
-        .max(200, 'Địa chỉ có nhiều nhất 50 kí tự'),
+        .min(5, 'Địa chỉ có ít nhất 5 kí tự')
+        .max(200, 'Địa chỉ có nhiều nhất 200 kí tự'),
     phone: z.string()
         .min(10, 'Số điện thoại có ít nhất 10 kí tự')
-        .max(15, 'Số điện thoại có nhiều nhất 50 kí tự')
+        .max(15, 'Số điện thoại có nhiều nhất 15 kí tự')
         .regex(/^[0-9+\-\s()]*$/, ''),
     avatar: z.any().optional(),
     customerLevel: z.string()
@@ -41,6 +46,13 @@ const createCustomerSchema = z.object({
 });
 
 type CreateCustomerFormData = z.infer<typeof createCustomerSchema>;
+
+const customerLevelOptions = [
+    { value: 'BRONZE', label: '🥉 Đồng (Bronze)' },
+    { value: 'SILVER', label: '🥈 Bạc (Silver)' },
+    { value: 'GOLD', label: '🥇 Vàng (Gold)' },
+    { value: 'DIAMOND', label: '💠 Kim cương (Diamond)' },
+];
 
 export const CustomerForm: React.FC<CustomerFormProps> = ({ isModalOpen, setIsModalOpen, load, customerToEdit }) => {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -51,10 +63,8 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ isModalOpen, setIsMo
     const isUpdateCustomerSuccess = useAppSelector((state) => state.customer.isUpdateCustomerSuccess);
     const isUpdateCustomerFailed = useAppSelector((state) => state.customer.isUpdateCustomerFailed);
     const message = useAppSelector((state) => state.customer.message);
-    const customerLevelList = ['BRONZE', 'SILVER', 'GOLD', 'DIAMOND'];
 
     const {
-        register,
         handleSubmit,
         reset,
         control,
@@ -63,13 +73,8 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ isModalOpen, setIsMo
     } = useForm<CreateCustomerFormData>({
         resolver: zodResolver(createCustomerSchema),
         defaultValues: {
-            password: '',
-            fullName: '',
-            email: '',
-            address: '',
-            phone: '',
-            avatar: undefined,
-            customerLevel: 'BRONZE',
+            password: '', fullName: '', email: '', address: '',
+            phone: '', avatar: undefined, customerLevel: 'BRONZE',
         }
     });
 
@@ -84,7 +89,7 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ isModalOpen, setIsMo
                 setValue('customerLevel', 'BRONZE');
             } else if (customerToEdit?.customerLevel === 'Bạc') {
                 setValue('customerLevel', 'SILVER');
-                } else if (customerToEdit?.customerLevel === 'Vàng') {
+            } else if (customerToEdit?.customerLevel === 'Vàng') {
                 setValue('customerLevel', 'GOLD');
             } else if (customerToEdit?.customerLevel === 'Kim cương') {
                 setValue('customerLevel', 'DIAMOND');
@@ -92,27 +97,17 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ isModalOpen, setIsMo
             setAvatarPreview(`${import.meta.env.VITE_BACKEND_URL}/storage/avatar/${customerToEdit.user.avatar}`);
         } else {
             reset({
-                password: '',
-                fullName: '',
-                email: '',
-                address: '',
-                phone: '',
-                avatar: undefined,
-                customerLevel: 'BRONZE',
+                password: '', fullName: '', email: '', address: '',
+                phone: '', avatar: undefined, customerLevel: 'BRONZE',
             });
-            setAvatarPreview('')
+            setAvatarPreview('');
         }
     }, [customerToEdit, setValue, reset, setAvatarPreview]);
 
     const resetForm = () => {
         reset({
-            password: '',
-            fullName: '',
-            email: '',
-            address: '',
-            phone: '',
-            avatar: undefined,
-            customerLevel: 'BRONZE',
+            password: '', fullName: '', email: '', address: '',
+            phone: '', avatar: undefined, customerLevel: 'BRONZE',
         });
         setAvatarPreview('');
         setIsSubmitting(false);
@@ -150,14 +145,10 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ isModalOpen, setIsMo
         };
 
         if (customerToEdit) {
-            dispatch(updateCustomer({
-                id: customerToEdit.id,
-                data: formData as ICreateCustomer
-            }));
+            dispatch(updateCustomer({ id: customerToEdit.id, data: formData as ICreateCustomer }));
         } else {
             dispatch(createCustomer(formData as ICreateCustomer));
         }
-
     };
 
     const handleClose = () => {
@@ -185,170 +176,202 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ isModalOpen, setIsMo
     }, [isCreateCustomerSuccess, isCreateCustomerFailed, isUpdateCustomerSuccess, isUpdateCustomerFailed, dispatch, load, message, customerToEdit]);
 
     return (
-        <dialog id="user_modal" className={`modal ${isModalOpen ? 'modal-open' : ''} modal-bottom sm:modal-middle w-full`}>
-            <div className="modal-box min-w-[60%]">
-                <h3 className="font-bold text-lg mb-4">{customerToEdit ? 'Chỉnh sửa khách hàng' : 'Tạo khách hàng'}</h3>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="form-control w-full mt-4">
-                        <label className="label">
-                            <span className="label-text">Mã CCCD</span>
-                        </label>
-                        <input type="text" {...register('identityCard')} placeholder="Nhập mã CCCD" className={`input input-bordered w-full ${errors.identityCard ? 'input-error' : ''}`} />
-                        {errors.identityCard && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.identityCard.message}</span>
-                            </label>
+        <Modal
+            title={
+                <Title level={4} style={{ margin: 0 }}>
+                    {customerToEdit ? 'Chỉnh sửa khách hàng' : 'Tạo khách hàng mới'}
+                </Title>
+            }
+            open={isModalOpen}
+            onCancel={handleClose}
+            footer={null}
+            width={680}
+            destroyOnHidden
+            centered
+            styles={{ body: { maxHeight: '75vh', overflowY: 'auto', padding: '16px 24px' } }}
+        >
+            <form onSubmit={handleSubmit(onSubmit)}>
+                {/* Avatar Section */}
+                <div style={{ textAlign: 'center', marginBottom: 20 }}>
+                    <div style={{ position: 'relative', display: 'inline-block' }}>
+                        {avatarPreview ? (
+                            <Image
+                                src={avatarPreview}
+                                width={80} height={80}
+                                style={{ borderRadius: '50%', objectFit: 'cover' }}
+                                preview={false}
+                            />
+                        ) : (
+                            <Avatar size={80} icon={<UserOutlined />} />
                         )}
-                    </div>
-                    <div className="flex gap-4">
-                        <div className="form-control w-full mt-4">
-                            <label className="label">
-                                <span className="label-text">Họ và tên</span>
-                            </label>
-                            <input type="text" {...register('fullName')} placeholder="Nhập họ và tên" className={`input input-bordered w-full ${errors.fullName ? 'input-error' : ''}`} />
-                            {errors.fullName && (
-                                <label className="label">
-                                    <span className="label-text-alt text-error">{errors.fullName.message}</span>
-                                </label>
-                            )}
-                        </div>
-                        <div className="form-control w-full mt-4">
-                            <label className="label">
-                                <span className="label-text">Địa chỉ</span>
-                            </label>
-                            <input type="text" {...register('address')} placeholder="Nhập địa chỉ" className={`input input-bordered w-full ${errors.address ? 'input-error' : ''}`} />
-                            {errors.address && (
-                                <label className="label">
-                                    <span className="label-text-alt text-error">{errors.address.message}</span>
-                                </label>
-                            )}
-                        </div>
-                    </div>
-                    {!customerToEdit && (
-                        <div className="form-control w-full mt-4">
-                            <label className="label">
-                                <span className="label-text">Mật khẩu</span>
-                            </label>
-                            <input type="password" {...register('password')} placeholder="Nhập mật khẩu" className={`input input-bordered w-full ${errors.password ? 'input-error' : ''}`} />
-                            {errors.password && (
-                                <label className="label">
-                                    <span className="label-text-alt text-error">{errors.password.message}</span>
-                                </label>
-                            )}
-                        </div>
-                    )}
-                    <div className="form-control w-full mt-4">
-                        <label className="label">
-                            <span className="label-text">Email</span>
+                        <label style={{
+                            position: 'absolute', bottom: 0, right: -4,
+                            background: '#1677ff', borderRadius: '50%',
+                            width: 28, height: 28,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            cursor: 'pointer', border: '2px solid #fff',
+                        }}>
+                            <CameraOutlined style={{ color: '#fff', fontSize: 14 }} />
+                            <input
+                                type="file"
+                                onChange={handleAvatarChange}
+                                accept="image/*"
+                                style={{ display: 'none' }}
+                            />
                         </label>
-                        <input type="email" {...register('email')} placeholder="Nhập email" className={`input input-bordered w-full ${errors.email ? 'input-error' : ''}`} />
-                        {errors.email && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.email.message}</span>
-                            </label>
-                        )}
                     </div>
-                    <div className="flex gap-4">
-                        <div className="form-control w-full mt-4">
-                            <label className="label">
-                                <span className="label-text">Số điện thoại</span>
-                            </label>
-                            <input type="text" {...register('phone')} placeholder="Nhập số điện thoại" className={`input input-bordered w-full ${errors.phone ? 'input-error' : ''}`} />
-                            {errors.phone && (
-                                <label className="label">
-                                    <span className="label-text-alt text-error">{errors.phone.message}</span>
-                                </label>
+                </div>
+
+                {/* Identity Card */}
+                <Form.Item
+                    label="Mã CCCD"
+                    validateStatus={errors.identityCard ? 'error' : ''}
+                    help={errors.identityCard?.message}
+                    required
+                    layout="vertical"
+                >
+                    <Controller
+                        name="identityCard"
+                        control={control}
+                        render={({ field }) => (
+                            <Input {...field} placeholder="Nhập mã CCCD" size="large" />
+                        )}
+                    />
+                </Form.Item>
+
+                <Row gutter={16}>
+                    <Col xs={24} md={12}>
+                        <Form.Item
+                            label="Họ và tên"
+                            validateStatus={errors.fullName ? 'error' : ''}
+                            help={errors.fullName?.message}
+                            required
+                            layout="vertical"
+                        >
+                            <Controller
+                                name="fullName"
+                                control={control}
+                                render={({ field }) => (
+                                    <Input {...field} placeholder="Nhập họ và tên" />
+                                )}
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} md={12}>
+                        <Form.Item
+                            label="Địa chỉ"
+                            validateStatus={errors.address ? 'error' : ''}
+                            help={errors.address?.message}
+                            required
+                            layout="vertical"
+                        >
+                            <Controller
+                                name="address"
+                                control={control}
+                                render={({ field }) => (
+                                    <Input {...field} placeholder="Nhập địa chỉ" />
+                                )}
+                            />
+                        </Form.Item>
+                    </Col>
+                </Row>
+
+                {/* Password - only for create */}
+                {!customerToEdit && (
+                    <Form.Item
+                        label="Mật khẩu"
+                        validateStatus={errors.password ? 'error' : ''}
+                        help={errors.password?.message}
+                        layout="vertical"
+                    >
+                        <Controller
+                            name="password"
+                            control={control}
+                            render={({ field }) => (
+                                <Input.Password {...field} placeholder="Nhập mật khẩu" />
                             )}
-                        </div>
-                        <div className="form-control w-full mt-4">
-                            <label className="label">
-                                <span className="label-text">Cấp bậc khách hàng</span>
-                            </label>
+                        />
+                    </Form.Item>
+                )}
+
+                <Form.Item
+                    label="Email"
+                    validateStatus={errors.email ? 'error' : ''}
+                    help={errors.email?.message}
+                    required
+                    layout="vertical"
+                >
+                    <Controller
+                        name="email"
+                        control={control}
+                        render={({ field }) => (
+                            <Input {...field} placeholder="Nhập email" type="email" />
+                        )}
+                    />
+                </Form.Item>
+
+                <Divider style={{ margin: '8px 0 16px' }} />
+
+                <Row gutter={16}>
+                    <Col xs={24} md={12}>
+                        <Form.Item
+                            label="Số điện thoại"
+                            validateStatus={errors.phone ? 'error' : ''}
+                            help={errors.phone?.message}
+                            required
+                            layout="vertical"
+                        >
+                            <Controller
+                                name="phone"
+                                control={control}
+                                render={({ field }) => (
+                                    <Input {...field} placeholder="Nhập SĐT" />
+                                )}
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} md={12}>
+                        <Form.Item
+                            label="Cấp bậc khách hàng"
+                            validateStatus={errors.customerLevel ? 'error' : ''}
+                            help={errors.customerLevel?.message}
+                            required
+                            layout="vertical"
+                        >
                             <Controller
                                 name="customerLevel"
                                 control={control}
                                 render={({ field }) => (
                                     <Select
                                         {...field}
-                                        options={customerLevelList.map(customerLevel => ({
-                                            value: customerLevel,
-                                            label: customerLevel
-                                        }))}
-                                        value={customerLevelList
-                                            .filter(customerLevel => customerLevel === field.value)
-                                            .map(customerLevel => ({
-                                                value: customerLevel,
-                                                label: customerLevel
-                                            }))[0]}
-                                        onChange={(selected) => {
-                                            field.onChange(selected?.value || '');
-                                        }}
-                                        className={`${errors.customerLevel ? 'border-error' : ''}`}
-                                        placeholder="Chọn cấp bậc khách hàng"
-                                        menuPortalTarget={document.body}
-                                        styles={{
-                                            menuPortal: (base) => ({ ...base, zIndex: 1000 })
-                                        }}
+                                        style={{ width: '100%' }}
+                                        options={customerLevelOptions}
+                                        placeholder="Chọn cấp bậc"
                                     />
                                 )}
                             />
-                            {errors.customerLevel && (
-                                <label className="label">
-                                    <span className="label-text-alt text-error">{errors.customerLevel?.message}</span>
-                                </label>
-                            )}
-                        </div>
-                    </div>
-                    <div className="form-control mt-4 space-x-2">
-                        <label className="label">
-                            <span className="label-text">Ảnh đại diện</span>
-                        </label>
-                        <input
-                            type="file"
-                            id="avatar-upload"
-                            onChange={handleAvatarChange}
-                            accept="image/*"
-                            className="hidden"
-                        />
+                        </Form.Item>
+                    </Col>
+                </Row>
 
-                        {/* Nút chọn ảnh thay thế */}
-                        <label htmlFor="avatar-upload" className="btn btn-outline btn-sm w-fit">
-                            📷 Chọn ảnh
-                        </label>
-                        {errors.avatar && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.avatar.message?.toString()}</span>
-                            </label>
-                        )}
-                        {avatarPreview && (
-                            <div className="mt-2">
-                                <img src={avatarPreview} alt="Avatar Preview" className="w-24 h-24" />
-                            </div>
-                        )}
-                    </div>
-                    <div className="flex justify-end gap-4 mt-4">
-                        <button
-                            type="submit"
-                            className="btn btn-neutral"
-                            disabled={isSubmitting}
-                        >
-                            {isSubmitting ? (
-                                <span className="loading loading-spinner loading-sm"></span>
-                            ) : (
-                                customerToEdit ? 'Cập nhật' : 'Tạo khách hàng'
-                            )}
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-error"
-                            onClick={handleClose}
-                            disabled={isSubmitting}
-                        >
-                            Đóng
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </dialog>
+                {/* Footer */}
+                <div style={{
+                    display: 'flex', justifyContent: 'flex-end', gap: 8,
+                    paddingTop: 16, borderTop: '1px solid #f0f0f0',
+                }}>
+                    <Button onClick={handleClose} disabled={isSubmitting}>
+                        Đóng
+                    </Button>
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        icon={<SaveOutlined />}
+                        loading={isSubmitting}
+                    >
+                        {customerToEdit ? 'Cập nhật' : 'Tạo mới'}
+                    </Button>
+                </div>
+            </form>
+        </Modal>
     );
 };

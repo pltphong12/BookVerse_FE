@@ -1,5 +1,12 @@
-import { X } from 'lucide-react';
+import React from 'react';
+import { Drawer, Descriptions, Avatar, Tag, Typography, Divider, Image } from 'antd';
+import {
+    UserOutlined, CalendarOutlined, MailOutlined,
+    PhoneOutlined, EnvironmentOutlined
+} from '@ant-design/icons';
 import { IUser } from '../../../types/backend';
+
+const { Title } = Typography;
 
 interface UserViewProps {
     isOpen: boolean;
@@ -7,67 +14,104 @@ interface UserViewProps {
     user: IUser | null;
 }
 
+const roleColorMap: Record<string, string> = {
+    ADMIN: 'red',
+    MANAGER: 'blue',
+    CUSTOMER: 'green',
+    STAFF: 'orange',
+};
+
+const formatDateTime = (dateStr?: string) => {
+    if (!dateStr) return '—';
+    return new Intl.DateTimeFormat('vi-VN', {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+    }).format(new Date(dateStr));
+};
+
 export const UserView: React.FC<UserViewProps> = ({ isOpen, setIsOpen, user }) => {
-    if (!isOpen || !user) return null;
+    if (!user) return null;
+
+    const avatarUrl = user.avatar
+        ? `${import.meta.env.VITE_BACKEND_URL}/storage/avatar/${user.avatar}`
+        : undefined;
+
     return (
-        <div className="fixed inset-0 z-999 flex items-center justify-center">  
-            {/* Backdrop */}
-            <div className="fixed inset-0 bg-black opacity-50" onClick={() => setIsOpen(false)}></div>
-
-            {/* Modal */}
-            <div className="relative z-50 w-full max-w-2xl rounded-lg bg-white p-6 dark:bg-gray-800">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                        Thông tin người dùng
-                    </h3>
-                    <button
-                        onClick={() => setIsOpen(false)}
-                        className="btn btn-sm btn-circle btn-ghost hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                        <X size={24} />
-                    </button>
-                </div>
-
-                {/* Content */}
-                <div className="space-y-4">
-                    <div className="flex items-center space-x-4">
-                        <div className="avatar">
-                            <div className="w-28 h-28 rounded-full ring ring-gray-700 ring-offset-base-100 ring-offset-2 overflow-hidden">
-                                <img src={`${import.meta.env.VITE_BACKEND_URL}/storage/avatar/${user.avatar}`} alt="User Avatar" />
-                            </div>
-                        </div>
-                        <div>
-                            <h4 className="text-lg font-semibold">{user.email}</h4>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Vai trò: {user.role.name}</p>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Họ và tên</p>
-                            <p className="text-gray-900 dark:text-white">{user.fullName}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Số điện thoại</p>
-                            <p className="text-gray-900 dark:text-white">{user.phone}</p>
-                        </div>
-
-                        <div>
-                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Địa chỉ</p>
-                            <p className="text-gray-900 dark:text-white">{user.address}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</p>
-                            <p className="text-gray-900 dark:text-white">{user.email}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Ngày tạo</p>
-                            <p className="text-gray-900 dark:text-white">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date(user.createdAt as string))}</p>
-                        </div>
-                    </div>
-                </div>
+        <Drawer
+            title={
+                <span style={{ fontSize: 18, fontWeight: 600 }}>
+                    <UserOutlined /> Thông tin người dùng
+                </span>
+            }
+            placement="right"
+            width={520}
+            onClose={() => setIsOpen(false)}
+            open={isOpen}
+            styles={{ body: { padding: '24px' } }}
+        >
+            {/* User Header */}
+            <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                {avatarUrl ? (
+                    <Image
+                        src={avatarUrl}
+                        alt={user.fullName}
+                        width={96}
+                        height={96}
+                        style={{
+                            borderRadius: '50%',
+                            objectFit: 'cover',
+                            border: '3px solid #e6f4ff',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                        }}
+                        fallback="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9Ijk2IiBoZWlnaHQ9Ijk2IiBmaWxsPSIjZjBmMGYwIiByeD0iNDgiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMiIgZmlsbD0iI2JmYmZiZiI+VXNlcjwvdGV4dD48L3N2Zz4="
+                    />
+                ) : (
+                    <Avatar
+                        size={96}
+                        icon={<UserOutlined />}
+                        style={{
+                            background: 'linear-gradient(135deg, #1677ff, #0958d9)',
+                            border: '3px solid #e6f4ff',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                        }}
+                    />
+                )}
+                <Title level={4} style={{ marginTop: 12, marginBottom: 4 }}>{user.fullName}</Title>
+                <Tag color={roleColorMap[user.role?.name] || 'default'} style={{ fontSize: 13 }}>
+                    {user.role?.name}
+                </Tag>
             </div>
-        </div>
+
+            <Divider />
+
+            {/* Details */}
+            <Descriptions
+                column={1}
+                bordered
+                size="small"
+                labelStyle={{ fontWeight: 600, width: 130, whiteSpace: 'nowrap' }}
+            >
+                <Descriptions.Item label={<><UserOutlined /> Họ tên</>}>
+                    {user.fullName}
+                </Descriptions.Item>
+                <Descriptions.Item label={<><MailOutlined /> Email</>}>
+                    {user.email}
+                </Descriptions.Item>
+                <Descriptions.Item label={<><PhoneOutlined /> SĐT</>}>
+                    {user.phone || '—'}
+                </Descriptions.Item>
+                <Descriptions.Item label={<><EnvironmentOutlined /> Địa chỉ</>}>
+                    {user.address || '—'}
+                </Descriptions.Item>
+                <Descriptions.Item label={<><CalendarOutlined /> Ngày tạo</>}>
+                    {formatDateTime(user.createdAt)}
+                </Descriptions.Item>
+                {user.updatedAt && (
+                    <Descriptions.Item label={<><CalendarOutlined /> Cập nhật</>}>
+                        {formatDateTime(user.updatedAt)}
+                    </Descriptions.Item>
+                )}
+            </Descriptions>
+        </Drawer>
     );
 };

@@ -1,84 +1,124 @@
-import { setBreadcrumbs } from '../../redux/slide/breadcrumbs.slice'
-import { useEffect } from 'react'
-import AmountStats from '../../components/admin/dashboard/component/AmountStats'
-import DashboardStats from '../../components/admin/dashboard/component/DashboardStats'
-import PageStats from '../../components/admin/dashboard/component/PageStats'
-
-// import UserGroupIcon  from '@heroicons/react/24/outline/UserGroupIcon'
-// import UsersIcon  from '@heroicons/react/24/outline/UsersIcon'
-// import CircleStackIcon  from '@heroicons/react/24/outline/CircleStackIcon'
-// import CreditCardIcon  from '@heroicons/react/24/outline/CreditCardIcon'
-// import UserChannels from './component/UserChannels'
-// import LineChart from './components/LineChart'
-// import BarChart from './components/BarChart'
-// import DashboardTopBar from './components/DashboardTopBar'
-// import { useDispatch } from 'react-redux'
-// import {showNotification} from '../common/headerSlice'
-// import DoughnutChart from './components/DoughnutChart'
-// import { useState } from 'react'
-import { CircleAlert, CreditCard, UserIcon, Users } from 'lucide-react'
-import { clearBreadcrumbs } from '../../redux/slide/breadcrumbs.slice'
-import { useAppDispatch } from '../../redux/hook'
+import { useEffect, useState, useCallback } from 'react'
 import { useLocation } from 'react-router-dom'
-
-const statsData = [
-    {title : "New Users", value : "34.7k", icon : <Users className='w-8 h-8'/>, description : "↗︎ 2300 (22%)"},
-    {title : "Total Sales", value : "$34,545", icon : <CreditCard className='w-8 h-8'/>, description : "Current month"},
-    {title : "Pending Leads", value : "450", icon : <CircleAlert className='w-8 h-8'/>, description : "50 in hot leads"},
-    {title : "Active Users", value : "5.6k", icon : <UserIcon className='w-8 h-8'/>, description : "↙ 300 (18%)"},
-]
-
-
+import { Row, Col } from 'antd'
+import { useAppDispatch } from '../../redux/hook'
+import { clearBreadcrumbs, setBreadcrumbs } from '../../redux/slide/breadcrumbs.slice'
+import { callFetchDashboardApi } from '../../services/api'
+import { IDashboardData } from '../../types/backend'
+import { PresetKey, PresetItem, getToday, getDateOffset } from '../../components/admin/dashboard/component/dashboard.utils'
+import DashboardFilterBar from '../../components/admin/dashboard/component/DashboardFilterBar'
+import DashboardStatCards from '../../components/admin/dashboard/component/DashboardStatCards'
+import RevenueChart from '../../components/admin/dashboard/component/RevenueChart'
+import OrderStatusBreakdown from '../../components/admin/dashboard/component/OrderStatusBreakdown'
+import TopProductsTable from '../../components/admin/dashboard/component/TopProductsTable'
+import DashboardSkeleton from '../../components/admin/dashboard/component/DashboardSkeleton'
 
 export const DashboardAdmin = () => {
-    const dispatch = useAppDispatch();
-    const location = useLocation();
+    const dispatch = useAppDispatch()
+    const location = useLocation()
 
+    // ─── Filter states ──────────────────────────────────
+    const [fromDate, setFromDate] = useState(getDateOffset(29))
+    const [toDate, setToDate] = useState(getToday())
+    const [groupBy, setGroupBy] = useState('DAY')
+    const [topN, setTopN] = useState(5)
+    const [activePreset, setActivePreset] = useState<PresetKey>('30d')
+
+    // ─── Data states ────────────────────────────────────
+    const [data, setData] = useState<IDashboardData | null>(null)
+    const [loading, setLoading] = useState(true)
+
+    // ─── Breadcrumbs ────────────────────────────────────
     useEffect(() => {
         dispatch(clearBreadcrumbs())
         dispatch(setBreadcrumbs([
-          { label: "Quản lý", path: "/admin" },
-          { label: "Dashboard", path: "/admin" },
-        ]));
-      }, [dispatch, location.pathname]);
+            { label: 'Quản lý', path: '/admin' },
+            { label: 'Dashboard', path: '/admin' },
+        ]))
+    }, [dispatch, location.pathname])
 
-    return(
-        <>
-        {/** ---------------------- Select Period Content ------------------------- */}
-            {/* <HeaderAdmin/> */}
-        
-        {/** ---------------------- Different stats content 1 ------------------------- */}
-            <div className="grid lg:grid-cols-4 mt-2 md:grid-cols-2 grid-cols-1 gap-6">
-                {
-                    statsData.map((d, k) => {
-                        return (
-                            <DashboardStats key={k} {...d} colorIndex={k}/>
-                        )
-                    })
-                }
-            </div>
+    // ─── Fetch data ─────────────────────────────────────
+    const fetchDashboard = useCallback(async () => {
+        setLoading(true)
+        try {
+            const res = await callFetchDashboardApi(fromDate, toDate, groupBy, topN)
+            if (res.data?.data) {
+                setData(res.data.data)
+            }
+        } catch (err) {
+            console.error('Failed to fetch dashboard', err)
+        } finally {
+            setLoading(false)
+        }
+    }, [fromDate, toDate, groupBy, topN])
 
+    useEffect(() => {
+        fetchDashboard()
+    }, [fetchDashboard])
 
+    // ─── Handlers ───────────────────────────────────────
+    const handlePreset = (preset: PresetItem) => {
+        setActivePreset(preset.key)
+        setFromDate(preset.days === 0 ? getToday() : getDateOffset(preset.days))
+        setToDate(getToday())
+        if (preset.days <= 90) setGroupBy('DAY')
+        else setGroupBy('MONTH')
+    }
 
-        {/** ---------------------- Different charts ------------------------- */}
-            {/* <div className="grid lg:grid-cols-2 mt-4 grid-cols-1 gap-6">
-                <LineChart />
-                <BarChart />
-            </div> */}
-            
-        {/** ---------------------- Different stats content 2 ------------------------- */}
-        
-            <div className="grid lg:grid-cols-2 mt-10 grid-cols-1 gap-6">
-                <AmountStats />
-                <PageStats />
-            </div>
+    const handleReset = () => {
+        setFromDate(getDateOffset(29))
+        setToDate(getToday())
+        setGroupBy('DAY')
+        setTopN(5)
+        setActivePreset('30d')
+    }
 
-        {/** ---------------------- User source channels table  ------------------------- */}
-        
-            {/* <div className="grid lg:grid-cols-2 mt-4 grid-cols-1 gap-6">
-                <UserChannels />
-                <DoughnutChart />
-            </div> */}
-        </>
+    const handleFromDateChange = (value: string) => {
+        setFromDate(value)
+        setActivePreset('')
+    }
+
+    const handleToDateChange = (value: string) => {
+        setToDate(value)
+        setActivePreset('')
+    }
+
+    // ─── Render ─────────────────────────────────────────
+    return (
+        <div>
+            <DashboardFilterBar
+                fromDate={fromDate}
+                toDate={toDate}
+                groupBy={groupBy}
+                topN={topN}
+                activePreset={activePreset}
+                onFromDateChange={handleFromDateChange}
+                onToDateChange={handleToDateChange}
+                onGroupByChange={setGroupBy}
+                onTopNChange={setTopN}
+                onPresetClick={handlePreset}
+                onFilter={fetchDashboard}
+                onReset={handleReset}
+            />
+
+            {loading && <DashboardSkeleton />}
+
+            {!loading && data && (
+                <>
+                    <DashboardStatCards summary={data.summary} />
+
+                    <Row gutter={[16, 16]} style={{ marginBottom: 20 }}>
+                        <Col xs={24} lg={16}>
+                            <RevenueChart revenueSeries={data.revenueSeries} />
+                        </Col>
+                        <Col xs={24} lg={8}>
+                            <OrderStatusBreakdown orderStatusBreakdown={data.orderStatusBreakdown} />
+                        </Col>
+                    </Row>
+
+                    <TopProductsTable topProducts={data.topProducts} />
+                </>
+            )}
+        </div>
     )
 }

@@ -1,121 +1,164 @@
-import { Book, Building2, KeyRound, LayoutDashboard, Library, Shield, ShoppingCart, TagsIcon, User, UserPen, Users } from 'lucide-react';
-import { Link, NavLink } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Layout, Menu } from 'antd';
+import {
+    DashboardOutlined, UserOutlined, SafetyCertificateOutlined,
+    KeyOutlined, TeamOutlined, BookOutlined, EditOutlined,
+    BankOutlined, ShopOutlined, TagsOutlined, ShoppingCartOutlined
+} from '@ant-design/icons';
+import { Link, useLocation } from 'react-router-dom';
+import type { MenuProps } from 'antd';
 import Logo from '../../../assets/main_logo.png';
-export const LeftSidebar = () => {
+
+const { Sider } = Layout;
+
+type MenuItem = Required<MenuProps>['items'][number];
+
+const menuItems: MenuItem[] = [
+    {
+        key: 'dashboard-group',
+        label: 'Dashboard',
+        type: 'group',
+        children: [
+            {
+                key: '/admin',
+                icon: <DashboardOutlined />,
+                label: <Link to="/admin">Trang quản lý</Link>,
+            },
+        ],
+    },
+    { type: 'divider' },
+    {
+        key: 'account-group',
+        label: 'Account',
+        type: 'group',
+        children: [
+            {
+                key: '/admin/users',
+                icon: <UserOutlined />,
+                label: <Link to="/admin/users">Người dùng</Link>,
+            },
+            {
+                key: '/admin/roles',
+                icon: <SafetyCertificateOutlined />,
+                label: <Link to="/admin/roles">Vai trò</Link>,
+            },
+            {
+                key: '/admin/permissions',
+                icon: <KeyOutlined />,
+                label: <Link to="/admin/permissions">Quyền hạn</Link>,
+            },
+        ],
+    },
+    { type: 'divider' },
+    {
+        key: 'content-group',
+        label: 'Content',
+        type: 'group',
+        children: [
+            {
+                key: '/admin/customers',
+                icon: <TeamOutlined />,
+                label: <Link to="/admin/customers">Khách hàng</Link>,
+            },
+            {
+                key: '/admin/books',
+                icon: <BookOutlined />,
+                label: <Link to="/admin/books">Sách</Link>,
+            },
+            {
+                key: '/admin/authors',
+                icon: <EditOutlined />,
+                label: <Link to="/admin/authors">Tác giả</Link>,
+            },
+            {
+                key: '/admin/publishers',
+                icon: <BankOutlined />,
+                label: <Link to="/admin/publishers">Nhà xuất bản</Link>,
+            },
+            {
+                key: '/admin/suppliers',
+                icon: <ShopOutlined />,
+                label: <Link to="/admin/suppliers">Nhà cung cấp</Link>,
+            },
+            {
+                key: '/admin/categories',
+                icon: <TagsOutlined />,
+                label: <Link to="/admin/categories">Thể loại</Link>,
+            },
+        ],
+    },
+    { type: 'divider' },
+    {
+        key: 'commerce-group',
+        label: 'Commerce',
+        type: 'group',
+        children: [
+            {
+                key: '/admin/orders',
+                icon: <ShoppingCartOutlined />,
+                label: <Link to="/admin/orders">Đơn hàng</Link>,
+            },
+        ],
+    },
+];
+
+export const LeftSidebar: React.FC = () => {
+    const location = useLocation();
+    const [collapsed, setCollapsed] = useState(false);
+
+    // Determine the active menu key based on current path
+    const selectedKey = location.pathname === '/admin' ? '/admin' : location.pathname;
 
     return (
-        <div className="z-30 overflow-y-auto h-full [scrollbar-width:none]">
-            <ul className="menu pt-2 w-60 bg-base-100 min-h-full text-base-content border-r border-gray-200 dark:border-gray-700">
-                <li className="font-semibold text-xl">
-                    <Link to={'/'}>
-                        <img
-                            className="w-auto h-auto object-contain"
-                            src={Logo}
-                            alt="BookVerse Logo"
-                            style={{
-                                filter: 'brightness(0) saturate(100%) invert(39%) sepia(57%) saturate(2000%) hue-rotate(200deg) brightness(96%) contrast(94%)',
-                            }}
-                        />
-                    </Link>
-                </li>
+        <Sider
+            width={240}
+            collapsible
+            collapsed={collapsed}
+            onCollapse={setCollapsed}
+            theme="light"
+            style={{
+                height: '100vh',
+                position: 'sticky',
+                top: 0,
+                left: 0,
+                borderRight: '1px solid #f0f0f0',
+                overflow: 'auto',
+            }}
+        >
+            {/* Logo */}
+            <div style={{
+                padding: collapsed ? '16px 8px' : '16px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderBottom: '1px solid #f0f0f0',
+                transition: 'all 0.2s',
+            }}>
+                <Link to="/">
+                    <img
+                        src={Logo}
+                        alt="BookVerse Logo"
+                        style={{
+                            width: collapsed ? 32 : '100%',
+                            height: 'auto',
+                            objectFit: 'contain',
+                            filter: 'brightness(0) saturate(100%) invert(39%) sepia(57%) saturate(2000%) hue-rotate(200deg) brightness(96%) contrast(94%)',
+                            transition: 'width 0.2s',
+                        }}
+                    />
+                </Link>
+            </div>
 
-                <div className='divider m-0'></div>
-                {/* Phần 1: Dashboard */}
-                <li className="menu-title">
-                    <span>Dashboard</span>
-                </li>
-                <li className="">
-                    <NavLink
-                        to={"/admin"}
-                        className="mb-2 flex items-center gap-2" >
-                        <LayoutDashboard />
-                        Trang quản lý
-                    </NavLink>
-                </li>
-
-                <div className='divider m-0'></div>
-
-                {/* Phần 2: Account */}
-                <li className="menu-title">
-                    <span>Account</span>
-                </li>
-                <li className="">
-                    <NavLink
-                        to={"/admin/users"}
-                        className="mb-2 flex items-center gap-2" >
-                        <User />
-                        Người dùng
-                    </NavLink>
-                    <NavLink
-                        to={"/admin/roles"}
-                        className="mb-2 flex items-center gap-2" >
-                        <Shield />
-                        Vai trò
-                    </NavLink>
-                    <NavLink
-                        to={"/admin/permissions"}
-                        className="mb-2 flex items-center gap-2" >
-                        <KeyRound />
-                        Quyền hạn
-                    </NavLink>
-                </li>
-
-                <div className='divider m-0'></div>
-
-                {/* Phần 3: Nội dung */}
-                <li className="menu-title">
-                    <span>Content</span>
-                </li>
-                <li className="">
-                    <NavLink
-                        to={"/admin/customers"}
-                        className="mb-2 flex items-center gap-2" >
-                        <Users />
-                        Khách hàng
-                    </NavLink>
-
-                    <NavLink
-                        to={"/admin/books"}
-                        className="mb-2 flex items-center gap-2" >
-                        <Book />
-                        Sách
-                    </NavLink>
-                    <NavLink
-                        to={"/admin/authors"}
-                        className="mb-2 flex items-center gap-2" >
-                        <UserPen />
-                        Tác giả
-                    </NavLink>
-                    <NavLink
-                        to={"/admin/publishers"}
-                        className="mb-2 flex items-center gap-2" >
-                        <Library />
-                        Nhà xuất bản
-                    </NavLink>
-                    <NavLink
-                        to={"/admin/suppliers"}
-                        className="mb-2 flex items-center gap-2" >
-                        <Building2 />
-                        Nhà cung cấp
-                    </NavLink>
-                    <NavLink
-                        to={"/admin/categories"}
-                        className="mb-2 flex items-center gap-2" >
-                        <TagsIcon />
-                        Thể loại
-                    </NavLink>
-                    {/*Đơn hàng*/}
-                    <li className="menu-title">
-                        <span>Commerce</span>
-                    </li>
-                    <NavLink
-                        to={"/admin/orders"}
-                        className="mb-2 flex items-center gap-2" >
-                        <ShoppingCart />
-                        Đơn hàng
-                    </NavLink>
-                </li>
-            </ul>
-        </div>
-    )
-}
+            {/* Menu */}
+            <Menu
+                mode="inline"
+                selectedKeys={[selectedKey]}
+                items={menuItems}
+                style={{
+                    border: 'none',
+                    fontSize: 14,
+                }}
+            />
+        </Sider>
+    );
+};

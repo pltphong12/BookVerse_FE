@@ -1,4 +1,5 @@
 import React from "react";
+import { Spin } from "antd";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { callFetchAllOrdersWithPaginationAndFilterApi } from "../../services/api";
 import { IOrder } from "../../types/backend";
@@ -12,11 +13,11 @@ export const OrderPage = () => {
     const queryClient = useQueryClient();
 
     const [dataSource, setDataSource] = React.useState<IOrder[]>([]);
-    
+
     // Pagination state
     const [page, setPage] = React.useState<number>(1);
     const [totalPage, setTotalPage] = React.useState<number>(0);
-    
+
     // Filter state
     const [orderCode, setOrderCode] = React.useState<string>("");
     const [status, setStatus] = React.useState<string>("");
@@ -27,13 +28,7 @@ export const OrderPage = () => {
     const { data: ordersQuery, isPending } = useQuery({
         queryKey: ['fetchingOrders', orderCode, status, paymentMethod, paymentStatus, dateFrom, page],
         queryFn: () => callFetchAllOrdersWithPaginationAndFilterApi(
-            orderCode, 
-            status, 
-            paymentMethod, 
-            paymentStatus, 
-            dateFrom, 
-            page, 
-            size
+            orderCode, status, paymentMethod, paymentStatus, dateFrom, page, size
         ),
         refetchOnWindowFocus: false,
         placeholderData: (previousData) => previousData,
@@ -60,11 +55,8 @@ export const OrderPage = () => {
         await queryClient.invalidateQueries({ queryKey: ['fetchingOrders'] });
     };
 
-    const getTable = () => {
-        if (isPending) {
-            return <div>Đang tải...</div>;
-        }
-        return (
+    return (
+        <Spin spinning={isPending} tip="Đang tải..." size="large">
             <OrderTable
                 load={load}
                 dataSource={dataSource}
@@ -82,12 +74,6 @@ export const OrderPage = () => {
                 dateFrom={dateFrom}
                 setDateFrom={setDateFrom}
             />
-        );
-    };
-
-    return (
-        <>
-            {getTable()}
-        </>
+        </Spin>
     );
 };

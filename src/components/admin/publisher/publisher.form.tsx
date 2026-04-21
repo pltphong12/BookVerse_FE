@@ -1,11 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useCallback, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { showToast, ToastType } from "../../../common/showToast";
 import { useAppDispatch, useAppSelector } from "../../../redux/hook";
 import { createPublisher, ICreatePublisher, resetCreatePublisher, resetUpdatePublisher, updatePublisher } from "../../../redux/slide/publisher.slice";
 import { callUploadSingleFile } from "../../../services/api";
+import {
+    Modal, Input, Form, Button, Row, Col, Divider, Image, Avatar, Typography
+} from 'antd';
+import { SaveOutlined, BankOutlined, CameraOutlined } from '@ant-design/icons';
+
+const { TextArea } = Input;
+const { Title } = Typography;
 
 interface PublisherFormProps {
     load: () => Promise<void>;
@@ -45,20 +52,16 @@ export const PublisherForm: React.FC<PublisherFormProps> = ({ isModalOpen, setIs
     const message = useAppSelector((state) => state.publisher.message);
 
     const {
-        register,
         handleSubmit,
         reset,
         setValue,
         formState: { errors },
+        control,
     } = useForm<CreatePublisherFormData>({
         resolver: zodResolver(createPublisherSchema),
         defaultValues: {
-            name: '',
-            address: '',
-            phone: '',
-            email: '',
-            description: '',
-            image: '',
+            name: '', address: '', phone: '',
+            email: '', description: '', image: '',
         }
     });
 
@@ -70,30 +73,16 @@ export const PublisherForm: React.FC<PublisherFormProps> = ({ isModalOpen, setIs
             setValue('email', publisherToEdit.email);
             setValue('description', publisherToEdit.description);
             setValue('image', publisherToEdit.image);
-            setPreviewUrl(`${import.meta.env.VITE_BACKEND_URL}/storage/publisher/${publisherToEdit.image}`)
+            setPreviewUrl(`${import.meta.env.VITE_BACKEND_URL}/storage/publisher/${publisherToEdit.image}`);
         } else {
-            reset({
-                name: '',
-                address: '',
-                phone: '',
-                email: '',
-                description: '',
-                image: '',
-            });
-            setPreviewUrl('')
+            reset({ name: '', address: '', phone: '', email: '', description: '', image: '' });
+            setPreviewUrl('');
         }
     }, [publisherToEdit, setValue, reset]);
 
     const resetForm = useCallback(() => {
-        reset({
-            name: '',
-            address: '',
-            phone: '',
-            email: '',
-            description: '',
-            image: '',
-        });
-        setPreviewUrl('')
+        reset({ name: '', address: '', phone: '', email: '', description: '', image: '' });
+        setPreviewUrl('');
         setIsSubmitting(false);
     }, [reset]);
 
@@ -123,10 +112,7 @@ export const PublisherForm: React.FC<PublisherFormProps> = ({ isModalOpen, setIs
         }
         const payload = { ...data, image: imageFileName };
         if (publisherToEdit) {
-            dispatch(updatePublisher({
-                id: publisherToEdit.id!,
-                data: payload as ICreatePublisher
-            }));
+            dispatch(updatePublisher({ id: publisherToEdit.id!, data: payload as ICreatePublisher }));
         } else {
             dispatch(createPublisher(payload as ICreatePublisher));
         }
@@ -155,146 +141,166 @@ export const PublisherForm: React.FC<PublisherFormProps> = ({ isModalOpen, setIs
     }, [isCreatePublisherSuccess, isCreatePublisherFailed, isUpdatePublisherSuccess, isUpdatePublisherFailed, dispatch, load, message, publisherToEdit, handleClose]);
 
     return (
-        <dialog id="publisher_modal" className={`modal ${isModalOpen ? 'modal-open' : ''} modal-bottom sm:modal-middle w-full`}>
-            <div className="modal-box">
-                <h3 className="font-bold text-lg mb-4">{publisherToEdit ? 'Chỉnh sửa nhà xuất bản' : 'Tạo nhà xuất bản'}</h3>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Tên nhà xuất bản</span>
-                        </label>
-                        <input
-                            type="text"
-                            {...register('name')}
-                            placeholder="Nhập tên nhà xuất bản"
-                            className={`input input-bordered w-full ${errors.name ? 'input-error' : ''}`}
-                        />
-                        {errors.name && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.name.message}</span>
-                            </label>
+        <Modal
+            title={
+                <Title level={4} style={{ margin: 0 }}>
+                    {publisherToEdit ? 'Chỉnh sửa nhà xuất bản' : 'Tạo nhà xuất bản mới'}
+                </Title>
+            }
+            open={isModalOpen}
+            onCancel={handleClose}
+            footer={null}
+            width={600}
+            destroyOnHidden
+            centered
+            styles={{ body: { maxHeight: '75vh', overflowY: 'auto', padding: '16px 24px' } }}
+        >
+            <form onSubmit={handleSubmit(onSubmit)}>
+                {/* Image Upload */}
+                <div style={{ textAlign: 'center', marginBottom: 20 }}>
+                    <div style={{ position: 'relative', display: 'inline-block' }}>
+                        {previewUrl ? (
+                            <Image
+                                src={previewUrl}
+                                width={80} height={80}
+                                style={{ borderRadius: '50%', objectFit: 'cover' }}
+                                preview={false}
+                            />
+                        ) : (
+                            <Avatar size={80} icon={<BankOutlined />} style={{ background: '#1677ff' }} />
                         )}
+                        <label style={{
+                            position: 'absolute', bottom: 0, right: -4,
+                            background: '#1677ff', borderRadius: '50%',
+                            width: 28, height: 28,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            cursor: 'pointer', border: '2px solid #fff',
+                        }}>
+                            <CameraOutlined style={{ color: '#fff', fontSize: 14 }} />
+                            <input
+                                type="file"
+                                onChange={handleImageChange}
+                                accept="image/*"
+                                style={{ display: 'none' }}
+                            />
+                        </label>
                     </div>
+                </div>
 
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Địa chỉ</span>
-                        </label>
-                        <input
-                            type="text"
-                            {...register('address')}
-                            placeholder="Nhập địa chỉ"
-                            className={`input input-bordered w-full ${errors.address ? 'input-error' : ''}`}
-                        />
-                        {errors.address && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.address.message}</span>
-                            </label>
+                {/* Name */}
+                <Form.Item
+                    label="Tên nhà xuất bản"
+                    validateStatus={errors.name ? 'error' : ''}
+                    help={errors.name?.message}
+                    required
+                    layout="vertical"
+                >
+                    <Controller
+                        name="name"
+                        control={control}
+                        render={({ field }) => (
+                            <Input {...field} placeholder="Nhập tên nhà xuất bản" size="large" />
                         )}
-                    </div>
+                    />
+                </Form.Item>
 
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Số điện thoại</span>
-                        </label>
-                        <input
-                            type="tel"
-                            {...register('phone')}
-                            placeholder="Nhập số điện thoại"
-                            className={`input input-bordered w-full ${errors.phone ? 'input-error' : ''}`}
-                        />
-                        {errors.phone && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.phone.message}</span>
-                            </label>
+                {/* Address */}
+                <Form.Item
+                    label="Địa chỉ"
+                    validateStatus={errors.address ? 'error' : ''}
+                    help={errors.address?.message}
+                    required
+                    layout="vertical"
+                >
+                    <Controller
+                        name="address"
+                        control={control}
+                        render={({ field }) => (
+                            <Input {...field} placeholder="Nhập địa chỉ" />
                         )}
-                    </div>
+                    />
+                </Form.Item>
 
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Email</span>
-                        </label>
-                        <input
-                            type="email"
-                            {...register('email')}
-                            placeholder="Nhập email"
-                            className={`input input-bordered w-full ${errors.email ? 'input-error' : ''}`}
-                        />
-                        {errors.email && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.email.message}</span>
-                            </label>
-                        )}
-                    </div>
+                <Divider style={{ margin: '8px 0 16px' }} />
 
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Mô tả</span>
-                        </label>
-                        <textarea
-                            {...register('description')}
-                            placeholder="Nhập mô tả"
-                            className={`textarea textarea-bordered w-full ${errors.description ? 'textarea-error' : ''}`}
-                            rows={3}
-                        />
-                        {errors.description && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.description.message}</span>
-                            </label>
-                        )}
-                    </div>
-
-                    <div className="form-control mt-4 space-x-2">
-                        <label className="label">
-                            <span className="label-text">Ảnh đại diện nhà xuất bản</span>
-                        </label>
-                        <input
-                            type="file"
-                            id="avatar-upload"
-                            onChange={handleImageChange}
-                            accept="image/*"
-                            className="hidden"
-                        />
-
-                        {/* Nút chọn ảnh thay thế */}
-                        <label htmlFor="avatar-upload" className="btn btn-outline btn-sm w-fit">
-                            📷 Chọn ảnh
-                        </label>
-                        {errors.image && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.image.message?.toString()}</span>
-                            </label>
-                        )}
-                        {previewUrl && (
-                            <div className="mt-2">
-                                <img src={previewUrl} alt="Avatar Preview" className="w-24 h-24" />
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="flex justify-end gap-4 mt-4">
-                        <button
-                            type="submit"
-                            className="btn btn-neutral"
-                            disabled={isSubmitting}
+                <Row gutter={16}>
+                    <Col xs={24} md={12}>
+                        <Form.Item
+                            label="Số điện thoại"
+                            validateStatus={errors.phone ? 'error' : ''}
+                            help={errors.phone?.message}
+                            required
+                            layout="vertical"
                         >
-                            {isSubmitting ? (
-                                <span className="loading loading-spinner loading-sm"></span>
-                            ) : (
-                                publisherToEdit ? 'Cập nhật' : 'Lưu'
-                            )}
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-error"
-                            onClick={handleClose}
-                            disabled={isSubmitting}
+                            <Controller
+                                name="phone"
+                                control={control}
+                                render={({ field }) => (
+                                    <Input {...field} placeholder="Nhập SĐT" />
+                                )}
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} md={12}>
+                        <Form.Item
+                            label="Email"
+                            validateStatus={errors.email ? 'error' : ''}
+                            help={errors.email?.message}
+                            required
+                            layout="vertical"
                         >
-                            Đóng
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </dialog>
+                            <Controller
+                                name="email"
+                                control={control}
+                                render={({ field }) => (
+                                    <Input {...field} placeholder="Nhập email" type="email" />
+                                )}
+                            />
+                        </Form.Item>
+                    </Col>
+                </Row>
+
+                {/* Description */}
+                <Form.Item
+                    label="Mô tả"
+                    validateStatus={errors.description ? 'error' : ''}
+                    help={errors.description?.message}
+                    required
+                    layout="vertical"
+                >
+                    <Controller
+                        name="description"
+                        control={control}
+                        render={({ field }) => (
+                            <TextArea
+                                {...field}
+                                rows={3}
+                                placeholder="Nhập mô tả"
+                                showCount
+                                maxLength={500}
+                            />
+                        )}
+                    />
+                </Form.Item>
+
+                {/* Footer */}
+                <div style={{
+                    display: 'flex', justifyContent: 'flex-end', gap: 8,
+                    paddingTop: 16, borderTop: '1px solid #f0f0f0',
+                }}>
+                    <Button onClick={handleClose} disabled={isSubmitting}>
+                        Đóng
+                    </Button>
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        icon={<SaveOutlined />}
+                        loading={isSubmitting}
+                    >
+                        {publisherToEdit ? 'Cập nhật' : 'Tạo mới'}
+                    </Button>
+                </div>
+            </form>
+        </Modal>
     );
 };

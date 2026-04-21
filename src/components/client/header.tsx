@@ -169,9 +169,6 @@ export const Header: React.FC = () => {
                                         onClick={() => handleCategoryClick()}
                                         className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-colors flex items-center gap-3 font-medium"
                                     >
-                                        <span className="w-7 h-7 flex items-center justify-center bg-primary-100 text-primary-600 rounded-lg text-sm">
-                                            📖
-                                        </span>
                                         Toàn bộ sản phẩm
                                     </button>
 
@@ -226,26 +223,33 @@ export const Header: React.FC = () => {
                                 </span>
                             </Link>
                         )}
-                        <div className="dropdown dropdown-end">
-                            <div tabIndex={0} role="button" className="flex flex-col items-center gap-1 hover:text-primary-500 cursor-pointer">
+                        <div className="relative group">
+                            <div className="flex flex-col items-center gap-1 hover:text-primary-500 cursor-pointer">
                                 <User className="w-6 h-6" />
                                 <span className="text-xs">Tài khoản</span>
                             </div>
-                            <ul className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                                {account.isAuthenticated ? (
-                                    <>
-                                        <li><button>Thông tin tài khoản</button></li>
-                                        <li><button onClick={() => navigate('/order-history')}>Lịch sử đơn hàng</button></li>
-                                        <li><button>Đổi mật khẩu</button></li>
-                                        <li><button onClick={handleLogout}>Đăng xuất</button></li>
-                                    </>
-                                ) : (
-                                    <>
-                                        <li><button onClick={() => navigate('/login')}>Đăng nhập</button></li>
-                                        <li><button onClick={() => navigate('/register')}>Đăng ký</button></li>
-                                    </>
-                                )}
-                            </ul>
+                            
+                            {/* Transparent bridge to prevent hover loss */}
+                            <div className="absolute top-full right-0 w-full h-4 -mt-4 bg-transparent"></div>
+
+                            <div className="absolute right-0 top-full m-2 w-52 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 transform origin-top-right scale-95 group-hover:scale-100">
+                                <div className="py-2">
+                                    {account.isAuthenticated ? (
+                                        <>
+                                            <button className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-colors font-medium">Thông tin tài khoản</button>
+                                            <button onClick={() => navigate('/order-history')} className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-colors font-medium">Lịch sử đơn hàng</button>
+                                            <button className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-colors font-medium">Đổi mật khẩu</button>
+                                            <div className="border-t border-gray-100 my-1"></div>
+                                            <button onClick={handleLogout} className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium">Đăng xuất</button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <button onClick={() => navigate('/login')} className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-colors font-medium">Đăng nhập</button>
+                                            <button onClick={() => navigate('/register')} className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-colors font-medium">Đăng ký</button>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

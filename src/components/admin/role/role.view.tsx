@@ -1,5 +1,9 @@
-import { X } from "lucide-react";
-import { IRole } from "../../../types/backend";
+import React from 'react';
+import { Drawer, Descriptions, Tag, Typography, Divider, Empty, Badge } from 'antd';
+import { SafetyCertificateOutlined, CalendarOutlined, ApiOutlined } from '@ant-design/icons';
+import { IRole } from '../../../types/backend';
+
+const { Title, Text } = Typography;
 
 interface RoleViewProps {
     isOpen: boolean;
@@ -7,66 +11,121 @@ interface RoleViewProps {
     role: IRole | null;
 }
 
+const roleColorMap: Record<string, string> = {
+    ADMIN: 'red',
+    MANAGER: 'blue',
+    CUSTOMER: 'green',
+    STAFF: 'orange',
+};
+
+const methodColorMap: Record<string, string> = {
+    GET: 'blue',
+    POST: 'green',
+    PUT: 'orange',
+    DELETE: 'red',
+    PATCH: 'purple',
+};
+
+const formatDateTime = (dateStr?: string) => {
+    if (!dateStr) return '—';
+    return new Intl.DateTimeFormat('vi-VN', {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit',
+    }).format(new Date(dateStr));
+};
+
 export const RoleView: React.FC<RoleViewProps> = ({ isOpen, setIsOpen, role }) => {
-    if (!isOpen || !role) return null;
+    if (!role) return null;
+
+    // Group permissions by domain
+    const permissionsByDomain = role.permissions?.reduce((acc: Record<string, typeof role.permissions>, perm) => {
+        const domain = perm.domain || 'Khác';
+        if (!acc[domain]) acc[domain] = [];
+        acc[domain].push(perm);
+        return acc;
+    }, {}) || {};
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-            {/* Backdrop */}
-            <div className="fixed inset-0 bg-black opacity-50" onClick={() => setIsOpen(false)}></div>
-
-            {/* Modal */}
-            <div className="relative z-50 w-full max-w-2xl rounded-lg bg-white p-6 dark:bg-gray-800">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                        Thông tin vai trò
-                    </h3>
-                    <button
-                        onClick={() => setIsOpen(false)}
-                        className="btn btn-sm btn-circle btn-ghost hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                        <X size={24} />
-                    </button>
-                </div>
-
-                {/* Content */}
-                <div className="space-y-4">
-                    <div className="items-center space-x-4">
-                        <h4 className="text-lg font-semibold">Vai trò: </h4>
-                        <p>{role.name}</p>
-                    </div>
-                    <div className="items-center space-x-4">
-                        <h4 className="text-lg font-semibold">Mô tả chi tiết: </h4>
-                        <p>{role.description}</p>
-                    </div>
-                    <div className="items-center space-x-4">
-                        <h4 className="text-lg font-semibold">Quyền hạn: {' '}</h4>
-                        <p>
-                            {role.permissions && role.permissions.length > 0
-                                ? role.permissions.map(permission => permission.name).join('\n ')
-                                : 'Không có quyền nào'
-                            }
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="col-span-2">
-                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Ngày tạo</p>
-                            <p className="text-gray-900 dark:text-white">
-                                {role.createdAt && new Intl.DateTimeFormat('en-US', {
-                                    year: 'numeric',
-                                    month: '2-digit',
-                                    day: '2-digit',
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                    second: '2-digit'
-                                }).format(new Date(role.createdAt))}
-                            </p>
-                        </div>
-                    </div>
+        <Drawer
+            title={
+                <span style={{ fontSize: 18, fontWeight: 600 }}>
+                    <SafetyCertificateOutlined /> Thông tin vai trò
+                </span>
+            }
+            placement="right"
+            width={600}
+            onClose={() => setIsOpen(false)}
+            open={isOpen}
+            styles={{ body: { padding: '24px' } }}
+        >
+            {/* Role Header */}
+            <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                <Tag color={roleColorMap[role.name] || 'default'} style={{ fontSize: 18, padding: '6px 20px' }}>
+                    {role.name}
+                </Tag>
+                <div style={{ marginTop: 8 }}>
+                    <Text type="secondary">{role.description}</Text>
                 </div>
             </div>
-        </div>
+
+            <Descriptions
+                column={1}
+                bordered
+                size="small"
+                labelStyle={{ fontWeight: 600, width: 130, whiteSpace: 'nowrap' }}
+            >
+                <Descriptions.Item label={<><SafetyCertificateOutlined /> Vai trò</>}>
+                    <Tag color={roleColorMap[role.name] || 'default'}>{role.name}</Tag>
+                </Descriptions.Item>
+                <Descriptions.Item label="Mô tả">
+                    {role.description || '—'}
+                </Descriptions.Item>
+                <Descriptions.Item label={<><CalendarOutlined /> Ngày tạo</>}>
+                    {formatDateTime(role.createdAt)}
+                </Descriptions.Item>
+                {role.updatedAt && (
+                    <Descriptions.Item label={<><CalendarOutlined /> Cập nhật</>}>
+                        {formatDateTime(role.updatedAt)}
+                    </Descriptions.Item>
+                )}
+            </Descriptions>
+
+            {/* Permissions */}
+            <Divider />
+            <Title level={5} style={{ marginBottom: 12 }}>
+                <ApiOutlined /> Quyền hạn{' '}
+                <Badge count={role.permissions?.length || 0} style={{ backgroundColor: '#1677ff' }} />
+            </Title>
+
+            {Object.keys(permissionsByDomain).length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {Object.entries(permissionsByDomain).map(([domain, perms]) => (
+                        <div key={domain} style={{
+                            border: '1px solid #f0f0f0', borderRadius: 8, padding: 12,
+                            background: '#fafafa',
+                        }}>
+                            <div style={{ fontWeight: 600, marginBottom: 8 }}>
+                                {domain}
+                                <Tag style={{ marginLeft: 8 }}>{perms.length}</Tag>
+                            </div>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                                {perms.map(perm => (
+                                    <Tag
+                                        key={perm.id}
+                                        color={methodColorMap[perm.method] || 'default'}
+                                        style={{ marginBottom: 4 }}
+                                    >
+                                        <span style={{ fontWeight: 600, marginRight: 4 }}>{perm.method}</span>
+                                        <span style={{ fontFamily: 'monospace', fontSize: 11 }}>{perm.apiPath}</span>
+                                    </Tag>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <Empty description="Không có quyền nào" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            )}
+        </Drawer>
     );
 };

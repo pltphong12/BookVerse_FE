@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
+import { Spin } from "antd";
 import { SupplierTable } from "../../components/admin/supplier/supplier.table";
 import { useAppDispatch } from "../../redux/hook";
 import { clearBreadcrumbs, setBreadcrumbs } from "../../redux/slide/breadcrumbs.slice";
@@ -20,7 +21,7 @@ export const SupplierPage = () => {
     const [dateFrom, setDateFrom] = React.useState<string>("")
 
     // Fetch all with pagination and filter
-    const { data: suppliersQuery, isPending} = useQuery({
+    const { data: suppliersQuery, isPending } = useQuery({
         queryKey: ['fetchingSuppliers', search, dateFrom, page],
         queryFn: () => callFetchAllSuppliersWithPaginationAndFilterApi(search, dateFrom, page, size),
         refetchOnWindowFocus: false,
@@ -28,14 +29,11 @@ export const SupplierPage = () => {
         retry: false
     });
 
-    
-
     React.useEffect(() => {
         if (suppliersQuery?.data.data) {
             setDataSource(suppliersQuery.data.data.result);
             setTotalPage(suppliersQuery.data.data.meta.pages)
         }
-        
     }, [suppliersQuery]);
 
     React.useEffect(() => {
@@ -51,35 +49,19 @@ export const SupplierPage = () => {
         await queryClient.invalidateQueries({ queryKey: ['fetchingSuppliers'] });
     };
 
-    const getTable = () => {
-        if (isPending) return (
-            <>
-                <div>Đang tải...</div>
-            </>
-        )
-        else {
-            return (
-                <>
-                    <SupplierTable
-                        load={load}
-                        dataSource={dataSource}
-                        page={page}
-                        totalPage={totalPage}
-                        setPage={setPage}
-                        search={search}
-                        setSearch={setSearch}                      
-                        dateFrom={dateFrom}
-                        setDateFrom={setDateFrom}
-                    />
-                </>
-            )
-        }
-    }
-
     return (
-        <>
-            {getTable()}
-        </>
+        <Spin spinning={isPending} tip="Đang tải..." size="large">
+            <SupplierTable
+                load={load}
+                dataSource={dataSource}
+                page={page}
+                totalPage={totalPage}
+                setPage={setPage}
+                search={search}
+                setSearch={setSearch}
+                dateFrom={dateFrom}
+                setDateFrom={setDateFrom}
+            />
+        </Spin>
     );
 }
-

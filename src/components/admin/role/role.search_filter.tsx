@@ -1,5 +1,7 @@
-import { Filter, Search } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import React from 'react';
+import { Input, DatePicker, Card, Row, Col, Button, Space } from 'antd';
+import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
 
 interface RoleSearchAndFilterProps {
     searchWithName: string;
@@ -9,73 +11,56 @@ interface RoleSearchAndFilterProps {
     setPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export const RoleSearchAndFilter: React.FC<RoleSearchAndFilterProps> = ({ searchWithName, setSearchWithName, dateFrom, setDateFrom, setPage }) => {
-    const [isExpanded, setIsExpanded] = useState<boolean>(false);
-    const searchRef = useRef<HTMLInputElement>(null);
-    // Focus in SearchInput when entry page
-    useEffect(() => {
-        if (searchRef.current) {
-            searchRef.current.focus();
-        }
-    }, []);
+export const RoleSearchAndFilter: React.FC<RoleSearchAndFilterProps> = ({
+    searchWithName, setSearchWithName,
+    dateFrom, setDateFrom,
+    setPage,
+}) => {
+    const handleReset = () => {
+        setSearchWithName('');
+        setDateFrom('');
+        setPage(1);
+    };
 
     return (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 transition-all duration-300 w-full">
-            <div className="p-4 sm:flex items-center justify-between">
-
-                <div className="relative flex-1 sm:max-w-md mb-4 sm:mb-0">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                        <Search size={18} />
-                    </div>
-                    <input
-                        type="text"
-                        ref={searchRef}
-                        name="name"
+        <Card
+            size="small"
+            style={{ marginBottom: 16, width: '100%' }}
+            styles={{ body: { padding: '16px' } }}
+        >
+            <Row gutter={[16, 16]} align="middle">
+                <Col xs={24} sm={12} md={8}>
+                    <Input
+                        placeholder="Tìm theo tên vai trò"
+                        prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
                         value={searchWithName}
-                        onChange={(events) => {
-                            events.preventDefault()
-                            setSearchWithName(events.target.value)
-                            setPage(1)
+                        onChange={(e) => {
+                            setSearchWithName(e.target.value);
+                            setPage(1);
                         }}
-                        placeholder="Nhập tên thể loại"
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                        allowClear
                     />
-                </div>
-
-
-                <div className="flex items-center gap-2">
-                    <button
-                        onClick={() => setIsExpanded(!isExpanded)}
-                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
-                    >
-                        <Filter size={16} />
-                        <span>Bộ lọc</span>
-                    </button>
-
-
-                </div>
-            </div>
-
-            {isExpanded && (
-                <div className="p-4 border-t border-gray-200 grid sm:grid-cols-2 md:grid-cols-4 gap-4 animate-fadeIn">
-
-                    <div className="space-y-2">
-                        <label htmlFor="dateFrom" className="block text-sm font-medium text-gray-700">
-                            Ngày tạo
-                        </label>
-                        <input
-                            type="date"
-                            id="dateFrom"
-                            name="dateFrom"
-                            value={dateFrom}
-                            onChange={(events) => {
-                                setDateFrom(events.target.value)
-                            }}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                        />
-                    </div>
-                </div>
-            )}
-        </div>
+                </Col>
+                <Col xs={24} sm={12} md={8}>
+                    <DatePicker
+                        placeholder="Từ ngày tạo"
+                        style={{ width: '100%' }}
+                        value={dateFrom ? dayjs(dateFrom) : null}
+                        onChange={(_date, dateString) => {
+                            setDateFrom(dateString as string);
+                            setPage(1);
+                        }}
+                        format="YYYY-MM-DD"
+                    />
+                </Col>
+                <Col xs={24} sm={12} md={8}>
+                    <Space>
+                        <Button icon={<ReloadOutlined />} onClick={handleReset}>
+                            Đặt lại
+                        </Button>
+                    </Space>
+                </Col>
+            </Row>
+        </Card>
     );
 };

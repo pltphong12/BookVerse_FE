@@ -1,14 +1,19 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Star, X } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import Select from 'react-select';
 import { z } from "zod";
 import { showToast, ToastType } from "../../../common/showToast";
 import { useAppDispatch, useAppSelector } from "../../../redux/hook";
 import { createBook, ICreateBook, ICreateBookImage, resetCreateBook, resetUpdateBook, updateBook } from "../../../redux/slide/book.slice";
 import { IAuthorInBook, ICategoryInBook, IPublisher, ISupplier } from "../../../types/backend";
 import { callUploadBatchFiles } from "../../../services/api";
+import {
+    Modal, Input, InputNumber, Select, Form, Button, Image, Row, Col, Divider, Typography
+} from 'antd';
+import { SaveOutlined, StarFilled, StarOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+
+const { TextArea } = Input;
+const { Title } = Typography;
 
 interface ImageItem {
     uid: string;
@@ -72,7 +77,6 @@ const createBookSchema = z.object({
     coverFormat: z.enum(["PAPERBACK", "HARDCOVER"], {
         errorMap: () => ({ message: "Vui lòng chọn định dạng bìa" })
     }),
-
     description: z.string()
         .min(10, 'Mô tả ít nhất 10 kí tự')
         .max(1000, 'Mô tả tối đa 1000 kí tự'),
@@ -80,7 +84,10 @@ const createBookSchema = z.object({
 
 type CreateBookFormData = z.infer<typeof createBookSchema>;
 
-export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen, load, bookToEdit, publishers, authors, categories, suppliers }) => {
+export const BookForm: React.FC<BookFormProps> = ({
+    isModalOpen, setIsModalOpen, load, bookToEdit,
+    publishers, authors, categories, suppliers,
+}) => {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [imageItems, setImageItems] = useState<ImageItem[]>([]);
     const dispatch = useAppDispatch();
@@ -91,29 +98,19 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
     const message = useAppSelector((state) => state.book.message);
 
     const {
-        register,
         handleSubmit,
         reset,
         setValue,
         formState: { errors },
-        control
+        control,
     } = useForm<CreateBookFormData>({
         resolver: zodResolver(createBookSchema),
         defaultValues: {
-            title: '',
-            publisher: { id: 0 },
-            supplier: { id: 0 },
-            authors: [],
-            category: { id: 0 },
-            price: 0,
-            discount: 0,
-            quantity: 0,
-            publishYear: 0,
-            weight: 0,
-            dimensions: '',
-            numberOfPages: 0,
-            coverFormat: 'PAPERBACK',
-            description: '',
+            title: '', publisher: { id: 0 }, supplier: { id: 0 },
+            authors: [], category: { id: 0 },
+            price: 0, discount: 0, quantity: 0,
+            publishYear: 0, weight: 0, dimensions: '',
+            numberOfPages: 0, coverFormat: 'PAPERBACK', description: '',
         }
     });
 
@@ -122,7 +119,7 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
             setValue('title', bookToEdit.title);
             setValue('publisher', bookToEdit.publisher);
             setValue('supplier', bookToEdit.supplier);
-            setValue('authors', bookToEdit.authors.map(author => ({ id: author.id })));
+            setValue('authors', bookToEdit.authors.map(a => ({ id: a.id })));
             setValue('category', bookToEdit.category);
             setValue('price', bookToEdit.price);
             setValue('discount', bookToEdit.discount);
@@ -140,7 +137,7 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
                     previewUrl: `${import.meta.env.VITE_BACKEND_URL}/storage/book/${img.relativePath}`,
                     relativePath: img.relativePath,
                     primary: img.primary,
-                    sortOrder: img.sortOrder ?? idx
+                    sortOrder: img.sortOrder ?? idx,
                 })));
             } else if (bookToEdit.image) {
                 setImageItems([{
@@ -148,25 +145,16 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
                     previewUrl: `${import.meta.env.VITE_BACKEND_URL}/storage/book/${bookToEdit.image}`,
                     relativePath: bookToEdit.image,
                     primary: true,
-                    sortOrder: 0
+                    sortOrder: 0,
                 }]);
             }
         } else {
             reset({
-                title: '',
-                publisher: { id: 0 },
-                supplier: { id: 0 },
-                authors: [],
-                category: { id: 0 },
-                price: 0,
-                discount: 0,
-                quantity: 0,
-                publishYear: 0,
-                weight: 0,
-                dimensions: '',
-                numberOfPages: 0,
-                coverFormat: 'PAPERBACK',
-                description: '',
+                title: '', publisher: { id: 0 }, supplier: { id: 0 },
+                authors: [], category: { id: 0 },
+                price: 0, discount: 0, quantity: 0,
+                publishYear: 0, weight: 0, dimensions: '',
+                numberOfPages: 0, coverFormat: 'PAPERBACK', description: '',
             });
             setImageItems([]);
         }
@@ -174,20 +162,11 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
 
     const resetForm = useCallback(() => {
         reset({
-            title: '',
-            publisher: { id: 0 },
-            supplier: { id: 0 },
-            authors: [],
-            category: { id: 0 },
-            price: 0,
-            discount: 0,
-            quantity: 0,
-            publishYear: 0,
-            weight: 0,
-            dimensions: '',
-            numberOfPages: 0,
-            coverFormat: 'PAPERBACK',
-            description: '',
+            title: '', publisher: { id: 0 }, supplier: { id: 0 },
+            authors: [], category: { id: 0 },
+            price: 0, discount: 0, quantity: 0,
+            publishYear: 0, weight: 0, dimensions: '',
+            numberOfPages: 0, coverFormat: 'PAPERBACK', description: '',
         });
         setImageItems([]);
         setIsSubmitting(false);
@@ -203,7 +182,7 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
                     file,
                     previewUrl: URL.createObjectURL(file),
                     primary: !hasPrimary && prev.length === 0 && index === 0,
-                    sortOrder: prev.length + index
+                    sortOrder: prev.length + index,
                 }));
                 return [...prev, ...newItems];
             });
@@ -224,7 +203,7 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
     const handleSetPrimary = (uid: string) => {
         setImageItems(prev => prev.map(item => ({
             ...item,
-            primary: item.uid === uid
+            primary: item.uid === uid,
         })));
     };
 
@@ -262,13 +241,13 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
                 return {
                     relativePath: uploadedFileNames[newFileIndex++],
                     sortOrder: idx,
-                    primary: item.primary
+                    primary: item.primary,
                 };
             }
             return {
                 relativePath: item.relativePath!,
                 sortOrder: idx,
-                primary: item.primary
+                primary: item.primary,
             };
         });
 
@@ -276,14 +255,11 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
         const formData = {
             ...data,
             image: primaryImage?.relativePath || '',
-            images
+            images,
         };
 
         if (bookToEdit) {
-            dispatch(updateBook({
-                id: bookToEdit.id,
-                data: formData as ICreateBook
-            }));
+            dispatch(updateBook({ id: bookToEdit.id, data: formData as ICreateBook }));
         } else {
             dispatch(createBook(formData as ICreateBook));
         }
@@ -314,411 +290,466 @@ export const BookForm: React.FC<BookFormProps> = ({ isModalOpen, setIsModalOpen,
     }, [isCreateBookSuccess, isCreateBookFailed, isUpdateBookSuccess, isUpdateBookFailed, dispatch, load, message, bookToEdit, handleClose]);
 
     return (
-        <dialog id="book_modal" className={`modal ${isModalOpen ? 'modal-open' : ''} modal-bottom sm:modal-middle w-full`}>
-            <div className="modal-box min-w-[60%]">
-                <h3 className="font-bold text-lg mb-4">{bookToEdit ? 'Chỉnh sửa sách' : 'Tạo sách'}</h3>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Tên sách</span>
-                        </label>
-                        <input
-                            type="text"
-                            {...register('title')}
-                            placeholder="Nhập tên sách"
-                            className={`input input-bordered w-full ${errors.title ? 'input-error' : ''}`}
-                        />
-                        {errors.title && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.title.message}</span>
-                            </label>
+        <Modal
+            title={
+                <Title level={4} style={{ margin: 0 }}>
+                    {bookToEdit ? 'Chỉnh sửa sách' : 'Tạo sách mới'}
+                </Title>
+            }
+            open={isModalOpen}
+            onCancel={handleClose}
+            footer={null}
+            width={780}
+            destroyOnHidden
+            centered
+            styles={{ body: { maxHeight: '75vh', overflowY: 'auto', padding: '16px 24px' } }}
+        >
+            <form onSubmit={handleSubmit(onSubmit)}>
+                {/* Title */}
+                <Form.Item
+                    label="Tên sách"
+                    validateStatus={errors.title ? 'error' : ''}
+                    help={errors.title?.message}
+                    required
+                    layout="vertical"
+                >
+                    <Controller
+                        name="title"
+                        control={control}
+                        render={({ field }) => (
+                            <Input {...field} placeholder="Nhập tên sách" size="large" />
                         )}
-                    </div>
+                    />
+                </Form.Item>
 
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Nhà xuất bản</span>
-                        </label>
-                        <Controller
-                            name="publisher.id"
-                            control={control}
-                            render={({ field }) => (
-                                <Select
-                                    {...field}
-                                    options={publishers.map(publisher => ({
-                                        value: publisher.id,
-                                        label: publisher.name
-                                    }))}
-                                    value={publishers
-                                        .filter(publisher => publisher.id === field.value)
-                                        .map(publisher => ({
-                                            value: publisher.id,
-                                            label: publisher.name
-                                        }))[0]}
-                                    onChange={(selected) => {
-                                        field.onChange(selected?.value || 0);
-                                    }}
-                                    className={`${errors.publisher ? 'border-error' : ''}`}
-                                    placeholder="Chọn nhà xuất bản"
-                                />
-                            )}
-                        />
-                        {errors.publisher && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.publisher.message}</span>
-                            </label>
-                        )}
-                    </div>
-
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Nhà cung cấp</span>
-                        </label>
-                        <Controller
-                            name="supplier.id"
-                            control={control}
-                            render={({ field }) => (
-                                <Select
-                                    {...field}
-                                    options={suppliers.map(supplier => ({
-                                        value: supplier.id,
-                                        label: supplier.name
-                                    }))}
-                                    value={suppliers
-                                        .filter(supplier => supplier.id === field.value)
-                                        .map(supplier => ({
-                                            value: supplier.id,
-                                            label: supplier.name
-                                        }))[0]}
-                                    onChange={(selected) => {
-                                        field.onChange(selected?.value || 0);
-                                    }}
-                                    className={`${errors.supplier ? 'border-error' : ''}`}
-                                    placeholder="Chọn nhà cung cấp"
-                                />
-                            )}
-                        />
-                        {errors.supplier && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.supplier.message}</span>
-                            </label>
-                        )}
-                    </div>
-
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Tác giả</span>
-                        </label>
-                        <Controller
-                            name="authors"
-                            control={control}
-                            render={({ field }) => (
-                                <Select
-                                    {...field}
-                                    isMulti
-                                    options={authors.map(author => ({
-                                        value: author.id,
-                                        label: author.name
-                                    }))}
-                                    value={authors
-                                        .filter(author => field.value?.some(v => v.id === author.id))
-                                        .map(author => ({
-                                            value: author.id,
-                                            label: author.name
-                                        }))}
-                                    onChange={(selected) => {
-                                        field.onChange(selected?.map(option => ({ id: option.value })) || []);
-                                    }}
-                                    className={`${errors.authors ? 'border-error' : ''}`}
-                                    placeholder="Chọn tác giả"
-                                />
-                            )}
-                        />
-                        {errors.authors && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.authors.message}</span>
-                            </label>
-                        )}
-                    </div>
-
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Thể loại</span>
-                        </label>
-                        <Controller
-                            name="category.id"
-                            control={control}
-                            render={({ field }) => (
-                                <Select
-                                    {...field}
-                                    options={categories.map(category => ({
-                                        value: category.id,
-                                        label: category.name
-                                    }))}
-                                    value={categories
-                                        .filter(category => category.id === field.value)
-                                        .map(category => ({
-                                            value: category.id,
-                                            label: category.name
-                                        }))[0]}
-                                    onChange={(selected) => {
-                                        field.onChange(selected?.value || 0);
-                                    }}
-                                    className={`${errors.category ? 'border-error' : ''}`}
-                                    placeholder="Chọn thể loại"
-                                />
-                            )}
-                        />
-                        {errors.category && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.category.message}</span>
-                            </label>
-                        )}
-                    </div>
-
-                    <div className="flex gap-4">
-                        <div className="form-control w-full mt-4">
-                            <label className="label">
-                                <span className="label-text">Giá</span>
-                            </label>
-                            <input
-                                type="number"
-                                {...register('price', { valueAsNumber: true })}
-                                placeholder="Nhập giá bán"
-                                className={`input input-bordered w-full ${errors.price ? 'input-error' : ''}`}
-                            />
-                            {errors.price && (
-                                <label className="label">
-                                    <span className="label-text-alt text-error">{errors.price.message}</span>
-                                </label>
-                            )}
-                        </div>
-
-                        <div className="form-control w-full mt-4">
-                            <label className="label">
-                                <span className="label-text">Giảm giá</span>
-                            </label>
-                            <input
-                                type="number"
-                                {...register('discount', { valueAsNumber: true })}
-                                placeholder="Nhập giảm giá"
-                                className={`input input-bordered w-full ${errors.discount ? 'input-error' : ''}`}
-                            />
-
-                            {errors.discount && (
-                                <label className="label">
-                                    <span className="label-text-alt text-error">{errors.discount.message}</span>
-                                </label>
-                            )}
-                        </div>
-
-                        <div className="form-control w-full mt-4">
-                            <label className="label">
-                                <span className="label-text">Số lượng</span>
-                            </label>
-                            <input
-                                type="number"
-                                {...register('quantity', { valueAsNumber: true })}
-                                placeholder="Nhập số lượng"
-                                className={`input input-bordered w-full ${errors.quantity ? 'input-error' : ''}`}
-                            />
-                            {errors.quantity && (
-                                <label className="label">
-                                    <span className="label-text-alt text-error">{errors.quantity.message}</span>
-                                </label>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="flex gap-4">
-                        <div className="form-control w-full mt-4">
-                            <label className="label">
-                                <span className="label-text">Năm xuất bản</span>
-                            </label>
-                            <input
-                                type="number"
-                                {...register('publishYear', { valueAsNumber: true })}
-                                placeholder="Nhập năm xuất bản"
-                                className={`input input-bordered w-full ${errors.publishYear ? 'input-error' : ''}`}
-                            />
-                            {errors.publishYear && (
-                                <label className="label">
-                                    <span className="label-text-alt text-error">{errors.publishYear.message}</span>
-                                </label>
-                            )}
-                        </div>
-
-                        <div className="form-control w-full mt-4">
-                            <label className="label">
-                                <span className="label-text">Trọng lượng (gr)</span>
-                            </label>
-                            <input
-                                type="number"
-                                {...register('weight', { valueAsNumber: true })}
-                                placeholder="Nhập trọng lượng"
-                                className={`input input-bordered w-full ${errors.weight ? 'input-error' : ''}`}
-                            />
-
-                            {errors.weight && (
-                                <label className="label">
-                                    <span className="label-text-alt text-error">{errors.weight.message}</span>
-                                </label>
-                            )}
-                        </div>
-
-                        <div className="form-control w-full mt-4">
-                            <label className="label">
-                                <span className="label-text">Số trang</span>
-                            </label>
-                            <input
-                                type="number"
-                                {...register('numberOfPages', { valueAsNumber: true })}
-                                placeholder="Nhập số trang"
-                                className={`input input-bordered w-full ${errors.numberOfPages ? 'input-error' : ''}`}
-                            />
-                            {errors.numberOfPages && (
-                                <label className="label">
-                                    <span className="label-text-alt text-error">{errors.numberOfPages.message}</span>
-                                </label>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="flex gap-4">
-                        <div className="form-control w-full mt-4">
-                            <label className="label">
-                                <span className="label-text">Kích thước</span>
-                            </label>
-                            <input
-                                type="text"
-                                {...register('dimensions')}
-                                placeholder="Nhập kích thước"
-                                className={`input input-bordered w-full ${errors.dimensions ? 'input-error' : ''}`}
-                            />
-                            {errors.dimensions && (
-                                <label className="label">
-                                    <span className="label-text-alt text-error">{errors.dimensions.message}</span>
-                                </label>
-                            )}
-                        </div>
-
-                        <div className="form-control w-full mt-4">
-                            <label className="label">
-                                <span className="label-text">Định dạng bìa</span>
-                            </label>
-                            <select
-                                {...register('coverFormat')}
-                                className={`select select-bordered w-full ${errors.coverFormat ? 'select-error' : ''}`}
-                            >
-                                <option value="PAPERBACK">Bìa Mềm (Paperback)</option>
-                                <option value="HARDCOVER">Bìa Cứng (Hardcover)</option>
-                            </select>
-
-                            {errors.coverFormat && (
-                                <label className="label">
-                                    <span className="label-text-alt text-error">{errors.coverFormat.message}</span>
-                                </label>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Mô tả</span>
-                        </label>
-                        <textarea
-                            {...register('description')}
-                            placeholder="Nhập mô tả"
-                            className={`textarea textarea-bordered w-full ${errors.description ? 'textarea-error' : ''}`}
-                            rows={4}
-                        />
-                        {errors.description && (
-                            <label className="label">
-                                <span className="label-text-alt text-error">{errors.description.message}</span>
-                            </label>
-                        )}
-                    </div>
-
-                    <div className="form-control mt-4">
-                        <label className="label">
-                            <span className="label-text">Ảnh sách</span>
-                        </label>
-                        <div className="flex flex-wrap gap-3 mt-1">
-                            {imageItems.map((item) => (
-                                <div
-                                    key={item.uid}
-                                    className={`relative group w-24 h-24 rounded-lg overflow-hidden border-2 ${item.primary ? 'border-yellow-400' : 'border-base-300'}`}
-                                >
-                                    <img
-                                        src={item.previewUrl}
-                                        alt="preview"
-                                        className="w-full h-full object-cover"
+                <Row gutter={16}>
+                    {/* Publisher */}
+                    <Col xs={24} md={12}>
+                        <Form.Item
+                            label="Nhà xuất bản"
+                            validateStatus={errors.publisher ? 'error' : ''}
+                            help={errors.publisher?.message}
+                            required
+                            layout="vertical"
+                        >
+                            <Controller
+                                name="publisher.id"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        {...field}
+                                        value={field.value || undefined}
+                                        onChange={(val) => field.onChange(val)}
+                                        placeholder="Chọn nhà xuất bản"
+                                        showSearch
+                                        optionFilterProp="label"
+                                        style={{ width: '100%' }}
+                                        options={publishers.map(p => ({ value: p.id, label: p.name }))}
                                     />
-                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
-                                        <button
-                                            type="button"
-                                            title="Đặt ảnh chính"
-                                            className={`btn btn-xs btn-circle ${item.primary ? 'btn-warning' : 'btn-ghost text-white'}`}
-                                            onClick={() => handleSetPrimary(item.uid)}
-                                        >
-                                            <Star size={14} fill={item.primary ? 'currentColor' : 'none'} />
-                                        </button>
-                                        <button
-                                            type="button"
-                                            title="Xóa ảnh"
-                                            className="btn btn-xs btn-circle btn-error"
-                                            onClick={() => handleRemoveImage(item.uid)}
-                                        >
-                                            <X size={14} />
-                                        </button>
-                                    </div>
-                                    {item.primary && (
-                                        <span className="absolute top-0.5 left-0.5 bg-yellow-400 text-black text-[10px] px-1 rounded font-semibold">
-                                            Chính
-                                        </span>
-                                    )}
-                                </div>
-                            ))}
-                            <label className="w-24 h-24 rounded-lg border-2 border-dashed border-base-300 flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors">
-                                <span className="text-2xl leading-none">+</span>
-                                <span className="text-xs mt-1">Thêm ảnh</span>
-                                <input
-                                    type="file"
-                                    multiple
-                                    onChange={handleImagesChange}
-                                    accept="image/*"
-                                    className="hidden"
-                                />
-                            </label>
-                        </div>
-                        {imageItems.length > 0 && (
-                            <p className="text-xs text-base-content/50 mt-1">Hover vào ảnh để đặt ảnh chính hoặc xóa. Ảnh có viền vàng là ảnh chính.</p>
-                        )}
-                    </div>
+                                )}
+                            />
+                        </Form.Item>
+                    </Col>
+                    {/* Supplier */}
+                    <Col xs={24} md={12}>
+                        <Form.Item
+                            label="Nhà cung cấp"
+                            validateStatus={errors.supplier ? 'error' : ''}
+                            help={errors.supplier?.message}
+                            layout="vertical"
+                        >
+                            <Controller
+                                name="supplier.id"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        {...field}
+                                        value={field.value || undefined}
+                                        onChange={(val) => field.onChange(val)}
+                                        placeholder="Chọn nhà cung cấp"
+                                        showSearch
+                                        optionFilterProp="label"
+                                        style={{ width: '100%' }}
+                                        options={suppliers.map(s => ({ value: s.id, label: s.name }))}
+                                    />
+                                )}
+                            />
+                        </Form.Item>
+                    </Col>
+                </Row>
 
-                    <div className="flex justify-end gap-4 mt-4">
-                        <button
-                            type="submit"
-                            className="btn btn-neutral"
-                            disabled={isSubmitting}
+                <Row gutter={16}>
+                    {/* Authors (Multi) */}
+                    <Col xs={24} md={12}>
+                        <Form.Item
+                            label="Tác giả"
+                            validateStatus={errors.authors ? 'error' : ''}
+                            help={errors.authors?.message}
+                            required
+                            layout="vertical"
                         >
-                            {isSubmitting ? (
-                                <span className="loading loading-spinner loading-sm"></span>
-                            ) : (
-                                bookToEdit ? 'Cập nhật' : 'Tạo'
-                            )}
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-error"
-                            onClick={handleClose}
-                            disabled={isSubmitting}
+                            <Controller
+                                name="authors"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        mode="multiple"
+                                        value={field.value?.map(a => a.id) || []}
+                                        onChange={(vals: number[]) => {
+                                            field.onChange(vals.map(id => ({ id })));
+                                        }}
+                                        placeholder="Chọn tác giả"
+                                        showSearch
+                                        optionFilterProp="label"
+                                        style={{ width: '100%' }}
+                                        options={authors.map(a => ({ value: a.id, label: a.name }))}
+                                    />
+                                )}
+                            />
+                        </Form.Item>
+                    </Col>
+                    {/* Category */}
+                    <Col xs={24} md={12}>
+                        <Form.Item
+                            label="Thể loại"
+                            validateStatus={errors.category ? 'error' : ''}
+                            help={errors.category?.message}
+                            required
+                            layout="vertical"
                         >
-                            Đóng
-                        </button>
+                            <Controller
+                                name="category.id"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        {...field}
+                                        value={field.value || undefined}
+                                        onChange={(val) => field.onChange(val)}
+                                        placeholder="Chọn thể loại"
+                                        showSearch
+                                        optionFilterProp="label"
+                                        style={{ width: '100%' }}
+                                        options={categories.map(c => ({ value: c.id, label: c.name }))}
+                                    />
+                                )}
+                            />
+                        </Form.Item>
+                    </Col>
+                </Row>
+
+                <Divider style={{ margin: '8px 0 16px' }} />
+
+                <Row gutter={16}>
+                    <Col xs={24} md={8}>
+                        <Form.Item
+                            label="Giá (₫)"
+                            validateStatus={errors.price ? 'error' : ''}
+                            help={errors.price?.message}
+                            required
+                            layout="vertical"
+                        >
+                            <Controller
+                                name="price"
+                                control={control}
+                                render={({ field }) => (
+                                    <InputNumber
+                                        {...field}
+                                        style={{ width: '100%' }}
+                                        min={0}
+                                        placeholder="Nhập giá"
+                                        formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                        parser={v => Number(v?.replace(/,/g, '') || 0)}
+                                    />
+                                )}
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} md={8}>
+                        <Form.Item
+                            label="Giảm giá (%)"
+                            validateStatus={errors.discount ? 'error' : ''}
+                            help={errors.discount?.message}
+                            layout="vertical"
+                        >
+                            <Controller
+                                name="discount"
+                                control={control}
+                                render={({ field }) => (
+                                    <InputNumber
+                                        {...field}
+                                        style={{ width: '100%' }}
+                                        min={0} max={100}
+                                        placeholder="Giảm giá"
+                                    />
+                                )}
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} md={8}>
+                        <Form.Item
+                            label="Số lượng"
+                            validateStatus={errors.quantity ? 'error' : ''}
+                            help={errors.quantity?.message}
+                            required
+                            layout="vertical"
+                        >
+                            <Controller
+                                name="quantity"
+                                control={control}
+                                render={({ field }) => (
+                                    <InputNumber
+                                        {...field}
+                                        style={{ width: '100%' }}
+                                        min={0}
+                                        placeholder="Số lượng"
+                                    />
+                                )}
+                            />
+                        </Form.Item>
+                    </Col>
+                </Row>
+
+                <Row gutter={16}>
+                    <Col xs={24} md={8}>
+                        <Form.Item
+                            label="Năm xuất bản"
+                            validateStatus={errors.publishYear ? 'error' : ''}
+                            help={errors.publishYear?.message}
+                            layout="vertical"
+                        >
+                            <Controller
+                                name="publishYear"
+                                control={control}
+                                render={({ field }) => (
+                                    <InputNumber
+                                        {...field}
+                                        style={{ width: '100%' }}
+                                        min={0}
+                                        max={new Date().getFullYear()}
+                                        placeholder="Năm XB"
+                                    />
+                                )}
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} md={8}>
+                        <Form.Item
+                            label="Trọng lượng (g)"
+                            validateStatus={errors.weight ? 'error' : ''}
+                            help={errors.weight?.message}
+                            layout="vertical"
+                        >
+                            <Controller
+                                name="weight"
+                                control={control}
+                                render={({ field }) => (
+                                    <InputNumber
+                                        {...field}
+                                        style={{ width: '100%' }}
+                                        min={1} max={10000}
+                                        placeholder="Trọng lượng"
+                                    />
+                                )}
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} md={8}>
+                        <Form.Item
+                            label="Số trang"
+                            validateStatus={errors.numberOfPages ? 'error' : ''}
+                            help={errors.numberOfPages?.message}
+                            layout="vertical"
+                        >
+                            <Controller
+                                name="numberOfPages"
+                                control={control}
+                                render={({ field }) => (
+                                    <InputNumber
+                                        {...field}
+                                        style={{ width: '100%' }}
+                                        min={1} max={10000}
+                                        placeholder="Số trang"
+                                    />
+                                )}
+                            />
+                        </Form.Item>
+                    </Col>
+                </Row>
+
+                <Row gutter={16}>
+                    <Col xs={24} md={12}>
+                        <Form.Item
+                            label="Kích thước"
+                            validateStatus={errors.dimensions ? 'error' : ''}
+                            help={errors.dimensions?.message}
+                            layout="vertical"
+                        >
+                            <Controller
+                                name="dimensions"
+                                control={control}
+                                render={({ field }) => (
+                                    <Input {...field} placeholder="VD: 20.5 x 13 x 1.5 cm" />
+                                )}
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} md={12}>
+                        <Form.Item
+                            label="Định dạng bìa"
+                            validateStatus={errors.coverFormat ? 'error' : ''}
+                            help={errors.coverFormat?.message}
+                            layout="vertical"
+                        >
+                            <Controller
+                                name="coverFormat"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        {...field}
+                                        style={{ width: '100%' }}
+                                        options={[
+                                            { value: 'PAPERBACK', label: 'Bìa Mềm (Paperback)' },
+                                            { value: 'HARDCOVER', label: 'Bìa Cứng (Hardcover)' },
+                                        ]}
+                                    />
+                                )}
+                            />
+                        </Form.Item>
+                    </Col>
+                </Row>
+
+                {/* Description */}
+                <Form.Item
+                    label="Mô tả"
+                    validateStatus={errors.description ? 'error' : ''}
+                    help={errors.description?.message}
+                    required
+                    layout="vertical"
+                >
+                    <Controller
+                        name="description"
+                        control={control}
+                        render={({ field }) => (
+                            <TextArea
+                                {...field}
+                                rows={4}
+                                placeholder="Nhập mô tả sách"
+                                showCount
+                                maxLength={1000}
+                            />
+                        )}
+                    />
+                </Form.Item>
+
+                {/* Image Upload Section */}
+                <Divider style={{ margin: '8px 0 16px' }} />
+                <Form.Item label="Ảnh sách" layout="vertical">
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+                        {imageItems.map((item) => (
+                            <div
+                                key={item.uid}
+                                style={{
+                                    position: 'relative',
+                                    width: 96, height: 96,
+                                    borderRadius: 8,
+                                    overflow: 'hidden',
+                                    border: item.primary ? '2px solid #faad14' : '1px solid #d9d9d9',
+                                }}
+                            >
+                                <Image
+                                    src={item.previewUrl}
+                                    alt="preview"
+                                    width={96} height={96}
+                                    style={{ objectFit: 'cover' }}
+                                    preview={false}
+                                />
+                                <div style={{
+                                    position: 'absolute', inset: 0,
+                                    background: 'rgba(0,0,0,0.4)',
+                                    opacity: 0, transition: 'opacity 0.2s',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
+                                }}
+                                    onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+                                    onMouseLeave={e => (e.currentTarget.style.opacity = '0')}
+                                >
+                                    <Button
+                                        type="text"
+                                        size="small"
+                                        icon={item.primary
+                                            ? <StarFilled style={{ color: '#faad14' }} />
+                                            : <StarOutlined style={{ color: '#fff' }} />
+                                        }
+                                        onClick={() => handleSetPrimary(item.uid)}
+                                        title="Đặt ảnh chính"
+                                    />
+                                    <Button
+                                        type="text"
+                                        size="small"
+                                        danger
+                                        icon={<DeleteOutlined style={{ color: '#ff4d4f' }} />}
+                                        onClick={() => handleRemoveImage(item.uid)}
+                                        title="Xóa ảnh"
+                                    />
+                                </div>
+                                {item.primary && (
+                                    <span style={{
+                                        position: 'absolute', top: 2, left: 2,
+                                        background: '#faad14', color: '#000',
+                                        fontSize: 10, padding: '1px 5px',
+                                        borderRadius: 4, fontWeight: 600,
+                                    }}>
+                                        Chính
+                                    </span>
+                                )}
+                            </div>
+                        ))}
+                        <label style={{
+                            width: 96, height: 96,
+                            borderRadius: 8,
+                            border: '2px dashed #d9d9d9',
+                            display: 'flex', flexDirection: 'column',
+                            alignItems: 'center', justifyContent: 'center',
+                            cursor: 'pointer', transition: 'border-color 0.2s',
+                        }}
+                            onMouseEnter={e => (e.currentTarget.style.borderColor = '#1677ff')}
+                            onMouseLeave={e => (e.currentTarget.style.borderColor = '#d9d9d9')}
+                        >
+                            <PlusOutlined style={{ fontSize: 20, color: '#8c8c8c' }} />
+                            <span style={{ fontSize: 12, color: '#8c8c8c', marginTop: 4 }}>Thêm ảnh</span>
+                            <input
+                                type="file"
+                                multiple
+                                onChange={handleImagesChange}
+                                accept="image/*"
+                                style={{ display: 'none' }}
+                            />
+                        </label>
                     </div>
-                </form>
-            </div >
-        </dialog >
+                    {imageItems.length > 0 && (
+                        <div style={{ fontSize: 12, color: '#8c8c8c', marginTop: 4 }}>
+                            Hover vào ảnh để đặt ảnh chính hoặc xóa. Ảnh có viền vàng là ảnh chính.
+                        </div>
+                    )}
+                </Form.Item>
+
+                {/* Footer */}
+                <div style={{
+                    display: 'flex', justifyContent: 'flex-end', gap: 8,
+                    paddingTop: 16, borderTop: '1px solid #f0f0f0',
+                }}>
+                    <Button onClick={handleClose} disabled={isSubmitting}>
+                        Đóng
+                    </Button>
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        icon={<SaveOutlined />}
+                        loading={isSubmitting}
+                    >
+                        {bookToEdit ? 'Cập nhật' : 'Tạo mới'}
+                    </Button>
+                </div>
+            </form>
+        </Modal>
     );
 };

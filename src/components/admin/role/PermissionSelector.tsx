@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Checkbox, Tag, Collapse, Empty, Spin, Badge } from 'antd';
 import { IPermission } from '../../../types/backend';
 
 interface PermissionSelectorProps {
@@ -10,22 +11,12 @@ interface PermissionSelectorProps {
     isDomainPartiallySelected: (domain: string) => boolean;
 }
 
-// Helper function to get method badge class for DaisyUI
-const getMethodBadgeClass = (method: string) => {
-    switch (method.toUpperCase()) {
-        case 'GET':
-            return 'badge-info';
-        case 'POST':
-            return 'badge-success';
-        case 'PUT':
-            return 'badge-warning';
-        case 'DELETE':
-            return 'badge-error';
-        case 'PATCH':
-            return 'badge-secondary';
-        default:
-            return 'badge-neutral';
-    }
+const methodColorMap: Record<string, string> = {
+    GET: 'blue',
+    POST: 'green',
+    PUT: 'orange',
+    DELETE: 'red',
+    PATCH: 'purple',
 };
 
 export const PermissionSelector: React.FC<PermissionSelectorProps> = ({
@@ -34,104 +25,119 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({
     onDomainToggle,
     isPermissionSelected,
     isDomainFullySelected,
-    isDomainPartiallySelected
+    isDomainPartiallySelected,
 }) => {
-    const [expandedDomains, setExpandedDomains] = useState<Record<string, boolean>>({});
+    const domains = Object.keys(permissionsByDomain);
 
-    const toggleDomainExpansion = (domain: string) => {
-        setExpandedDomains(prev => ({
-            ...prev,
-            [domain]: !prev[domain]
-        }));
-    };
+    if (domains.length === 0) {
+        return (
+            <div style={{
+                border: '1px solid #f0f0f0', borderRadius: 8,
+                padding: '32px 0', textAlign: 'center',
+            }}>
+                <Spin />
+                <div style={{ color: '#8c8c8c', marginTop: 8 }}>Đang tải danh sách quyền hạn...</div>
+            </div>
+        );
+    }
 
-    const isDomainExpanded = (domain: string) => {
-        return expandedDomains[domain] !== false; // Default to expanded
-    };
-    return (
-        <div className="card bg-base-100 shadow-sm border border-base-300">
-            <div className="card-body p-4">
-                <div className="max-h-96 overflow-y-auto">
-                    {Object.keys(permissionsByDomain).length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-8">
-                            <div className="loading loading-spinner loading-lg text-primary"></div>
-                            <p className="text-base-content/60 mt-2">Đang tải danh sách quyền hạn...</p>
-                        </div>
-                    ) : (
-                        <div className="space-y-4">
-                            {Object.entries(permissionsByDomain).map(([domain, permissions]) => (
-                                <div key={domain} className="collapse collapse-arrow bg-base-200">
-                                    <input
-                                        type="checkbox"
-                                        checked={isDomainExpanded(domain)}
-                                        onChange={() => toggleDomainExpansion(domain)}
+    const [activeKeys, setActiveKeys] = useState<string[]>(domains);
+
+    const collapseItems = domains.map((domain) => {
+        const permissions = permissionsByDomain[domain];
+        const isFullySelected = isDomainFullySelected(domain);
+        const isPartially = isDomainPartiallySelected(domain);
+
+        return {
+            key: domain,
+            label: (
+                <div
+                    style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <Checkbox
+                        checked={isFullySelected}
+                        indeterminate={isPartially}
+                        onChange={(e) => {
+                            e.stopPropagation();
+                            onDomainToggle(domain);
+                        }}
+                    />
+                    <span style={{ fontWeight: 600 }}>{domain}</span>
+                    <Badge
+                        count={`${permissions.length} quyền`}
+                        style={{ backgroundColor: '#8c8c8c', fontSize: 11 }}
+                    />
+                </div>
+            ),
+            children: (
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                    gap: 8,
+                }}>
+                    {permissions.map((permission) => {
+                        const selected = isPermissionSelected(permission.id);
+                        return (
+                            <div
+                                key={permission.id}
+                                onClick={() => onPermissionToggle(permission)}
+                                style={{
+                                    border: `2px solid ${selected ? '#1677ff' : '#f0f0f0'}`,
+                                    borderRadius: 8,
+                                    padding: '8px 12px',
+                                    cursor: 'pointer',
+                                    background: selected ? '#e6f4ff' : '#fff',
+                                    transition: 'all 0.2s',
+                                }}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                                    <Checkbox
+                                        checked={selected}
+                                        style={{ marginTop: 2 }}
+                                        onChange={() => onPermissionToggle(permission)}
                                     />
-                                    <div className="collapse-title text-lg font-medium flex items-center gap-3">
-                                        <input
-                                            type="checkbox"
-                                            className="checkbox checkbox-primary checkbox-sm"
-                                            checked={isDomainFullySelected(domain)}
-                                            ref={(el) => {
-                                                if (el) {
-                                                    el.indeterminate = isDomainPartiallySelected(domain);
-                                                }
-                                            }}
-                                            onChange={(e) => {
-                                                e.stopPropagation();
-                                                onDomainToggle(domain);
-                                            }}
-                                        />
-                                        <span className="text-base-content font-semibold">
-                                            {domain}
-                                        </span>
-                                        <span className="badge badge-neutral badge-sm">
-                                            {permissions.length} quyền
-                                        </span>
-                                    </div>
-
-                                    <div className="collapse-content">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-4">
-                                            {permissions.map((permission) => (
-                                                <div
-                                                    key={permission.id}
-                                                    className={`card bg-base-100 border-2 transition-all duration-200 hover:shadow-md ${isPermissionSelected(permission.id)
-                                                        ? 'border-primary shadow-md'
-                                                        : 'border-base-200'
-                                                        }`}
-                                                >
-                                                    <div className="card-body p-3">
-                                                        <div className="flex items-start gap-3">
-                                                            <input
-                                                                type="checkbox"
-                                                                className="checkbox checkbox-primary checkbox-sm mt-1"
-                                                                checked={isPermissionSelected(permission.id)}
-                                                                onChange={() => onPermissionToggle(permission)}
-                                                            />
-                                                            <div className="flex-1 min-w-0">
-                                                                <div className="flex items-center gap-2 mb-2">
-                                                                    <div className={`badge badge-sm ${getMethodBadgeClass(permission.method)}`}>
-                                                                        {permission.method}
-                                                                    </div>
-                                                                </div>
-                                                                <h4 className="font-medium text-base-content text-sm mb-1 line-clamp-2">
-                                                                    {permission.name}
-                                                                </h4>
-                                                                <p className="text-xs text-base-content/60 truncate font-mono">
-                                                                    {permission.apiPath}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ))}
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{ marginBottom: 4 }}>
+                                            <Tag color={methodColorMap[permission.method] || 'default'} style={{ fontSize: 11 }}>
+                                                {permission.method}
+                                            </Tag>
+                                        </div>
+                                        <div style={{
+                                            fontSize: 13, fontWeight: 500,
+                                            overflow: 'hidden', textOverflow: 'ellipsis',
+                                            display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                                        }}>
+                                            {permission.name}
+                                        </div>
+                                        <div style={{
+                                            fontSize: 11, color: '#8c8c8c', fontFamily: 'monospace',
+                                            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                                        }}>
+                                            {permission.apiPath}
                                         </div>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
-                    )}
+                            </div>
+                        );
+                    })}
                 </div>
-            </div>
+            ),
+        };
+    });
+
+    return (
+        <div style={{
+            border: '1px solid #f0f0f0', borderRadius: 8,
+            maxHeight: 400, overflowY: 'auto',
+        }}>
+            <Collapse
+                activeKey={activeKeys}
+                onChange={(keys) => setActiveKeys(keys as string[])}
+                items={collapseItems}
+                size="small"
+                ghost
+            />
         </div>
     );
 };

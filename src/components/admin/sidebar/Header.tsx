@@ -1,16 +1,21 @@
-import { Bell } from "lucide-react"
-import { Account } from "./Account.tsx"
+import React from 'react';
+import { Badge, Space } from 'antd';
+import { BellOutlined } from '@ant-design/icons';
+import { Account } from './Account';
 
-export const Header = () => {
+export const Header: React.FC = () => {
     return (
-        <>
-            <div className="">
-                <div className="flex justify-end items-center gap-2">
-                    <Bell size={20}/>
-                    <Account />
-                </div>
-                
-            </div>
-        </>
-    )
-}
+        <div style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            gap: 16,
+            marginBottom: 8,
+        }}>
+            <Badge count={0} size="small">
+                <BellOutlined style={{ fontSize: 20, color: '#595959', cursor: 'pointer' }} />
+            </Badge>
+            <Account />
+        </div>
+    );
+};

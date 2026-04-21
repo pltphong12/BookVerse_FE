@@ -74,7 +74,7 @@ export default function ProductCard(book: IBook) {
                             e.preventDefault();
                             handleAddToCart();
                         }}
-                        className="w-full btn bg-primary-500 text-white btn-sm hover:bg-primary-600">
+                        className="w-full flex items-center justify-center gap-2 bg-primary-500 text-white px-3 py-2.5 rounded-lg hover:bg-primary-600 transition-colors font-medium text-sm hover:shadow-md">
                         <ShoppingCart className="w-4 h-4" />
                         Thêm vào giỏ
                     </button>

@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
+import { Spin } from "antd";
 import { PublisherTable } from "../../components/admin/publisher/publisher.table";
 import { useAppDispatch } from "../../redux/hook";
 import { clearBreadcrumbs, setBreadcrumbs } from "../../redux/slide/breadcrumbs.slice";
@@ -17,7 +18,6 @@ export const PublisherPage = () => {
     const [totalPage, setTotalPage] = React.useState<number>(0);
     // Filter
     const [search, setSearch] = React.useState<string>("");
-
     // Fetching to render at dropdown
     const [dateFrom, setDateFrom] = React.useState<string>("")
 
@@ -35,7 +35,6 @@ export const PublisherPage = () => {
             setDataSource(publishersQuery.data.data.result);
             setTotalPage(publishersQuery.data.data.meta.pages)
         }
-        
     }, [publishersQuery]);
 
     React.useEffect(() => {
@@ -51,35 +50,19 @@ export const PublisherPage = () => {
         await queryClient.invalidateQueries({ queryKey: ['fetchingPublishers'] });
     };
 
-    const getTable = () => {
-        if (isPending) return (
-            <>
-                <div>Loading...</div>
-            </>
-        )
-        else {
-            return (
-                <>
-                    <PublisherTable
-                        load={load}
-                        dataSource={dataSource}
-                        page={page}
-                        totalPage={totalPage}
-                        setPage={setPage}
-                        search={search}
-                        setSearch={setSearch}                   
-                        dateFrom={dateFrom}
-                        setDateFrom={setDateFrom}
-                    />
-                </>
-            )
-        }
-    }
-
     return (
-        <>
-            {getTable()}
-        </>
+        <Spin spinning={isPending} tip="Đang tải..." size="large">
+            <PublisherTable
+                load={load}
+                dataSource={dataSource}
+                page={page}
+                totalPage={totalPage}
+                setPage={setPage}
+                search={search}
+                setSearch={setSearch}
+                dateFrom={dateFrom}
+                setDateFrom={setDateFrom}
+            />
+        </Spin>
     );
 }
-

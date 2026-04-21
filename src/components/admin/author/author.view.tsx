@@ -1,5 +1,9 @@
-import { X } from 'lucide-react';
+import React from 'react';
+import { Drawer, Descriptions, Image, Tag, Typography, Divider, Empty, Avatar, List } from 'antd';
+import { BookOutlined, CalendarOutlined, EnvironmentOutlined, UserOutlined } from '@ant-design/icons';
 import { IAuthor } from '../../../types/backend';
+
+const { Title, Text } = Typography;
 
 interface AuthorViewProps {
     isOpen: boolean;
@@ -8,178 +12,153 @@ interface AuthorViewProps {
 }
 
 export const AuthorView: React.FC<AuthorViewProps> = ({ isOpen, setIsOpen, author }) => {
-    if (!isOpen || !author) return null;
+    if (!author) return null;
+
+    const avatarUrl = author.avatar
+        ? `${import.meta.env.VITE_BACKEND_URL}/storage/author/${author.avatar}`
+        : undefined;
+
+    const formatDate = (dateStr?: string) => {
+        if (!dateStr) return '—';
+        return new Intl.DateTimeFormat('vi-VN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+        }).format(new Date(dateStr));
+    };
+
+    const formatDateTime = (dateStr?: string) => {
+        if (!dateStr) return '—';
+        return new Intl.DateTimeFormat('vi-VN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+        }).format(new Date(dateStr));
+    };
 
     return (
-        <div className="fixed inset-0 z-999 flex items-center justify-center">
-            {/* Backdrop */}
-            <div className="fixed inset-0 bg-black opacity-50" onClick={() => setIsOpen(false)}></div>
-
-            {/* Modal */}
-            <div className="relative z-50 w-full max-w-2xl rounded-lg bg-white p-6 dark:bg-gray-800">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                        Thông tin tác giả
-                    </h3>
-                    <button
-                        onClick={() => setIsOpen(false)}
-                        className="btn btn-sm btn-circle btn-ghost hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                        <X size={24} />
-                    </button>
-                </div>
-
-                {/* Content */}
-                <div className="p-6">
-                    <div className="flex flex-col lg:flex-row gap-8">
-                        {/* Book Cover */}
-                        <div className="flex-shrink-0">
-                            <div className="w-64 h-80 bg-gradient-to-b from-blue-900 to-blue-700 rounded-lg shadow-lg overflow-hidden relative">
-                                {author.avatar ? (
-                                    <img
-                                        src={`${import.meta.env.VITE_BACKEND_URL}/storage/author/${author.avatar}`}
-                                        alt={author.name}
-                                        className="w-full h-full object-cover"
-                                    />
-                                ) : (
-                                    <div className="absolute inset-0 bg-gradient-to-br from-blue-800 to-blue-900">
-                                        {/* Default Book Cover Design */}
-                                        <div className="p-6 h-full flex flex-col justify-between text-white">
-
-
-                                            {/* Abstract design */}
-                                            <div className="flex-1 flex items-center justify-center">
-                                                <div className="relative">
-                                                    <div className="w-20 h-12 bg-blue-600 rounded-full opacity-80"></div>
-                                                    <div className="absolute top-2 left-6 w-2 h-2 bg-cyan-300 rounded-full"></div>
-                                                    <div className="absolute top-2 right-6 w-2 h-2 bg-cyan-300 rounded-full"></div>
-                                                    <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-1 bg-red-500 rounded-full"></div>
-                                                </div>
-                                            </div>
-
-                                            {/* Decorative elements */}
-                                            <div className="flex items-end justify-center space-x-1 mb-4">
-                                                <div className="w-1 h-8 bg-yellow-400 opacity-70"></div>
-                                                <div className="w-1 h-6 bg-yellow-400 opacity-70"></div>
-                                                <div className="w-1 h-10 bg-yellow-400 opacity-70"></div>
-                                                <div className="w-1 h-4 bg-yellow-400 opacity-70"></div>
-                                                <div className="w-1 h-12 bg-yellow-400 opacity-70"></div>
-                                            </div>
-
-                                            <div className="text-center">
-                                                <p className="text-sm font-semibold line-clamp-2">
-                                                    {author.books && author.books.length > 0
-                                                        ? author.books.map(book => book.title).join(', ').toUpperCase()
-                                                        : 'UNKNOWN AUTHOR'
-                                                    }
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Book Details */}
-                        <div className="flex-1 space-y-6">
-                            {/* Title */}
-                            {/* <div>
-                                        <h1 className="text-3xl   text-gray-800 dark:text-white mb-2">{author.title}</h1>
-                                    </div> */}
-
-                            {/* Details Grid */}
-                            <div className="space-y-4">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-gray-600 dark:text-gray-400 font-medium">Họ và tên: </span>
-                                    <span className="text-gray-800 dark:text-white font-semibold">{author.name}</span>
-                                </div>
-
-                                <div className="flex justify-between items-start">
-                                    <span className="text-gray-600 dark:text-gray-400 font-medium">Sách: </span>
-                                    <div className="text-right">
-                                        {author.books && author.books.length > 0 ? (
-                                            author.books.map((book, index) => (
-                                                <div key={book.id} className="text-gray-800 dark:text-white font-semibold">
-                                                    {book.title}
-                                                    {index < author.books.length - 1 && ', '}
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <span className="text-gray-400">Chưa có sách</span>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="flex justify-between items-center">
-                                    <span className="text-gray-600 dark:text-gray-400 font-medium">Quê quán: </span>
-                                    <span className="text-gray-800 dark:text-white font-semibold">{author.nationality}</span>
-                                </div>
-
-                                {/* <div className="flex justify-between items-center">
-                                            <span className="text-gray-600 dark:text-gray-400 font-medium">Giá:</span>
-                                            <span className="text-2xl  ">{formatPrice(book.price)}</span>
-                                        </div> */}
-
-                                <div className="flex justify-between items-center">
-                                    <span className="text-gray-600 dark:text-gray-400 font-medium">Ngày sinh:</span>
-                                    <span className=" text-gray-800 dark:text-white font-semibold">
-                                        {author.birthday && new Intl.DateTimeFormat('en-US', {
-                                            year: 'numeric',
-                                            month: '2-digit',
-                                            day: '2-digit',
-                                        }).format(new Date(author.birthday))}</span>
-                                </div>
-
-                                <div className="flex justify-between items-center">
-                                    <span className="text-gray-600 dark:text-gray-400 font-medium">Ngày tạo:</span>
-                                    <span className="text-gray-800 dark:text-white font-semibold">
-                                        {author.createdAt && new Intl.DateTimeFormat('en-US', {
-                                            year: 'numeric',
-                                            month: '2-digit',
-                                            day: '2-digit',
-                                            hour: '2-digit',
-                                            minute: '2-digit',
-                                            second: '2-digit'
-                                        }).format(new Date(author.createdAt))}
-                                    </span>
-                                </div>
-                            </div>
-
-                            {/* Description */}
-
-
-                            {/* Additional Information */}
-                        </div>
-                    </div>
-                    {/* <div className='pt-4'>
-                        <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                            <h3 className="text-lg   text-gray-800 dark:text-white">Mô tả</h3>
-                            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                                {book.description || 'Chưa có mô tả cho cuốn sách này.'}
-                            </p>
-                        </div>
-                    </div> */}
-                    {/* <div className='pt-4'>
-                                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                                    <h3 className="text-lg   text-gray-800 dark:text-white mb-3">Thông tin bổ sung</h3>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-gray-600 dark:text-gray-400 font-medium">Ngày tạo:</span>
-                                        <span className="text-gray-800 dark:text-white font-semibold">
-                                            {book.createdAt && new Intl.DateTimeFormat('en-US', {
-                                                year: 'numeric',
-                                                month: '2-digit',
-                                                day: '2-digit',
-                                                hour: '2-digit',
-                                                minute: '2-digit',
-                                                second: '2-digit'
-                                            }).format(new Date(book.createdAt))}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div> */}
-                </div>
+        <Drawer
+            title={
+                <span style={{ fontSize: 18, fontWeight: 600 }}>
+                    Thông tin tác giả
+                </span>
+            }
+            placement="right"
+            width={560}
+            onClose={() => setIsOpen(false)}
+            open={isOpen}
+            styles={{
+                body: { padding: '24px' },
+            }}
+        >
+            {/* Author Avatar & Name Header */}
+            <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                {avatarUrl ? (
+                    <Image
+                        src={avatarUrl}
+                        alt={author.name}
+                        width={160}
+                        height={200}
+                        style={{
+                            objectFit: 'cover',
+                            borderRadius: 12,
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                        }}
+                        fallback="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTYwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE0IiBmaWxsPSIjYmZiZmJmIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4="
+                    />
+                ) : (
+                    <Avatar
+                        size={120}
+                        icon={<UserOutlined />}
+                        style={{
+                            backgroundColor: '#f0f5ff',
+                            color: '#1677ff',
+                            fontSize: 48,
+                        }}
+                    />
+                )}
+                <Title level={4} style={{ marginTop: 12, marginBottom: 4 }}>
+                    {author.name}
+                </Title>
+                <Tag icon={<EnvironmentOutlined />} color="blue">
+                    {author.nationality}
+                </Tag>
             </div>
-        </div>
+
+            <Divider />
+
+            {/* Author Details */}
+            <Descriptions
+                column={1}
+                bordered
+                size="small"
+                labelStyle={{ fontWeight: 600, width: 140 }}
+            >
+                <Descriptions.Item label={<><UserOutlined /> Họ và tên</>}>
+                    {author.name}
+                </Descriptions.Item>
+                <Descriptions.Item label={<><EnvironmentOutlined /> Quê quán</>}>
+                    {author.nationality}
+                </Descriptions.Item>
+                <Descriptions.Item label={<><CalendarOutlined /> Ngày sinh</>}>
+                    {formatDate(author.birthday)}
+                </Descriptions.Item>
+                <Descriptions.Item label={<><CalendarOutlined /> Ngày tạo</>}>
+                    {formatDateTime(author.createdAt)}
+                </Descriptions.Item>
+                {author.updatedAt && (
+                    <Descriptions.Item label={<><CalendarOutlined /> Cập nhật</>}>
+                        {formatDateTime(author.updatedAt)}
+                    </Descriptions.Item>
+                )}
+                {author.createdBy && (
+                    <Descriptions.Item label="Người tạo">
+                        <Text>{author.createdBy}</Text>
+                    </Descriptions.Item>
+                )}
+            </Descriptions>
+
+            <Divider />
+
+            {/* Author Books */}
+            <Title level={5} style={{ marginBottom: 12 }}>
+                <BookOutlined /> Danh sách sách ({author.books?.length || 0})
+            </Title>
+
+            {author.books && author.books.length > 0 ? (
+                <List
+                    size="small"
+                    bordered
+                    dataSource={author.books}
+                    renderItem={(book, index) => (
+                        <List.Item>
+                            <List.Item.Meta
+                                avatar={
+                                    <Tag color="geekblue" style={{ minWidth: 28, textAlign: 'center' }}>
+                                        {index + 1}
+                                    </Tag>
+                                }
+                                title={
+                                    <Text strong>{book.title}</Text>
+                                }
+                                description={
+                                    book.publisher?.name
+                                        ? `NXB: ${book.publisher.name}`
+                                        : undefined
+                                }
+                            />
+                        </List.Item>
+                    )}
+                />
+            ) : (
+                <Empty
+                    description="Chưa có sách nào"
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                />
+            )}
+        </Drawer>
     );
 };

@@ -1,14 +1,24 @@
-import { Edit, Trash, View } from "lucide-react";
 import React from "react";
+import { Table, Button, Space, Popconfirm, Tooltip, Tag, Card, Typography } from "antd";
+import { EditOutlined, DeleteOutlined, EyeOutlined, PlusOutlined, ApiOutlined } from '@ant-design/icons';
+import type { ColumnsType } from 'antd/es/table';
 import { showToast, ToastType } from "../../../../common/showToast";
 import { useAppDispatch, useAppSelector } from "../../../../redux/hook";
 import { deletePermission, ICreatePermission, resetDeletePermission } from "../../../../redux/slide/permission.slice";
 import { IPermission } from "../../../../types/backend";
-import { Pagination } from "../../../global/Pagination";
 import { PermissionForm } from "./permission.form";
 import { PermissionSearchAndFilter } from "./permission.search_filter";
 import { PermissionView } from "./permission.view";
 
+const { Title, Text } = Typography;
+
+const methodColorMap: Record<string, string> = {
+    GET: 'blue',
+    POST: 'green',
+    PUT: 'orange',
+    DELETE: 'red',
+    PATCH: 'purple',
+};
 
 interface PermissionTableProps {
     load: () => Promise<void>;
@@ -27,18 +37,18 @@ interface PermissionTableProps {
     setDateFrom: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const PermissionTable: React.FC<PermissionTableProps> = ({ load, page, totalPage, setPage, dataSource, search, setSearch, method, setMethod, domain, setDomain, domains, dateFrom, setDateFrom }) => {
+export const PermissionTable: React.FC<PermissionTableProps> = ({
+    load, page, totalPage, setPage, dataSource,
+    search, setSearch, method, setMethod,
+    domain, setDomain, domains, dateFrom, setDateFrom,
+}) => {
     const [isViewModalOpen, setIsViewModalOpen] = React.useState<boolean>(false);
     const [selectedPermission, setSelectedPermission] = React.useState<IPermission | null>(null);
-
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState<boolean>(false);
-
-    const isDeletePermissionSuccess = useAppSelector((state) => state.permission.isDeletePermissionSuccess);
-    const isDeletePermissionFailed = useAppSelector((state) => state.permission.isDeletePermissionFailed);
-
     const [permissionToEdit, setPermissionToEdit] = React.useState<ICreatePermission | undefined>(undefined);
     const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
+    const isDeletePermissionSuccess = useAppSelector((state) => state.permission.isDeletePermissionSuccess);
+    const isDeletePermissionFailed = useAppSelector((state) => state.permission.isDeletePermissionFailed);
     const message = useAppSelector((state) => state.permission.message);
     const dispatch = useAppDispatch();
 
@@ -47,196 +57,188 @@ export const PermissionTable: React.FC<PermissionTableProps> = ({ load, page, to
         setIsViewModalOpen(true);
     };
 
-    const getPermissionClass = (permission: string) => {
-        switch (permission) {
-            case 'GET': return 'badge badge-info';
-            case 'POST': return 'badge badge-success';
-            case 'PUT': return 'badge badge-warning';
-            case 'DELETE': return 'badge badge-error';
-            default: return 'badge';
-        }
-    };
-
     const executeDeletePermission = (id: number) => {
         dispatch(deletePermission(id));
-    }
+    };
 
     React.useEffect(() => {
         if (isDeletePermissionSuccess) {
             showToast("Xóa quyền hạn thành công", ToastType.SUCCESS);
             dispatch(resetDeletePermission());
-            load()
-            setPage(1)
+            load();
+            setPage(1);
         }
         if (isDeletePermissionFailed) {
             showToast("Xóa quyền hạn không thành công " + message, ToastType.ERROR);
             dispatch(resetDeletePermission());
         }
     }, [isDeletePermissionSuccess, isDeletePermissionFailed, message, dispatch, setPage, load]);
+
+    const columns: ColumnsType<IPermission> = [
+        {
+            title: 'STT',
+            key: 'index',
+            width: 55,
+            align: 'center',
+            render: (_text, _record, index) => (
+                <span style={{ fontWeight: 500 }}>
+                    {index + (page - 1) * 10 + 1}
+                </span>
+            ),
+        },
+        {
+            title: 'Tên quyền hạn',
+            key: 'name',
+            ellipsis: true,
+            render: (_text, record) => (
+                <span style={{ fontWeight: 600, fontSize: 13 }}>{record.name}</span>
+            ),
+        },
+        {
+            title: 'Domain',
+            key: 'domain',
+            width: 120,
+            responsive: ['md'],
+            render: (_text, record) => (
+                <Tag>{record.domain}</Tag>
+            ),
+        },
+        {
+            title: 'API Path',
+            key: 'apiPath',
+            width: 200,
+            responsive: ['lg'],
+            ellipsis: true,
+            render: (_text, record) => (
+                <Text code style={{ fontSize: 11 }}>{record.apiPath}</Text>
+            ),
+        },
+        {
+            title: 'Method',
+            key: 'method',
+            width: 90,
+            align: 'center',
+            render: (_text, record) => (
+                <Tag color={methodColorMap[record.method] || 'default'}>
+                    {record.method}
+                </Tag>
+            ),
+        },
+        {
+            title: 'Ngày tạo',
+            key: 'createdAt',
+            width: 110,
+            responsive: ['xl'],
+            render: (_text, record) => (
+                <span style={{ fontSize: 12, color: '#595959' }}>
+                    {record.createdAt
+                        ? new Intl.DateTimeFormat('vi-VN', {
+                            year: 'numeric', month: '2-digit', day: '2-digit',
+                        }).format(new Date(record.createdAt))
+                        : '—'
+                    }
+                </span>
+            ),
+        },
+        {
+            title: 'Thao tác',
+            key: 'action',
+            width: 140,
+            align: 'center',
+            fixed: 'right',
+            render: (_text, record) => (
+                <Space size="small">
+                    <Tooltip title="Xem chi tiết">
+                        <Button
+                            type="text"
+                            icon={<EyeOutlined />}
+                            style={{ color: '#1677ff' }}
+                            onClick={() => handleViewPermission(record)}
+                        />
+                    </Tooltip>
+                    <Tooltip title="Chỉnh sửa">
+                        <Button
+                            type="text"
+                            icon={<EditOutlined />}
+                            style={{ color: '#faad14' }}
+                            onClick={() => {
+                                setPermissionToEdit(record);
+                                setIsModalOpen(true);
+                            }}
+                        />
+                    </Tooltip>
+                    <Popconfirm
+                        title="Xóa quyền hạn"
+                        description="Bạn có chắc chắn muốn xóa quyền hạn này?"
+                        onConfirm={() => executeDeletePermission(record.id)}
+                        okText="Xóa"
+                        cancelText="Hủy"
+                        okButtonProps={{ danger: true }}
+                    >
+                        <Tooltip title="Xóa">
+                            <Button type="text" danger icon={<DeleteOutlined />} />
+                        </Tooltip>
+                    </Popconfirm>
+                </Space>
+            ),
+        },
+    ];
+
     return (
         <>
-            <div className='flex'>
-                <PermissionSearchAndFilter
-                    searchWithName={search}
-                    setSearchWithName={setSearch}
-                    method={method}
-                    setMethod={setMethod}
-                    domain={domain}
-                    setDomain={setDomain}
-                    domains={domains}
-                    dateFrom={dateFrom}
-                    setDateFrom={setDateFrom}
-                    setPage={setPage}
-                />
-            </div>
-            <div className="flex justify-between">
-                <div className="text-2xl font-bold">Quản lý quyền hạn</div>
-                <button
-                    className="btn btn-neutral justify-end"
-                    onClick={() => {
-                        setIsModalOpen(true);
-                        setPermissionToEdit(undefined);
+            <PermissionSearchAndFilter
+                searchWithName={search}
+                setSearchWithName={setSearch}
+                method={method}
+                setMethod={setMethod}
+                domain={domain}
+                setDomain={setDomain}
+                domains={domains}
+                dateFrom={dateFrom}
+                setDateFrom={setDateFrom}
+                setPage={setPage}
+            />
+
+            <Card styles={{ body: { padding: 0 } }}>
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '16px 24px',
+                    borderBottom: '1px solid #f0f0f0',
+                }}>
+                    <Title level={4} style={{ margin: 0 }}>
+                        <ApiOutlined /> Quản lý quyền hạn
+                    </Title>
+                    <Button
+                        type="primary"
+                        icon={<PlusOutlined />}
+                        onClick={() => {
+                            setIsModalOpen(true);
+                            setPermissionToEdit(undefined);
+                        }}
+                    >
+                        Tạo quyền hạn
+                    </Button>
+                </div>
+
+                <Table
+                    columns={columns}
+                    dataSource={dataSource}
+                    rowKey="id"
+                    pagination={{
+                        current: page,
+                        total: totalPage * 10,
+                        pageSize: 10,
+                        onChange: (p) => setPage(p),
+                        showSizeChanger: false,
+                        showTotal: (total) => `Tổng ${total} quyền hạn`,
+                        style: { padding: '0 16px' },
                     }}
-                >
-                    Tạo quyền hạn
-                </button>
-            </div>
-
-            <div className="rounded-box border border-base-content/5 bg-base-100">
-                <table className="table">
-                    {/* head */}
-                    <thead>
-                        <tr>
-                            <th className='cursor-pointer hover:bg-base-200'>
-                                <span>STT</span>
-                            </th>
-                            <th className='cursor-pointer hover:bg-base-200'>
-                                <div className='flex items-center gap-1'>
-                                    <span>Tên quyền hạn</span>
-                                </div>
-                            </th>
-                            <th className='cursor-pointer hover:bg-base-200'>
-                                <div className='flex items-center gap-1'>
-                                    <span>Tên domain</span>
-                                </div>
-                            </th>
-                            <th className='cursor-pointer hover:bg-base-200'>
-                                <div className='flex items-center gap-1'>
-                                    <span>Đường dẫn API</span>
-                                </div>
-                            </th>
-                            <th className='cursor-pointer hover:bg-base-200'>
-                                <div className='flex items-center gap-1'>
-                                    <span>Phương thức</span>
-                                </div>
-                            </th>
-                            <th className='cursor-pointer hover:bg-base-200'>
-                                <div className='flex items-center gap-1'>
-                                    <span>Ngày tạo</span>
-                                </div>
-                            </th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {dataSource.map((record, index) => {
-                            return (
-                                <tr key={record.id} className='hover:bg-base-300'>
-                                    <td>
-                                        <div className=''>
-                                            {index + (page - 1) * 10 + 1}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="flex items-center gap-3">
-                                            <div>
-                                                <div className="font-bold">{record.name}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        {record.domain}
-                                    </td>
-                                    <td>
-                                        {record.apiPath}
-                                    </td>
-                                    <td>
-                                        <span className={getPermissionClass(record.method)}>
-                                            {record.method}
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(record.createdAt as string))}
-                                    </td>
-                                    <td className="w-[1%]">
-                                        <div className="dropdown dropdown-left">
-                                            <button tabIndex={0} className="btn btn-ghost btn-sm" onMouseDown={() => {
-                                                setIsDeleteModalOpen(false)
-                                            }}>
-                                                ⋮
-                                            </button>
-                                            <ul
-                                                tabIndex={0}
-                                                className="dropdown-content menu bg-base-100 rounded-box z-[10] w-36 p-2 shadow-lg border border-base-content/20"
-                                            >
-                                                <li>
-                                                    <button
-                                                        className="flex items-center gap-2 text-info"
-                                                        onClick={() => handleViewPermission(record)}
-                                                    >
-                                                        <View className="w-4 h-4" />
-                                                        <span>Xem</span>
-                                                    </button>
-                                                </li>
-                                                <li>
-                                                    <button
-                                                        className="flex items-center gap-2 text-warning"
-                                                        onClick={() => {
-                                                            setPermissionToEdit(record);
-                                                            setIsModalOpen(true);
-                                                        }}
-                                                    >
-                                                        <Edit className="w-4 h-4" />
-                                                        <span>Sửa</span>
-                                                    </button>
-                                                </li>
-                                                <li>
-                                                    <button tabIndex={0} className="flex items-center gap-2 text-error"
-                                                        onClick={() => {
-                                                            setIsDeleteModalOpen(true)
-                                                        }}>
-                                                        <Trash className="w-4 h-4" />
-                                                        <span>Xóa</span>
-                                                    </button>
-                                                    {isDeleteModalOpen && (
-                                                        <ul tabIndex={0} className="dropdown-content menu bg-base-200 rounded-box z-[10] w-52 p-2 shadow-lg border border-base-content/20">
-                                                            <li className='w-full'>Bạn có chắn chắn muốn xóa</li>
-                                                            <li className="mt-1">
-                                                                <button
-                                                                    className="btn btn-error btn-sm w-full"
-                                                                    onClick={() => executeDeletePermission(record.id)}
-                                                                >
-                                                                    Xóa
-                                                                </button>
-                                                            </li>
-
-                                                        </ul>
-                                                    )}
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-                            )
-                        })}
-                    </tbody>
-
-                </table>
-
-            </div >
-            {dataSource.length === 0 && <div className=''>Không có dữ liệu</div>}
-            < Pagination page={page} totalPage={totalPage} setPage={setPage} />
+                    size="middle"
+                    scroll={{ x: 600 }}
+                />
+            </Card>
 
             <PermissionView
                 isOpen={isViewModalOpen}
@@ -244,12 +246,12 @@ export const PermissionTable: React.FC<PermissionTableProps> = ({ load, page, to
                 permission={selectedPermission}
             />
 
-            < PermissionForm
+            <PermissionForm
                 isModalOpen={isModalOpen}
                 setIsModalOpen={setIsModalOpen}
                 load={load}
                 permissionToEdit={permissionToEdit}
             />
         </>
-    )
-}
+    );
+};

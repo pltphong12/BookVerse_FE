@@ -1,5 +1,12 @@
-import { X } from 'lucide-react';
+import React from 'react';
+import { Drawer, Descriptions, Avatar, Typography, Divider, Image } from 'antd';
+import {
+    BankOutlined, CalendarOutlined, MailOutlined,
+    PhoneOutlined, EnvironmentOutlined, FileTextOutlined
+} from '@ant-design/icons';
 import { IPublisher } from '../../../types/backend';
+
+const { Title, Paragraph } = Typography;
 
 interface PublisherViewProps {
     isOpen: boolean;
@@ -8,73 +15,102 @@ interface PublisherViewProps {
 }
 
 export const PublisherView: React.FC<PublisherViewProps> = ({ isOpen, setIsOpen, publisher }) => {
-    if (!isOpen || !publisher) return null;
+    if (!publisher) return null;
+
+    const imageUrl = publisher.image
+        ? `${import.meta.env.VITE_BACKEND_URL}/storage/publisher/${publisher.image}`
+        : undefined;
+
+    const formatDateTime = (dateStr?: string) => {
+        if (!dateStr) return '—';
+        return new Intl.DateTimeFormat('vi-VN', {
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit', second: '2-digit',
+        }).format(new Date(dateStr));
+    };
 
     return (
-        <div className="fixed inset-0 z-999 flex items-center justify-center">
-            {/* Backdrop */}
-            <div className="fixed inset-0 bg-black opacity-50" onClick={() => setIsOpen(false)}></div>
-
-            {/* Modal */}
-            <div className="relative z-50 w-full max-w-2xl rounded-lg bg-white p-6 dark:bg-gray-800">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                        Thông tin nhà xuất bản
-                    </h3>
-                    <button
-                        onClick={() => setIsOpen(false)}
-                        className="btn btn-sm btn-circle btn-ghost hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                        <X size={24} />
-                    </button>
-                </div>
-
-                {/* Content */}
-                <div className="space-y-4">
-                    <div className="flex items-center space-x-4">
-                        <div className="avatar">
-                            <div className="w-28 h-28 rounded-full ring ring-gray-700 ring-offset-base-100 ring-offset-2 overflow-hidden">
-                                <img src={`${import.meta.env.VITE_BACKEND_URL}/storage/publisher/${publisher.image}`} alt="User Avatar" />
-                            </div>
-                        </div>
-                        <div>
-                            <h4 className="text-lg font-semibold">{publisher.name}</h4>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Email: {publisher.email}</p>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Địa chỉ</p>
-                            <p className="text-gray-900 dark:text-white">{publisher.address}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Số điện thoại</p>
-                            <p className="text-gray-900 dark:text-white">{publisher.phone}</p>
-                        </div>
-                        <div className="col-span-2">
-                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Ngày tạo</p>
-                            <p className="text-gray-900 dark:text-white">
-                                {publisher.createdAt && new Intl.DateTimeFormat('en-US', {
-                                    year: 'numeric',
-                                    month: '2-digit',
-                                    day: '2-digit',
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                    second: '2-digit'
-                                }).format(new Date(publisher.createdAt))}
-                            </p>
-                        </div>
-                        <div className="col-span-2">
-                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Mô tả</p>
-                            <p className="text-gray-900 dark:text-white">{publisher.description}</p>
-                        </div>
-
-
-                    </div>
-                </div>
+        <Drawer
+            title={
+                <span style={{ fontSize: 18, fontWeight: 600 }}>
+                    <BankOutlined /> Thông tin nhà xuất bản
+                </span>
+            }
+            placement="right"
+            width={520}
+            onClose={() => setIsOpen(false)}
+            open={isOpen}
+            styles={{ body: { padding: '24px' } }}
+        >
+            {/* Publisher Header */}
+            <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                {imageUrl ? (
+                    <Image
+                        src={imageUrl}
+                        alt={publisher.name}
+                        width={96}
+                        height={96}
+                        style={{
+                            borderRadius: '50%',
+                            objectFit: 'cover',
+                            border: '3px solid #e6f4ff',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                        }}
+                        fallback="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9Ijk2IiBoZWlnaHQ9Ijk2IiBmaWxsPSIjZjBmMGYwIiByeD0iNDgiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMiIgZmlsbD0iI2JmYmZiZiI+TlhCPC90ZXh0Pjwvc3ZnPg=="
+                    />
+                ) : (
+                    <Avatar
+                        size={96}
+                        icon={<BankOutlined />}
+                        style={{
+                            background: 'linear-gradient(135deg, #1e88e5, #1565c0)',
+                            border: '3px solid #e6f4ff',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                        }}
+                    />
+                )}
+                <Title level={4} style={{ marginTop: 12, marginBottom: 0 }}>{publisher.name}</Title>
             </div>
-        </div>
+
+            <Divider />
+
+            {/* Details */}
+            <Descriptions
+                column={1}
+                bordered
+                size="small"
+                labelStyle={{ fontWeight: 600, width: 130, whiteSpace: 'nowrap' }}
+            >
+                <Descriptions.Item label={<><BankOutlined /> Tên NXB</>}>
+                    {publisher.name}
+                </Descriptions.Item>
+                <Descriptions.Item label={<><EnvironmentOutlined /> Địa chỉ</>}>
+                    {publisher.address || '—'}
+                </Descriptions.Item>
+                <Descriptions.Item label={<><PhoneOutlined /> SĐT</>}>
+                    {publisher.phone || '—'}
+                </Descriptions.Item>
+                <Descriptions.Item label={<><MailOutlined /> Email</>}>
+                    {publisher.email || '—'}
+                </Descriptions.Item>
+                <Descriptions.Item label={<><CalendarOutlined /> Ngày tạo</>}>
+                    {formatDateTime(publisher.createdAt)}
+                </Descriptions.Item>
+                {publisher.updatedAt && (
+                    <Descriptions.Item label={<><CalendarOutlined /> Cập nhật</>}>
+                        {formatDateTime(publisher.updatedAt)}
+                    </Descriptions.Item>
+                )}
+            </Descriptions>
+
+            {/* Description */}
+            <Divider />
+            <Title level={5} style={{ marginBottom: 8 }}>
+                <FileTextOutlined /> Mô tả
+            </Title>
+            <Paragraph type="secondary" style={{ whiteSpace: 'pre-wrap' }}>
+                {publisher.description || 'Chưa có mô tả.'}
+            </Paragraph>
+        </Drawer>
     );
 };
