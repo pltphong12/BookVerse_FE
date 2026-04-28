@@ -3,7 +3,8 @@ import { Layout, Menu } from 'antd';
 import {
     DashboardOutlined, UserOutlined, SafetyCertificateOutlined,
     KeyOutlined, TeamOutlined, BookOutlined, EditOutlined,
-    BankOutlined, ShopOutlined, TagsOutlined, ShoppingCartOutlined
+    BankOutlined, ShopOutlined, TagsOutlined, ShoppingCartOutlined,
+    MenuFoldOutlined, MenuUnfoldOutlined
 } from '@ant-design/icons';
 import { Link, useLocation } from 'react-router-dom';
 import type { MenuProps } from 'antd';
@@ -115,14 +116,15 @@ export const LeftSidebar: React.FC = () => {
             collapsible
             collapsed={collapsed}
             onCollapse={setCollapsed}
+            trigger={null}
             theme="light"
+            className="admin-sider"
             style={{
                 height: '100vh',
                 position: 'sticky',
                 top: 0,
                 left: 0,
                 borderRight: '1px solid #f0f0f0',
-                overflow: 'auto',
             }}
         >
             {/* Logo */}
@@ -133,6 +135,7 @@ export const LeftSidebar: React.FC = () => {
                 justifyContent: 'center',
                 borderBottom: '1px solid #f0f0f0',
                 transition: 'all 0.2s',
+                flexShrink: 0,
             }}>
                 <Link to="/">
                     <img
@@ -149,16 +152,42 @@ export const LeftSidebar: React.FC = () => {
                 </Link>
             </div>
 
-            {/* Menu */}
-            <Menu
-                mode="inline"
-                selectedKeys={[selectedKey]}
-                items={menuItems}
+            {/* Scrollable Menu */}
+            <div style={{
+                flex: 1,
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                minHeight: 0,
+            }}>
+                <Menu
+                    mode="inline"
+                    selectedKeys={[selectedKey]}
+                    items={menuItems}
+                    style={{
+                        border: 'none',
+                        fontSize: 14,
+                    }}
+                />
+            </div>
+
+            {/* Custom Collapse Trigger */}
+            <div
+                onClick={() => setCollapsed(!collapsed)}
                 style={{
-                    border: 'none',
-                    fontSize: 14,
+                    height: 48,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    borderTop: '1px solid #f0f0f0',
+                    transition: 'all 0.2s',
+                    color: '#595959',
+                    fontSize: 16,
+                    flexShrink: 0,
                 }}
-            />
+            >
+                {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            </div>
         </Sider>
     );
 };
