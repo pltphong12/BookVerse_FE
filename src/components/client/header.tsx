@@ -1,45 +1,36 @@
-import { ChevronDown, Menu, Search, ShoppingCart, User } from "lucide-react";
+import { ChevronDown, Clock, Menu, Search, ShoppingCart, TrendingUp, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../../assets/main_logo.png";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
-import { useQueryClient } from "@tanstack/react-query";
-import { callLogoutApi, callFetchAllCategoriesApi, callFetchCartApi } from "../../services/api";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { callLogoutApi, callFetchAllCategoriesApi, callFetchCartApi, callSearchAutocompleteApi } from "../../services/api";
 import { showToast, ToastType } from "../../common/showToast";
 import { resetAccount } from "../../redux/slide/account.slide";
 import { setCartSum } from "../../redux/slide/cart.slice";
 import { AxiosError } from "axios";
 import { useState, useEffect, useRef } from "react";
-import { ICategoryInBook } from "../../types/backend";
+import { ICategoryInBook, ISearchAutocompleteProduct } from "../../types/backend";
+import { useDebouncedCallback } from "use-debounce";
 
 export const Header: React.FC = () => {
     const navigate = useNavigate();
     const account = useAppSelector((state) => state.account);
     const queryClient = useQueryClient();
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
-    const [categories, setCategories] = useState<ICategoryInBook[]>([]);
-    const [loadingCategories, setLoadingCategories] = useState(false);
     const categoryRef = useRef<HTMLDivElement>(null);
     const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const dispatch = useAppDispatch();
     const cartSum = useAppSelector((state) => state.cart.sum);
 
-    // Fetch categories from DB
-    useEffect(() => {
-        const fetchCategories = async () => {
-            setLoadingCategories(true);
-            try {
-                const res = await callFetchAllCategoriesApi();
-                if (res.data?.data) {
-                    setCategories(res.data.data);
-                }
-            } catch (error) {
-                console.error('Failed to fetch categories:', error);
-            } finally {
-                setLoadingCategories(false);
-            }
-        };
-        fetchCategories();
-    }, []);
+    // Fetch categories from DB (cached with React Query)
+    const { data: categories = [], isLoading: loadingCategories } = useQuery<ICategoryInBook[]>({
+        queryKey: ['all-categories'],
+        queryFn: async () => {
+            const res = await callFetchAllCategoriesApi();
+            return res.data?.data ?? [];
+        },
+        staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    });
 
     // Fetch cart count
     useEffect(() => {
@@ -63,6 +54,73 @@ export const Header: React.FC = () => {
         return () => {
             if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
         };
+    }, []);
+
+    // Search autocomplete state
+    const [searchQuery, setSearchQuery] = useState('');
+    const [suggestions, setSuggestions] = useState<string[]>([]);
+    const [searchProducts, setSearchProducts] = useState<ISearchAutocompleteProduct[]>([]);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isSearching, setIsSearching] = useState(false);
+    const searchRef = useRef<HTMLDivElement>(null);
+
+    // Debounced autocomplete fetch using use-debounce
+    const debouncedFetchAutocomplete = useDebouncedCallback(async (keyword: string) => {
+        if (keyword.trim().length < 1) {
+            setSuggestions([]);
+            setSearchProducts([]);
+            setIsSearchOpen(false);
+            return;
+        }
+        setIsSearching(true);
+        try {
+            const res = await callSearchAutocompleteApi(keyword.trim());
+            if (res.data?.data) {
+                setSuggestions(res.data.data.suggestions);
+                setSearchProducts(res.data.data.products);
+                setIsSearchOpen(true);
+            }
+        } catch (error) {
+            console.error('Autocomplete failed:', error);
+        } finally {
+            setIsSearching(false);
+        }
+    }, 300);
+
+    const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setSearchQuery(value);
+        debouncedFetchAutocomplete(value);
+    };
+
+    const handleSearchSubmit = () => {
+        if (searchQuery.trim()) {
+            setIsSearchOpen(false);
+            navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+        }
+    };
+
+    const handleSuggestionClick = (suggestion: string) => {
+        setSearchQuery(suggestion);
+        setIsSearchOpen(false);
+        navigate(`/products?search=${encodeURIComponent(suggestion)}`);
+    };
+
+    const handleSearchProductClick = (productId: number) => {
+        setIsSearchOpen(false);
+        setSearchQuery('');
+        navigate(`/product/${productId}`);
+    };
+
+    // Close search dropdown on click outside
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+                setIsSearchOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
     const handleMouseEnter = () => {
@@ -199,16 +257,94 @@ export const Header: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Search Bar */}
-                        <div className="flex-1 relative">
+                        {/* Search Bar with Autocomplete */}
+                        <div className="flex-1 relative" ref={searchRef}>
                             <input
                                 type="text"
+                                value={searchQuery}
+                                onChange={handleSearchInputChange}
+                                onFocus={() => { if (suggestions.length > 0 || searchProducts.length > 0) setIsSearchOpen(true); }}
+                                onKeyDown={(e) => { if (e.key === 'Enter') handleSearchSubmit(); if (e.key === 'Escape') setIsSearchOpen(false); }}
                                 placeholder="Tìm kiếm sách, tác giả, nhà xuất bản..."
                                 className="w-full px-4 py-3 pr-12 border-2 border-l-0 border-primary-300 rounded-r-lg focus:outline-none focus:border-primary-500 h-[50px]"
                             />
-                            <button className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary-500 text-white p-2 rounded-md hover:bg-primary-600">
+                            <button
+                                onClick={handleSearchSubmit}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary-500 text-white p-2 rounded-md hover:bg-primary-600 cursor-pointer"
+                            >
                                 <Search className="w-5 h-5" />
                             </button>
+
+                            {/* Autocomplete Dropdown */}
+                            {isSearchOpen && (suggestions.length > 0 || searchProducts.length > 0) && (
+                                <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-2xl border border-gray-100 z-50 overflow-hidden animate-in fade-in slide-in-from-top-1 duration-200">
+                                    {/* Suggestions Section */}
+                                    {suggestions.length > 0 && (
+                                        <div className="p-4 pb-3">
+                                            <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+                                                <Clock className="w-4 h-4 text-gray-400" />
+                                                <span>Gợi ý</span>
+                                            </div>
+                                            <div className="flex flex-wrap gap-2">
+                                                {suggestions.map((suggestion, index) => (
+                                                    <button
+                                                        key={index}
+                                                        onClick={() => handleSuggestionClick(suggestion)}
+                                                        className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded-full hover:bg-primary-50 hover:text-primary-600 transition-colors cursor-pointer border border-gray-200 hover:border-primary-300"
+                                                    >
+                                                        {suggestion}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Divider */}
+                                    {suggestions.length > 0 && searchProducts.length > 0 && (
+                                        <div className="mx-4 border-t border-gray-100"></div>
+                                    )}
+
+                                    {/* Products Section */}
+                                    {searchProducts.length > 0 && (
+                                        <div className="p-4 pt-3">
+                                            <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+                                                <TrendingUp className="w-4 h-4 text-gray-400" />
+                                                <span>Sản phẩm</span>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                {searchProducts.map((product) => (
+                                                    <button
+                                                        key={product.id}
+                                                        onClick={() => handleSearchProductClick(product.id)}
+                                                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors text-left cursor-pointer group"
+                                                    >
+                                                        <div className="w-12 h-16 shrink-0 rounded-md overflow-hidden bg-gray-100 border border-gray-200">
+                                                            <img
+                                                                src={`${import.meta.env.VITE_BACKEND_URL}/storage/book/${product.imageUrl}`}
+                                                                alt={product.title}
+                                                                className="w-full h-full object-cover"
+                                                                onError={(e) => {
+                                                                    (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 48 64%22><rect fill=%22%23f3f4f6%22 width=%2248%22 height=%2264%22/><text x=%2224%22 y=%2236%22 text-anchor=%22middle%22 fill=%22%239ca3af%22 font-size=%2210%22>📖</text></svg>';
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <span className="text-sm text-gray-700 group-hover:text-primary-600 transition-colors line-clamp-2 font-medium">
+                                                            {product.title}
+                                                        </span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Loading indicator */}
+                                    {isSearching && (
+                                        <div className="px-4 py-3 text-center border-t border-gray-100">
+                                            <div className="inline-block w-4 h-4 border-2 border-primary-300 border-t-primary-600 rounded-full animate-spin"></div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -228,7 +364,7 @@ export const Header: React.FC = () => {
                                 <User className="w-6 h-6" />
                                 <span className="text-xs">Tài khoản</span>
                             </div>
-                            
+
                             {/* Transparent bridge to prevent hover loss */}
                             <div className="absolute top-full right-0 w-full h-4 -mt-4 bg-transparent"></div>
 

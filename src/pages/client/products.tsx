@@ -7,6 +7,7 @@ import { Pagination } from '../../components/global/Pagination';
 import { callFetchAllProductsWithPaginationAndFilterApi, callFetchAllCategoriesApi, callFetchAllPublishersApi } from '../../services/api';
 import { IBook, IBookFilterCriteria } from '../../types/backend';
 import { useSearchParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 
 type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'best-selling' | 'rating';
 
@@ -32,6 +33,7 @@ export default function AllProductsPage() {
     const [totalProducts, setTotalProducts] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [searchKeyword, setSearchKeyword] = useState(searchParams.get('search') || '');
 
     const [filters, setFilters] = useState<Filters>({
         priceRange: [0, 300000],
@@ -44,27 +46,37 @@ export default function AllProductsPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [productsPerPage, setProductsPerPage] = useState(12);
 
-    const [categoryOptions, setCategoryOptions] = useState<{ id: number; name: string }[]>([]);
-    const [publisherOptions, setPublisherOptions] = useState<{ id: number; name: string }[]>([]);
     const publishYears = [2020, 2021, 2022, 2023, 2024, 2025, 2026];
     const coverTypes = ['PAPERBACK', 'HARDCOVER'];
     const hasAppliedUrlFilter = useRef(false);
 
-    useEffect(() => {
-        const fetchOptions = async () => {
-            const [catRes, pubRes] = await Promise.all([
-                callFetchAllCategoriesApi(),
-                callFetchAllPublishersApi(),
-            ]);
-            if (catRes.data?.data) {
-                setCategoryOptions(catRes.data.data.map(c => ({ id: c.id, name: c.name })));
-            }
-            if (pubRes.data?.data) {
-                setPublisherOptions(pubRes.data.data.map(p => ({ id: p.id, name: p.name })));
-            }
-        };
-        fetchOptions();
-    }, []);
+    // Fetch categories (shared cache with Header via query key ['all-categories'])
+    const { data: categoryOptions = [] } = useQuery({
+        queryKey: ['all-categories'],
+        queryFn: async () => {
+            const res = await callFetchAllCategoriesApi();
+            return res.data?.data ?? [];
+        },
+        staleTime: 5 * 60 * 1000,
+        select: (data) => data.map((c: { id: number; name: string }) => ({ id: c.id, name: c.name })),
+    });
+
+    // Fetch publishers (cached)
+    const { data: publisherOptions = [] } = useQuery({
+        queryKey: ['all-publishers'],
+        queryFn: async () => {
+            const res = await callFetchAllPublishersApi();
+            return res.data?.data ?? [];
+        },
+        staleTime: 5 * 60 * 1000,
+        select: (data) => data.map((p: { id: number; name: string }) => ({ id: p.id, name: p.name })),
+    });
+
+    // Keep refs in sync so fetchProducts doesn't depend on query data directly
+    const categoryOptionsRef = useRef(categoryOptions);
+    const publisherOptionsRef = useRef(publisherOptions);
+    useEffect(() => { categoryOptionsRef.current = categoryOptions; }, [categoryOptions]);
+    useEffect(() => { publisherOptionsRef.current = publisherOptions; }, [publisherOptions]);
 
     // Apply category filter from URL query params
     useEffect(() => {
@@ -91,21 +103,30 @@ export default function AllProductsPage() {
         }
     }, [searchParams, categoryOptions]);
 
+    // Sync search keyword from URL
+    useEffect(() => {
+        const search = searchParams.get('search') || '';
+        setSearchKeyword(search);
+        setCurrentPage(1);
+    }, [searchParams]);
+
     const fetchProducts = useCallback(async () => {
         setLoading(true);
         const criteria: IBookFilterCriteria = {};
+
+        if (searchKeyword.trim()) criteria.title = searchKeyword.trim();
 
         if (filters.priceRange[0] > 0) criteria.minPrice = filters.priceRange[0];
         if (filters.priceRange[1] < 300000) criteria.maxPrice = filters.priceRange[1];
 
         if (filters.categories.length > 0) {
             criteria.categoryId = filters.categories
-                .map(name => categoryOptions.find(c => c.name === name)?.id)
+                .map(name => categoryOptionsRef.current.find(c => c.name === name)?.id)
                 .filter((id): id is number => id !== undefined);
         }
         if (filters.publishers.length > 0) {
             criteria.publisherId = filters.publishers
-                .map(name => publisherOptions.find(p => p.name === name)?.id)
+                .map(name => publisherOptionsRef.current.find(p => p.name === name)?.id)
                 .filter((id): id is number => id !== undefined);
         }
         if (filters.publishYears.length > 0) {
@@ -124,7 +145,7 @@ export default function AllProductsPage() {
             setTotalPages(res.data.data.meta.pages);
         }
         setLoading(false);
-    }, [filters, sortBy, currentPage, productsPerPage, categoryOptions, publisherOptions]);
+    }, [filters, sortBy, currentPage, productsPerPage, searchKeyword]);
 
     useEffect(() => {
         fetchProducts();
@@ -155,6 +176,25 @@ export default function AllProductsPage() {
                     <ChevronRight className="w-4 h-4" />
                     <span className="text-gray-900 font-semibold">Tất cả sản phẩm</span>
                 </div>
+
+                {/* Search keyword indicator */}
+                {searchKeyword && (
+                    <div className="flex items-center gap-3 mb-6 p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
+                        <span className="text-sm text-gray-500">Kết quả tìm kiếm cho:</span>
+                        <span className="text-base font-semibold text-primary-600">"{searchKeyword}"</span>
+                        <span className="text-sm text-gray-400">({totalProducts} sản phẩm)</span>
+                        <button
+                            onClick={() => {
+                                setSearchKeyword('');
+                                setCurrentPage(1);
+                                window.history.replaceState(null, '', '/products');
+                            }}
+                            className="ml-auto text-sm text-gray-400 hover:text-red-500 transition-colors cursor-pointer flex items-center gap-1"
+                        >
+                            ✕ Xóa tìm kiếm
+                        </button>
+                    </div>
+                )}
 
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
                     <div>

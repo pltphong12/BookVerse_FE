@@ -192,6 +192,17 @@ export interface IBookFilterCriteria {
     sortType?: string;
 }
 
+export interface ISearchAutocompleteProduct {
+    id: number;
+    title: string;
+    imageUrl: string;
+}
+
+export interface ISearchAutocomplete {
+    suggestions: string[];
+    products: ISearchAutocompleteProduct[];
+}
+
 export interface IFile {
     fileName: string;
     uploadTime: string;

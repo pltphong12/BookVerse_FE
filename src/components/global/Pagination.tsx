@@ -24,7 +24,7 @@ export const Pagination = (props: PaginationProps) => {
 
     // Tạo danh sách các trang cần hiển thị
     const getPageNumbers = () => {
-        const pages = [];
+        const pages: (number | string)[] = [];
         const maxVisiblePages = 6; // Số trang tối đa hiển thị
 
         if (totalPage <= maxVisiblePages) {
@@ -65,29 +65,41 @@ export const Pagination = (props: PaginationProps) => {
 
     const pageNumbers = getPageNumbers();
 
+    const baseButtonClass =
+        'inline-flex items-center justify-center min-w-[40px] h-10 px-3 text-sm font-medium rounded-lg border transition-all duration-200 cursor-pointer select-none';
+    const defaultButtonClass =
+        'bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300';
+    const activeButtonClass =
+        'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-200 hover:bg-blue-700';
+    const disabledButtonClass =
+        'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed hover:bg-gray-100';
+    const ellipsisClass =
+        'inline-flex items-center justify-center min-w-[40px] h-10 px-3 text-sm font-medium text-gray-400 select-none';
+
     return (
-        <div className="join justify-center flex">
+        <div className="flex justify-center items-center gap-1.5 mt-6 py-4">
             {/* Nút Previous */}
             <button
-                className="join-item btn btn-md"
+                className={`${baseButtonClass} ${page === 1 ? disabledButtonClass : defaultButtonClass}`}
                 disabled={page === 1}
                 onClick={handlePreviousPage}
                 aria-label="Trang trước"
             >
-                «
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
             </button>
 
             {/* Các số trang */}
             {pageNumbers.map((pageNumber, index) => {
                 if (pageNumber === '...') {
                     return (
-                        <button
+                        <span
                             key={`ellipsis-${index}`}
-                            className="join-item btn btn-md"
-                            disabled
+                            className={ellipsisClass}
                         >
                             ...
-                        </button>
+                        </span>
                     );
                 }
 
@@ -96,7 +108,7 @@ export const Pagination = (props: PaginationProps) => {
                 return (
                     <button
                         key={pageNumber}
-                        className={`join-item btn btn-md ${isActive ? 'btn-active' : ''}`}
+                        className={`${baseButtonClass} ${isActive ? activeButtonClass : defaultButtonClass}`}
                         onClick={() => handlePageClick(pageNumber as number)}
                         aria-label={`Trang ${pageNumber}`}
                         aria-current={isActive ? 'page' : undefined}
@@ -108,12 +120,14 @@ export const Pagination = (props: PaginationProps) => {
 
             {/* Nút Next */}
             <button
-                className="join-item btn btn-md"
+                className={`${baseButtonClass} ${page === totalPage ? disabledButtonClass : defaultButtonClass}`}
                 disabled={page === totalPage}
                 onClick={handleNextPage}
                 aria-label="Trang tiếp theo"
             >
-                »
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
             </button>
         </div>
     );

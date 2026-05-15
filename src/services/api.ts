@@ -1,4 +1,4 @@
-import { ILoginRes, IAuthor, IAuthorInBook, IBackendRes, IBook, IBookFilterCriteria, ICart, ICategory, ICategoryInBook, ICreateOrderReq, ICreateOrderRes, IDashboardData, IFile, IPagination, IPermission, IPublisher, IRole, IUser, ISupplier, ICustomer, IOrder } from "../types/backend";
+import { ILoginRes, IAuthor, IAuthorInBook, IBackendRes, IBook, IBookFilterCriteria, ICart, ICategory, ICategoryInBook, ICreateOrderReq, ICreateOrderRes, IDashboardData, IFile, IPagination, IPermission, IPublisher, IRole, IUser, ISupplier, ICustomer, IOrder, ISearchAutocomplete } from "../types/backend";
 import axiosInstance from "./axios-customize";
 
 
@@ -266,13 +266,18 @@ export const callFetchAllProductsWithPaginationAndFilterApi = (
     criteria.publishYear?.forEach(year => params.append('publishYear', year.toString()));
     criteria.coverFormat?.forEach(format => params.append('coverFormat', format));
 
-    const url = `api/v1/books/search-product?${params.toString()}`;
+    const url = `api/v1/search/products?${params.toString()}`;
     return axiosInstance.get<IBackendRes<IPagination<IBook>>>(url);
 }
 
 export const callFetchTop5LatestBooksApi = () => {
     const url = 'api/v1/books/top-5-latest'
     return axiosInstance.get<IBackendRes<IBook[]>>(url)
+}
+
+export const callSearchAutocompleteApi = (query: string) => {
+    const url = `api/v1/search/autocomplete?query=${encodeURIComponent(query)}`;
+    return axiosInstance.get<IBackendRes<ISearchAutocomplete>>(url);
 }
 
 export const callCreateBookApi = (
