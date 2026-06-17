@@ -3,6 +3,7 @@ import { Input, DatePicker, Card, Row, Col, Button, Space, Select } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import { IRole } from '../../../types/backend';
 import dayjs from 'dayjs';
+import { useDebouncedCallback } from 'use-debounce';
 
 const roleColorMap: Record<string, string> = {
     ADMIN: '🔴', MANAGER: '🔵', CUSTOMER: '🟢', STAFF: '🟠',
@@ -25,7 +26,20 @@ export const UserSearchAndFilter: React.FC<UserSearchAndFilterProps> = ({
     dateFrom, setDateFrom,
     setPage,
 }) => {
+    const [localSearch, setLocalSearch] = React.useState(search);
+
+    React.useEffect(() => {
+        setLocalSearch(search);
+    }, [search]);
+
+    const debouncedSetSearch = useDebouncedCallback((val: string) => {
+        setSearch(val);
+        setPage(1);
+    }, 500);
+
     const handleReset = () => {
+        debouncedSetSearch.cancel();
+        setLocalSearch('');
         setSearch('');
         setRoleId(0);
         setDateFrom('');
@@ -43,10 +57,11 @@ export const UserSearchAndFilter: React.FC<UserSearchAndFilterProps> = ({
                     <Input
                         placeholder="Tìm theo email hoặc tên"
                         prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
-                        value={search}
+                        value={localSearch}
                         onChange={(e) => {
-                            setSearch(e.target.value);
-                            setPage(1);
+                            const val = e.target.value;
+                            setLocalSearch(val);
+                            debouncedSetSearch(val);
                         }}
                         allowClear
                     />

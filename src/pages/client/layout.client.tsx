@@ -4,7 +4,7 @@ import { Header } from "../../components/client/Header"
 import { useEffect } from "react"
 import { callGetAccountApi } from "../../services/api"
 import { useAppDispatch } from "../../redux/hook"
-import { setAccount } from "../../redux/slide/account.slide"
+import { setAccount, resetAccount } from "../../redux/slide/account.slide"
 import { IUser } from "../../types/backend"
 
 export const LayoutClient = () => {
@@ -15,7 +15,9 @@ export const LayoutClient = () => {
                 const res = await callGetAccountApi()
                 dispatch(setAccount(res.data?.data as IUser))
             } catch (error) {
-                alert(error)
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('role');
+                dispatch(resetAccount());
             }
         }
         getAccount()

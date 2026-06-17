@@ -18,7 +18,7 @@ export const Footer: React.FC = () => {
                             </Link>
                         </div>
                         <p className="text-sm mb-4">
-                            Hệ thống cửa hàng sách hàng đầu Việt Nam, cung cấp hàng triệu đầu sách chất lượng.
+                            BookVerse là hệ thống cửa hàng sách trực tuyến, cung cấp hàng triệu đầu sách chất lượng đến với độc giả yêu sách trên cả nước.
                         </p>
                         <div className="flex gap-3">
                             <a href="https://www.facebook.com/plthanhphong/" className="bg-primary-500 hover:bg-primary-600 p-2 rounded-full transition-colors">
@@ -79,7 +79,7 @@ export const Footer: React.FC = () => {
                 </div>
 
                 <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
-                    <p>&copy; 2024 BookVerse. All rights reserved.</p>
+                    <p>&copy; 2026 BookVerse. All rights reserved.</p>
                 </div>
             </div>
         </footer>

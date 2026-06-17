@@ -2,6 +2,7 @@ import React from 'react';
 import { Input, DatePicker, Card, Row, Col, Button, Space } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { useDebouncedCallback } from 'use-debounce';
 
 interface PublisherSearchAndFilterProps {
     search: string;
@@ -16,7 +17,20 @@ export const PublisherSearchAndFilter: React.FC<PublisherSearchAndFilterProps> =
     dateFrom, setDateFrom,
     setPage,
 }) => {
+    const [localSearch, setLocalSearch] = React.useState(search);
+
+    React.useEffect(() => {
+        setLocalSearch(search);
+    }, [search]);
+
+    const debouncedSetSearch = useDebouncedCallback((val: string) => {
+        setSearch(val);
+        setPage(1);
+    }, 500);
+
     const handleReset = () => {
+        debouncedSetSearch.cancel();
+        setLocalSearch('');
         setSearch('');
         setDateFrom('');
         setPage(1);
@@ -33,10 +47,11 @@ export const PublisherSearchAndFilter: React.FC<PublisherSearchAndFilterProps> =
                     <Input
                         placeholder="Tìm theo tên nhà xuất bản"
                         prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
-                        value={search}
+                        value={localSearch}
                         onChange={(e) => {
-                            setSearch(e.target.value);
-                            setPage(1);
+                            const val = e.target.value;
+                            setLocalSearch(val);
+                            debouncedSetSearch(val);
                         }}
                         allowClear
                     />

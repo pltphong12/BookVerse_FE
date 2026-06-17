@@ -2,6 +2,7 @@ import React from 'react';
 import { Input, DatePicker, Card, Row, Col, Button, Space, Select } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { useDebouncedCallback } from 'use-debounce';
 
 interface OrderSearchAndFilterProps {
     orderCode: string;
@@ -45,7 +46,20 @@ export const OrderSearchAndFilter: React.FC<OrderSearchAndFilterProps> = ({
     dateFrom, setDateFrom,
     setPage,
 }) => {
+    const [localOrderCode, setLocalOrderCode] = React.useState(orderCode);
+
+    React.useEffect(() => {
+        setLocalOrderCode(orderCode);
+    }, [orderCode]);
+
+    const debouncedSetOrderCode = useDebouncedCallback((val: string) => {
+        setOrderCode(val);
+        setPage(1);
+    }, 500);
+
     const handleReset = () => {
+        debouncedSetOrderCode.cancel();
+        setLocalOrderCode('');
         setOrderCode('');
         setStatus('');
         setPaymentMethod('');
@@ -65,10 +79,11 @@ export const OrderSearchAndFilter: React.FC<OrderSearchAndFilterProps> = ({
                     <Input
                         placeholder="Mã đơn hàng..."
                         prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
-                        value={orderCode}
+                        value={localOrderCode}
                         onChange={(e) => {
-                            setOrderCode(e.target.value);
-                            setPage(1);
+                            const val = e.target.value;
+                            setLocalOrderCode(val);
+                            debouncedSetOrderCode(val);
                         }}
                         allowClear
                     />

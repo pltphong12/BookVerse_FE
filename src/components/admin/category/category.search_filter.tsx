@@ -2,6 +2,7 @@ import React from 'react';
 import { Input, DatePicker, Card, Row, Col, Button, Space } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { useDebouncedCallback } from 'use-debounce';
 
 interface CategorySearchAndFilterProps {
     searchWithName: string;
@@ -16,7 +17,20 @@ export const CategorySearchAndFilter: React.FC<CategorySearchAndFilterProps> = (
     dateFrom, setDateFrom,
     setPage,
 }) => {
+    const [localSearchWithName, setLocalSearchWithName] = React.useState(searchWithName);
+
+    React.useEffect(() => {
+        setLocalSearchWithName(searchWithName);
+    }, [searchWithName]);
+
+    const debouncedSetSearchWithName = useDebouncedCallback((val: string) => {
+        setSearchWithName(val);
+        setPage(1);
+    }, 500);
+
     const handleReset = () => {
+        debouncedSetSearchWithName.cancel();
+        setLocalSearchWithName('');
         setSearchWithName('');
         setDateFrom('');
         setPage(1);
@@ -33,10 +47,11 @@ export const CategorySearchAndFilter: React.FC<CategorySearchAndFilterProps> = (
                     <Input
                         placeholder="Tìm theo tên thể loại"
                         prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
-                        value={searchWithName}
+                        value={localSearchWithName}
                         onChange={(e) => {
-                            setSearchWithName(e.target.value);
-                            setPage(1);
+                            const val = e.target.value;
+                            setLocalSearchWithName(val);
+                            debouncedSetSearchWithName(val);
                         }}
                         allowClear
                     />

@@ -4,8 +4,9 @@ import { IBook } from '../../../../types/backend';
 import { formatPrice } from '../../../../common/formatPrice';
 import { callAddToCartApi } from '../../../../services/api';
 import { showToast, ToastType } from '../../../../common/showToast';
-import { useAppDispatch } from '../../../../redux/hook';
+import { useAppDispatch, useAppSelector } from '../../../../redux/hook';
 import { setCartSum } from '../../../../redux/slide/cart.slice';
+import { useNavigate } from 'react-router-dom';
 
 interface ProductInfoProps {
     product: IBook;
@@ -15,8 +16,15 @@ export default function ProductInfo({ product }: ProductInfoProps) {
     const [quantity, setQuantity] = useState(1);
     const [isWishlisted, setIsWishlisted] = useState(false);
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    const isAuthenticated = useAppSelector((state) => state.account.isAuthenticated);
 
     const handleAddToCart = async () => {
+        if (!isAuthenticated) {
+            showToast("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!", ToastType.ERROR);
+            navigate("/login");
+            return;
+        }
         try {
             const res = await callAddToCartApi(product.id, quantity);
             if (res.data?.data) {
@@ -114,7 +122,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
                         >
                             +
                         </button>
-                        <span className="text-gray-500 text-sm ml-4">120 sản phẩm có sẵn</span>
+                        <span className="text-gray-500 text-sm ml-4">{product.quantity} sản phẩm có sẵn</span>
                     </div>
                 </div>
 

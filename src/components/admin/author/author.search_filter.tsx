@@ -2,6 +2,7 @@ import React from 'react';
 import { Input, DatePicker, Card, Row, Col, Button, Space } from 'antd';
 import { SearchOutlined, FilterOutlined, ReloadOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { useDebouncedCallback } from 'use-debounce';
 
 interface AuthorSearchAndFilterProps {
     searchWithName: string;
@@ -22,7 +23,32 @@ export const AuthorSearchAndFilter: React.FC<AuthorSearchAndFilterProps> = ({
     setDateFrom,
     setPage,
 }) => {
+    const [localSearchWithName, setLocalSearchWithName] = React.useState(searchWithName);
+    const [localSearchWithNationality, setLocalSearchWithNationality] = React.useState(searchWithNationality);
+
+    React.useEffect(() => {
+        setLocalSearchWithName(searchWithName);
+    }, [searchWithName]);
+
+    React.useEffect(() => {
+        setLocalSearchWithNationality(searchWithNationality);
+    }, [searchWithNationality]);
+
+    const debouncedSetSearchWithName = useDebouncedCallback((val: string) => {
+        setSearchWithName(val);
+        setPage(1);
+    }, 500);
+
+    const debouncedSetSearchWithNationality = useDebouncedCallback((val: string) => {
+        setSearchWithNationality(val);
+        setPage(1);
+    }, 500);
+
     const handleReset = () => {
+        debouncedSetSearchWithName.cancel();
+        debouncedSetSearchWithNationality.cancel();
+        setLocalSearchWithName('');
+        setLocalSearchWithNationality('');
         setSearchWithName('');
         setSearchWithNationality('');
         setDateFrom('');
@@ -40,10 +66,11 @@ export const AuthorSearchAndFilter: React.FC<AuthorSearchAndFilterProps> = ({
                     <Input
                         placeholder="Tìm theo tên tác giả"
                         prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
-                        value={searchWithName}
+                        value={localSearchWithName}
                         onChange={(e) => {
-                            setSearchWithName(e.target.value);
-                            setPage(1);
+                            const val = e.target.value;
+                            setLocalSearchWithName(val);
+                            debouncedSetSearchWithName(val);
                         }}
                         allowClear
                     />
@@ -52,10 +79,11 @@ export const AuthorSearchAndFilter: React.FC<AuthorSearchAndFilterProps> = ({
                     <Input
                         placeholder="Tìm theo quê quán"
                         prefix={<FilterOutlined style={{ color: '#bfbfbf' }} />}
-                        value={searchWithNationality}
+                        value={localSearchWithNationality}
                         onChange={(e) => {
-                            setSearchWithNationality(e.target.value);
-                            setPage(1);
+                            const val = e.target.value;
+                            setLocalSearchWithNationality(val);
+                            debouncedSetSearchWithNationality(val);
                         }}
                         allowClear
                     />

@@ -67,6 +67,7 @@ export const InternalLoginPage = () => {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-200 p-4">
+            <ToastContainer />
             {/* Decorative blobs */}
             <div className="fixed top-[-120px] left-[-120px] w-[400px] h-[400px] bg-blue-300/30 rounded-full blur-3xl pointer-events-none" />
             <div className="fixed bottom-[-100px] right-[-100px] w-[350px] h-[350px] bg-purple-300/30 rounded-full blur-3xl pointer-events-none" />
@@ -182,7 +183,6 @@ export const InternalLoginPage = () => {
                                     </span>
                                 </Link>
                             </div>
-                            <ToastContainer />
                         </form>
                     </div>
                 </div>

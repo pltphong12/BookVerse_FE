@@ -2,6 +2,7 @@ import React from 'react';
 import { Input, DatePicker, Card, Row, Col, Button, Space, Select } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { useDebouncedCallback } from 'use-debounce';
 
 interface PermissionSearchAndFilterProps {
     searchWithName: string;
@@ -31,7 +32,20 @@ export const PermissionSearchAndFilter: React.FC<PermissionSearchAndFilterProps>
     dateFrom, setDateFrom,
     setPage,
 }) => {
+    const [localSearchWithName, setLocalSearchWithName] = React.useState(searchWithName);
+
+    React.useEffect(() => {
+        setLocalSearchWithName(searchWithName);
+    }, [searchWithName]);
+
+    const debouncedSetSearchWithName = useDebouncedCallback((val: string) => {
+        setSearchWithName(val);
+        setPage(1);
+    }, 500);
+
     const handleReset = () => {
+        debouncedSetSearchWithName.cancel();
+        setLocalSearchWithName('');
         setSearchWithName('');
         setMethod('');
         setDomain('');
@@ -50,10 +64,11 @@ export const PermissionSearchAndFilter: React.FC<PermissionSearchAndFilterProps>
                     <Input
                         placeholder="Tìm theo tên quyền hạn"
                         prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
-                        value={searchWithName}
+                        value={localSearchWithName}
                         onChange={(e) => {
-                            setSearchWithName(e.target.value);
-                            setPage(1);
+                            const val = e.target.value;
+                            setLocalSearchWithName(val);
+                            debouncedSetSearchWithName(val);
                         }}
                         allowClear
                     />

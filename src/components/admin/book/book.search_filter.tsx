@@ -3,6 +3,7 @@ import { Input, DatePicker, Card, Row, Col, Button, Space, Select } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import { IAuthorInBook, ICategoryInBook, IPublisher } from '../../../types/backend';
 import dayjs from 'dayjs';
+import { useDebouncedCallback } from 'use-debounce';
 
 interface BookSearchAndFilterProps {
     search: string;
@@ -30,7 +31,20 @@ export const BookSearchAndFilter: React.FC<BookSearchAndFilterProps> = ({
     dateFrom, setDateFrom,
     setPage,
 }) => {
+    const [localSearch, setLocalSearch] = React.useState(search);
+
+    React.useEffect(() => {
+        setLocalSearch(search);
+    }, [search]);
+
+    const debouncedSetSearch = useDebouncedCallback((val: string) => {
+        setSearch(val);
+        setPage(1);
+    }, 500);
+
     const handleReset = () => {
+        debouncedSetSearch.cancel();
+        setLocalSearch('');
         setSearch('');
         setPublisherId(0);
         setAuthorId(0);
@@ -50,10 +64,11 @@ export const BookSearchAndFilter: React.FC<BookSearchAndFilterProps> = ({
                     <Input
                         placeholder="Tìm theo tên sách"
                         prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
-                        value={search}
+                        value={localSearch}
                         onChange={(e) => {
-                            setSearch(e.target.value);
-                            setPage(1);
+                            const val = e.target.value;
+                            setLocalSearch(val);
+                            debouncedSetSearch(val);
                         }}
                         allowClear
                     />

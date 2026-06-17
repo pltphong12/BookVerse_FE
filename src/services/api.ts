@@ -31,7 +31,7 @@ export const callRefreshTokenApi = () => {
 }
 
 export const callGetAccountApi = () => {
-    const url: string = 'api/v1/auth/account'
+    const url: string = 'api/v1/auth/me'
     return axiosInstance.get<IBackendRes<IUser>>(url)
 }
 

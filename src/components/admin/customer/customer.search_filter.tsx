@@ -2,6 +2,7 @@ import React from 'react';
 import { Input, DatePicker, Card, Row, Col, Button, Space, Select } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { useDebouncedCallback } from 'use-debounce';
 
 interface CustomerSearchAndFilterProps {
     search: string;
@@ -27,7 +28,20 @@ export const CustomerSearchAndFilter: React.FC<CustomerSearchAndFilterProps> = (
     dateFrom, setDateFrom,
     setPage,
 }) => {
+    const [localSearch, setLocalSearch] = React.useState(search);
+
+    React.useEffect(() => {
+        setLocalSearch(search);
+    }, [search]);
+
+    const debouncedSetSearch = useDebouncedCallback((val: string) => {
+        setSearch(val);
+        setPage(1);
+    }, 500);
+
     const handleReset = () => {
+        debouncedSetSearch.cancel();
+        setLocalSearch('');
         setSearch('');
         setCustomerLevel('');
         setDateFrom('');
@@ -45,10 +59,11 @@ export const CustomerSearchAndFilter: React.FC<CustomerSearchAndFilterProps> = (
                     <Input
                         placeholder="Tìm theo CCCD"
                         prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
-                        value={search}
+                        value={localSearch}
                         onChange={(e) => {
-                            setSearch(e.target.value);
-                            setPage(1);
+                            const val = e.target.value;
+                            setLocalSearch(val);
+                            debouncedSetSearch(val);
                         }}
                         allowClear
                     />

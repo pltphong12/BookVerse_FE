@@ -1,16 +1,23 @@
 import { ShoppingCart, Star } from 'lucide-react';
 import { IBook } from '../../../types/backend';
 import { formatPrice } from '../../../common/formatPrice';
-import { Link } from 'react-router-dom';
-import { useAppDispatch } from '../../../redux/hook';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../../redux/hook';
 import { setCartSum } from '../../../redux/slide/cart.slice';
 import { callAddToCartApi } from '../../../services/api';
 import { showToast, ToastType } from '../../../common/showToast';
 
 export default function ProductCard(book: IBook) {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    const isAuthenticated = useAppSelector((state) => state.account.isAuthenticated);
 
     const handleAddToCart = async () => {
+        if (!isAuthenticated) {
+            showToast("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!", ToastType.ERROR);
+            navigate("/login");
+            return;
+        }
         try {
             const res = await callAddToCartApi(book.id, 1);
             if (res.data?.data) {

@@ -16,11 +16,15 @@ const NO_RETRY_HEADER = 'x-no-retry';
 const mutex = new Mutex();
 
 const handleRefreshToken = async (): Promise<string | null> => {
-  return await mutex.runExclusive(async () => {
-      const res = await callRefreshTokenApi()
-      if (res && res.data) return res.data.data?.accessToken as string;
-      else return null;
-  });
+  try {
+    return await mutex.runExclusive(async () => {
+        const res = await callRefreshTokenApi()
+        if (res && res.data) return res.data.data?.accessToken as string;
+        else return null;
+    });
+  } catch (error) {
+    return null;
+  }
 };
 
 axiosInstance.interceptors.request.use(function (config) {
@@ -49,6 +53,9 @@ axiosInstance.interceptors.response.use(
         error.config.headers['Authorization'] = `Bearer ${access_token}`;
         localStorage.setItem('access_token', access_token)
         return axiosInstance.request(error.config);
+      } else {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('role');
       }
     }
     return Promise.reject(error);

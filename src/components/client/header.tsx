@@ -164,7 +164,7 @@ export const Header: React.FC = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 flex justify-between items-center text-sm">
                     <div className="flex gap-4">
                         <span>Hotline: 0767557431</span>
-                        <span>Miễn phí vận chuyển đơn từ 300k</span>
+                        <span>Miễn phí vận chuyển đơn từ 300.000đ</span>
                     </div>
                     <div className="flex gap-4">
                         <Link to="/order-history" className="hover:underline">Theo dõi đơn hàng</Link>
