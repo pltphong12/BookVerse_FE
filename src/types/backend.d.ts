@@ -339,3 +339,15 @@ export interface IDashboardData {
     revenueSeries: IRevenueSeries[];
     topProducts: ITopProduct[];
 }
+
+// Chat types
+export interface IChatMessage {
+    role: 'user' | 'assistant';
+    content: string;
+    timestamp?: string;
+}
+
+export interface IChatHistory {
+    sessionId: string;
+    messages: IChatMessage[];
+}

@@ -1,4 +1,4 @@
-import { ILoginRes, IAuthor, IAuthorInBook, IBackendRes, IBook, IBookFilterCriteria, ICart, ICategory, ICategoryInBook, ICreateOrderReq, ICreateOrderRes, IDashboardData, IFile, IPagination, IPermission, IPublisher, IRole, IUser, ISupplier, ICustomer, IOrder, ISearchAutocomplete } from "../types/backend";
+import { ILoginRes, IAuthor, IAuthorInBook, IBackendRes, IBook, IBookFilterCriteria, ICart, ICategory, ICategoryInBook, IChatHistory, ICreateOrderReq, ICreateOrderRes, IDashboardData, IFile, IPagination, IPermission, IPublisher, IRole, IUser, ISupplier, ICustomer, IOrder, ISearchAutocomplete } from "../types/backend";
 import axiosInstance from "./axios-customize";
 
 
@@ -689,3 +689,14 @@ export const callFetchDashboardApi = (fromDate?: string, toDate?: string, groupB
     const url = `api/v1/dashboard/overview?${params.toString()}`
     return axiosInstance.get<IBackendRes<IDashboardData>>(url)
 }
+
+/**
+ * 
+Module Chat
+ */
+
+export const callFetchChatHistoryApi = (sessionId: string) => {
+    const url = `api/v1/chat/history?sessionId=${sessionId}`
+    return axiosInstance.get<IBackendRes<IChatHistory>>(url)
+}
+
