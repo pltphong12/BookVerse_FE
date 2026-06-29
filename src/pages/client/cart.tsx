@@ -100,24 +100,24 @@ export default function CartPage() {
     return (
         <div className="min-h-[60vh]">
             {/* Breadcrumb */}
-            <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-                <Link to="/" className="hover:text-primary-500 transition-colors">
+            <div className="flex items-center gap-2 text-sm text-white/50 mb-6">
+                <Link to="/" className="hover:text-primary-300 transition-colors">
                     Trang chủ
                 </Link>
                 <ChevronRight className="w-4 h-4" />
-                <span className="text-gray-800 font-semibold">Giỏ hàng</span>
+                <span className="text-white font-semibold">Giỏ hàng</span>
             </div>
 
             {/* Page Title */}
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                     <div className="flex items-center justify-center w-10 h-10 rounded-xl 
-                                    bg-gradient-to-br from-primary-500 to-primary-600 shadow-lg shadow-primary-200/40">
+                                    bg-gradient-to-br from-primary-500 to-primary-600 shadow-lg shadow-primary-500/30">
                         <ShoppingCart className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Giỏ hàng của bạn</h1>
-                        <p className="text-sm text-gray-400">
+                        <h1 className="text-2xl font-bold text-white">Giỏ hàng của bạn</h1>
+                        <p className="text-sm text-white/60">
                             {cartItems.length > 0
                                 ? `${cartItems.length} sản phẩm trong giỏ hàng`
                                 : 'Chưa có sản phẩm nào'}
@@ -127,8 +127,8 @@ export default function CartPage() {
                 {cartItems.length > 0 && (
                     <button
                         onClick={handleClearCart}
-                        className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-400 
-                                   hover:text-red-500 hover:bg-red-50 rounded-lg
+                        className="flex items-center gap-1.5 px-3 py-2 text-sm text-white/60 
+                                   hover:text-red-400 hover:bg-white/5 rounded-lg
                                    transition-all duration-150"
                     >
                         <Trash2 className="w-4 h-4" />
@@ -158,8 +158,8 @@ export default function CartPage() {
                         <div className="pt-4">
                             <Link
                                 to="/products"
-                                className="inline-flex items-center gap-2 text-sm text-primary-500 
-                                           hover:text-primary-600 font-medium transition-colors"
+                                className="inline-flex items-center gap-2 text-sm text-primary-400 
+                                           hover:text-primary-300 font-medium transition-colors"
                             >
                                 <ChevronRight className="w-4 h-4 rotate-180" />
                                 Tiếp tục mua sắm

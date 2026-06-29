@@ -193,29 +193,29 @@ export default function CheckoutPage() {
     return (
         <div className="min-h-[60vh] pb-10">
             {/* Breadcrumb */}
-            <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-                <Link to="/" className="hover:text-primary-500 transition-colors">
+            <div className="flex items-center gap-2 text-sm text-white/50 mb-6">
+                <Link to="/" className="hover:text-primary-300 transition-colors">
                     Trang chủ
                 </Link>
                 <ChevronRight className="w-4 h-4" />
-                <Link to="/cart" className="hover:text-primary-500 transition-colors">
+                <Link to="/cart" className="hover:text-primary-300 transition-colors">
                     Giỏ hàng
                 </Link>
                 <ChevronRight className="w-4 h-4" />
-                <span className="text-gray-800 font-semibold">Thanh toán</span>
+                <span className="text-white font-semibold">Thanh toán</span>
             </div>
 
             {/* Page Title */}
             <div className="flex items-center gap-3 mb-8">
                 <div
                     className="flex items-center justify-center w-10 h-10 rounded-xl 
-                                bg-gradient-to-br from-primary-500 to-primary-600 shadow-lg shadow-primary-200/40"
+                                bg-gradient-to-br from-primary-500 to-primary-600 shadow-lg shadow-primary-500/30"
                 >
                     <CreditCard className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Thanh toán đơn hàng</h1>
-                    <p className="text-sm text-gray-400">
+                    <h1 className="text-2xl font-bold text-white">Thanh toán đơn hàng</h1>
+                    <p className="text-sm text-white/60">
                         Kiểm tra thông tin và xác nhận đơn hàng của bạn
                     </p>
                 </div>
@@ -226,17 +226,17 @@ export default function CheckoutPage() {
                     {/* ===================== LEFT COLUMN ===================== */}
                     <div className="lg:col-span-2 space-y-6">
                         {/* ---- Shipping Information ---- */}
-                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                        <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 shadow-xl overflow-hidden">
                             {/* Section header */}
-                            <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100 bg-gray-50/50">
-                                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary-100 text-primary-600">
+                            <div className="flex items-center gap-3 px-6 py-4 border-b border-white/10 bg-white/5">
+                                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary-500/20 text-primary-300">
                                     <MapPin className="w-4 h-4" />
                                 </div>
                                 <div>
-                                    <h2 className="font-semibold text-gray-800 text-[15px]">
+                                    <h2 className="font-semibold text-white text-[15px]">
                                         Thông tin giao hàng
                                     </h2>
-                                    <p className="text-xs text-gray-400">
+                                    <p className="text-xs text-white/55">
                                         Nhập thông tin người nhận hàng
                                     </p>
                                 </div>
@@ -245,25 +245,25 @@ export default function CheckoutPage() {
                             <div className="p-6 space-y-5">
                                 {/* Receiver Name */}
                                 <div>
-                                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1.5">
-                                        <User className="w-4 h-4 text-gray-400" />
+                                    <label className="flex items-center gap-2 text-sm font-medium text-white/80 mb-1.5">
+                                        <User className="w-4 h-4 text-white/40" />
                                         Họ và tên người nhận
-                                        <span className="text-red-500">*</span>
+                                        <span className="text-red-400">*</span>
                                     </label>
                                     <input
                                         id="receiverName"
                                         type="text"
                                         placeholder="VD: Nguyễn Văn A"
                                         {...register('receiverName')}
-                                        className={`w-full px-4 py-3 rounded-xl border text-sm text-gray-800
-                                                   bg-white placeholder-gray-300
-                                                   focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400
+                                        className={`w-full px-4 py-3 rounded-xl border text-sm text-white
+                                                   bg-white/5 placeholder-white/30
+                                                   focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 focus:bg-white/10
                                                    transition-all duration-200
-                                                   ${errors.receiverName ? 'border-red-300 focus:ring-red-200 focus:border-red-400' : 'border-gray-200'}`}
+                                                   ${errors.receiverName ? 'border-red-400 focus:ring-red-200 focus:border-red-400' : 'border-white/10'}`}
                                     />
                                     {errors.receiverName && (
-                                        <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1">
-                                            <span className="inline-block w-1 h-1 rounded-full bg-red-500" />
+                                        <p className="mt-1.5 text-xs text-red-400 flex items-center gap-1">
+                                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-400" />
                                             {errors.receiverName.message}
                                         </p>
                                     )}
@@ -271,25 +271,25 @@ export default function CheckoutPage() {
 
                                 {/* Phone */}
                                 <div>
-                                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1.5">
-                                        <Phone className="w-4 h-4 text-gray-400" />
+                                    <label className="flex items-center gap-2 text-sm font-medium text-white/80 mb-1.5">
+                                        <Phone className="w-4 h-4 text-white/40" />
                                         Số điện thoại
-                                        <span className="text-red-500">*</span>
+                                        <span className="text-red-400">*</span>
                                     </label>
                                     <input
                                         id="receiverPhone"
                                         type="tel"
                                         placeholder="VD: 0912345678"
                                         {...register('receiverPhone')}
-                                        className={`w-full px-4 py-3 rounded-xl border text-sm text-gray-800
-                                                   bg-white placeholder-gray-300
-                                                   focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400
+                                        className={`w-full px-4 py-3 rounded-xl border text-sm text-white
+                                                   bg-white/5 placeholder-white/30
+                                                   focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 focus:bg-white/10
                                                    transition-all duration-200
-                                                   ${errors.receiverPhone ? 'border-red-300 focus:ring-red-200 focus:border-red-400' : 'border-gray-200'}`}
+                                                   ${errors.receiverPhone ? 'border-red-400 focus:ring-red-200 focus:border-red-400' : 'border-white/10'}`}
                                     />
                                     {errors.receiverPhone && (
-                                        <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1">
-                                            <span className="inline-block w-1 h-1 rounded-full bg-red-500" />
+                                        <p className="mt-1.5 text-xs text-red-400 flex items-center gap-1">
+                                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-400" />
                                             {errors.receiverPhone.message}
                                         </p>
                                     )}
@@ -297,25 +297,25 @@ export default function CheckoutPage() {
 
                                 {/* Email */}
                                 <div>
-                                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1.5">
-                                        <Mail className="w-4 h-4 text-gray-400" />
+                                    <label className="flex items-center gap-2 text-sm font-medium text-white/80 mb-1.5">
+                                        <Mail className="w-4 h-4 text-white/40" />
                                         Email
-                                        <span className="text-xs text-gray-400 font-normal">(không bắt buộc)</span>
+                                        <span className="text-xs text-white/40 font-normal"> (không bắt buộc)</span>
                                     </label>
                                     <input
                                         id="receiverEmail"
                                         type="email"
                                         placeholder="VD: example@email.com"
                                         {...register('receiverEmail')}
-                                        className={`w-full px-4 py-3 rounded-xl border text-sm text-gray-800
-                                                   bg-white placeholder-gray-300
-                                                   focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400
+                                        className={`w-full px-4 py-3 rounded-xl border text-sm text-white
+                                                   bg-white/5 placeholder-white/30
+                                                   focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 focus:bg-white/10
                                                    transition-all duration-200
-                                                   ${errors.receiverEmail ? 'border-red-300 focus:ring-red-200 focus:border-red-400' : 'border-gray-200'}`}
+                                                   ${errors.receiverEmail ? 'border-red-400 focus:ring-red-200 focus:border-red-400' : 'border-white/10'}`}
                                     />
                                     {errors.receiverEmail && (
-                                        <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1">
-                                            <span className="inline-block w-1 h-1 rounded-full bg-red-500" />
+                                        <p className="mt-1.5 text-xs text-red-400 flex items-center gap-1">
+                                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-400" />
                                             {errors.receiverEmail.message}
                                         </p>
                                     )}
@@ -323,25 +323,25 @@ export default function CheckoutPage() {
 
                                 {/* Address */}
                                 <div>
-                                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1.5">
-                                        <MapPin className="w-4 h-4 text-gray-400" />
+                                    <label className="flex items-center gap-2 text-sm font-medium text-white/80 mb-1.5">
+                                        <MapPin className="w-4 h-4 text-white/40" />
                                         Địa chỉ giao hàng
-                                        <span className="text-red-500">*</span>
+                                        <span className="text-red-400">*</span>
                                     </label>
                                     <textarea
                                         id="receiverAddress"
                                         rows={3}
                                         placeholder="VD: Số 1, Đường ABC, Quận XYZ, TP.HCM"
                                         {...register('receiverAddress')}
-                                        className={`w-full px-4 py-3 rounded-xl border text-sm text-gray-800
-                                                   bg-white placeholder-gray-300 resize-none
-                                                   focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400
+                                        className={`w-full px-4 py-3 rounded-xl border text-sm text-white
+                                                   bg-white/5 placeholder-white/30 resize-none
+                                                   focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 focus:bg-white/10
                                                    transition-all duration-200
-                                                   ${errors.receiverAddress ? 'border-red-300 focus:ring-red-200 focus:border-red-400' : 'border-gray-200'}`}
+                                                   ${errors.receiverAddress ? 'border-red-400 focus:ring-red-200 focus:border-red-400' : 'border-white/10'}`}
                                     />
                                     {errors.receiverAddress && (
-                                        <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1">
-                                            <span className="inline-block w-1 h-1 rounded-full bg-red-500" />
+                                        <p className="mt-1.5 text-xs text-red-400 flex items-center gap-1">
+                                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-400" />
                                             {errors.receiverAddress.message}
                                         </p>
                                     )}
@@ -349,36 +349,36 @@ export default function CheckoutPage() {
 
                                 {/* Note */}
                                 <div>
-                                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1.5">
-                                        <ScrollText className="w-4 h-4 text-gray-400" />
+                                    <label className="flex items-center gap-2 text-sm font-medium text-white/80 mb-1.5">
+                                        <ScrollText className="w-4 h-4 text-white/40" />
                                         Ghi chú
-                                        <span className="text-xs text-gray-400 font-normal">(không bắt buộc)</span>
+                                        <span className="text-xs text-white/40 font-normal"> (không bắt buộc)</span>
                                     </label>
                                     <textarea
                                         id="note"
                                         rows={2}
                                         placeholder="Ghi chú thêm về đơn hàng"
                                         {...register('note')}
-                                        className={`w-full px-4 py-3 rounded-xl border text-sm text-gray-800
-                                                   bg-white placeholder-gray-300 resize-none
-                                                   focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400
-                                                   transition-all duration-200 border-gray-200`}
+                                        className="w-full px-4 py-3 rounded-xl border text-sm text-white
+                                                   bg-white/5 placeholder-white/30 resize-none
+                                                   focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 focus:bg-white/10
+                                                   transition-all duration-200 border-white/10"
                                     />
                                 </div>
                             </div>
                         </div>
 
                         {/* ---- Payment Method ---- */}
-                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                            <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100 bg-gray-50/50">
-                                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600">
+                        <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 shadow-xl overflow-hidden">
+                            <div className="flex items-center gap-3 px-6 py-4 border-b border-white/10 bg-white/5">
+                                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-300">
                                     <CreditCard className="w-4 h-4" />
                                 </div>
                                 <div>
-                                    <h2 className="font-semibold text-gray-800 text-[15px]">
+                                    <h2 className="font-semibold text-white text-[15px]">
                                         Phương thức thanh toán
                                     </h2>
-                                    <p className="text-xs text-gray-400">
+                                    <p className="text-xs text-white/55">
                                         Chọn cách bạn muốn thanh toán
                                     </p>
                                 </div>
@@ -392,30 +392,30 @@ export default function CheckoutPage() {
                                     className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 
                                                transition-all duration-200 cursor-pointer text-left
                                                ${selectedPayment === 'COD'
-                                            ? 'border-primary-500 bg-primary-50/60 shadow-sm shadow-primary-100'
-                                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50/50'
+                                            ? 'border-primary-500 bg-primary-500/20 shadow-lg shadow-primary-500/10'
+                                            : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
                                         }`}
                                 >
                                     <div
                                         className={`flex items-center justify-center w-12 h-12 rounded-xl 
                                                     ${selectedPayment === 'COD'
-                                                ? 'bg-gradient-to-br from-primary-500 to-primary-600 shadow-md shadow-primary-200/50'
-                                                : 'bg-gray-100'
+                                                ? 'bg-gradient-to-br from-primary-500 to-primary-600 shadow-md shadow-primary-500/25'
+                                                : 'bg-white/10'
                                             }`}
                                     >
                                         <Banknote
-                                            className={`w-6 h-6 ${selectedPayment === 'COD' ? 'text-white' : 'text-gray-400'
+                                            className={`w-6 h-6 ${selectedPayment === 'COD' ? 'text-white' : 'text-white/40'
                                                 }`}
                                         />
                                     </div>
                                     <div className="flex-1">
                                         <p
-                                            className={`font-semibold text-sm ${selectedPayment === 'COD' ? 'text-primary-700' : 'text-gray-700'
+                                            className={`font-semibold text-sm ${selectedPayment === 'COD' ? 'text-primary-300' : 'text-white/90'
                                                 }`}
                                         >
                                             Thanh toán khi nhận hàng (COD)
                                         </p>
-                                        <p className="text-xs text-gray-400 mt-0.5">
+                                        <p className="text-xs text-white/50 mt-0.5">
                                             Thanh toán bằng tiền mặt khi nhận hàng tại địa chỉ của bạn
                                         </p>
                                     </div>
@@ -423,7 +423,7 @@ export default function CheckoutPage() {
                                         className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0
                                                     ${selectedPayment === 'COD'
                                                 ? 'border-primary-500 bg-primary-500'
-                                                : 'border-gray-300'
+                                                : 'border-white/30'
                                             }`}
                                     >
                                         {selectedPayment === 'COD' && (
@@ -439,30 +439,30 @@ export default function CheckoutPage() {
                                     className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 
                                                transition-all duration-200 cursor-pointer text-left
                                                ${selectedPayment === 'VNPAY'
-                                            ? 'border-primary-500 bg-primary-50/60 shadow-sm shadow-primary-100'
-                                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50/50'
+                                            ? 'border-primary-500 bg-primary-500/20 shadow-lg shadow-primary-500/10'
+                                            : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
                                         }`}
                                 >
                                     <div
                                         className={`flex items-center justify-center w-12 h-12 rounded-xl 
                                                     ${selectedPayment === 'VNPAY'
-                                                ? 'bg-gradient-to-br from-primary-500 to-primary-600 shadow-md shadow-primary-200/50'
-                                                : 'bg-gray-100'
+                                                ? 'bg-gradient-to-br from-primary-500 to-primary-600 shadow-md shadow-primary-500/25'
+                                                : 'bg-white/10'
                                             }`}
                                     >
                                         <CreditCard
-                                            className={`w-6 h-6 ${selectedPayment === 'VNPAY' ? 'text-white' : 'text-gray-400'
+                                            className={`w-6 h-6 ${selectedPayment === 'VNPAY' ? 'text-white' : 'text-white/40'
                                                 }`}
                                         />
                                     </div>
                                     <div className="flex-1">
                                         <p
-                                            className={`font-semibold text-sm ${selectedPayment === 'VNPAY' ? 'text-primary-700' : 'text-gray-700'
+                                            className={`font-semibold text-sm ${selectedPayment === 'VNPAY' ? 'text-primary-300' : 'text-white/90'
                                                 }`}
                                         >
                                             Thanh toán qua VNPAY
                                         </p>
-                                        <p className="text-xs text-gray-400 mt-0.5">
+                                        <p className="text-xs text-white/50 mt-0.5">
                                             Thanh toán online qua cổng VNPAY (ATM, Visa, MasterCard, QR Code)
                                         </p>
                                     </div>
@@ -470,7 +470,7 @@ export default function CheckoutPage() {
                                         className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0
                                                     ${selectedPayment === 'VNPAY'
                                                 ? 'border-primary-500 bg-primary-500'
-                                                : 'border-gray-300'
+                                                : 'border-white/30'
                                             }`}
                                     >
                                         {selectedPayment === 'VNPAY' && (
@@ -480,8 +480,8 @@ export default function CheckoutPage() {
                                 </button>
 
                                 {errors.paymentMethod && (
-                                    <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                                        <span className="inline-block w-1 h-1 rounded-full bg-red-500" />
+                                    <p className="mt-1 text-xs text-red-400 flex items-center gap-1">
+                                        <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-400" />
                                         {errors.paymentMethod.message}
                                     </p>
                                 )}
@@ -491,8 +491,8 @@ export default function CheckoutPage() {
                         {/* Back link */}
                         <Link
                             to="/cart"
-                            className="inline-flex items-center gap-2 text-sm text-primary-500 
-                                       hover:text-primary-600 font-medium transition-colors"
+                            className="inline-flex items-center gap-2 text-sm text-primary-400 
+                                       hover:text-primary-300 font-medium transition-colors"
                         >
                             <ArrowLeft className="w-4 h-4" />
                             Quay lại giỏ hàng
@@ -501,7 +501,7 @@ export default function CheckoutPage() {
 
                     {/* ===================== RIGHT COLUMN (Summary) ===================== */}
                     <div className="lg:col-span-1">
-                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden sticky top-6">
+                        <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 shadow-xl overflow-hidden sticky top-24">
                             {/* Header */}
                             <div className="bg-gradient-to-r from-primary-500 to-primary-600 px-5 py-4">
                                 <div className="flex items-center gap-2.5">
@@ -525,10 +525,10 @@ export default function CheckoutPage() {
                                         return (
                                             <div
                                                 key={item.id}
-                                                className="flex gap-3 p-2.5 rounded-lg bg-gray-50/80 border border-gray-100"
+                                                className="flex gap-3 p-2.5 rounded-lg bg-white/5 border border-white/5"
                                             >
                                                 {/* Thumbnail */}
-                                                <div className="relative flex-shrink-0 w-14 h-[72px] rounded-md overflow-hidden bg-gray-100 border border-gray-100">
+                                                <div className="relative flex-shrink-0 w-14 h-[72px] rounded-md overflow-hidden bg-white/5 border border-white/5">
                                                     {item.book.image ? (
                                                         <img
                                                             src={`${import.meta.env.VITE_BACKEND_URL}/storage/book/${item.book.image}`}
@@ -536,7 +536,7 @@ export default function CheckoutPage() {
                                                             className="w-full h-full object-cover"
                                                         />
                                                     ) : (
-                                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100">
+                                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-500/20 to-primary-600/20">
                                                             <span className="text-lg">📚</span>
                                                         </div>
                                                     )}
@@ -544,22 +544,22 @@ export default function CheckoutPage() {
                                                     <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] 
                                                                      flex items-center justify-center px-1
                                                                      text-[10px] font-bold text-white 
-                                                                     bg-primary-500 rounded-full shadow-sm">
+                                                                     bg-primary-600 rounded-full shadow-md">
                                                         {item.quantity}
                                                     </span>
                                                 </div>
 
                                                 {/* Info */}
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="text-xs font-medium text-gray-800 line-clamp-2 leading-snug">
+                                                    <p className="text-xs font-medium text-white line-clamp-2 leading-snug">
                                                         {item.book.title}
                                                     </p>
                                                     <div className="flex items-center gap-2 mt-1.5">
-                                                        <span className="text-xs font-bold text-primary-600">
+                                                        <span className="text-xs font-bold text-primary-300">
                                                             {formatPrice(discountedPrice)}
                                                         </span>
                                                         {discount > 0 && (
-                                                            <span className="text-[10px] text-gray-400 line-through">
+                                                            <span className="text-[10px] text-white/40 line-through">
                                                                 {formatPrice(item.book.price)}
                                                             </span>
                                                         )}
@@ -570,56 +570,56 @@ export default function CheckoutPage() {
                                     })}
                                 </div>
 
-                                <div className="border-t border-dashed border-gray-200" />
+                                <div className="border-t border-dashed border-white/10" />
 
                                 {/* Price breakdown */}
                                 <div className="space-y-2.5">
                                     <div className="flex items-center justify-between text-sm">
-                                        <span className="text-gray-500">
+                                        <span className="text-white/60">
                                             Tạm tính ({cartItems.reduce((s, i) => s + i.quantity, 0)} sản phẩm)
                                         </span>
-                                        <span className="font-medium text-gray-800">
+                                        <span className="font-medium text-white">
                                             {formatPrice(totalOriginal)}
                                         </span>
                                     </div>
 
                                     {totalDiscount > 0 && (
                                         <div className="flex items-center justify-between text-sm">
-                                            <span className="flex items-center gap-1.5 text-gray-500">
+                                            <span className="flex items-center gap-1.5 text-white/60">
                                                 <Tag className="w-3.5 h-3.5 text-red-400" />
                                                 Giảm giá
                                             </span>
-                                            <span className="font-medium text-red-500">
+                                            <span className="font-medium text-red-400">
                                                 -{formatPrice(totalDiscount)}
                                             </span>
                                         </div>
                                     )}
 
                                     <div className="flex items-center justify-between text-sm">
-                                        <span className="flex items-center gap-1.5 text-gray-500">
-                                            <Truck className="w-3.5 h-3.5" />
+                                        <span className="flex items-center gap-1.5 text-white/60">
+                                            <Truck className="w-3.5 h-3.5 text-primary-300" />
                                             Phí vận chuyển
                                         </span>
                                         {shippingFee === 0 ? (
-                                            <span className="font-medium text-green-500">
+                                            <span className="font-medium text-emerald-400">
                                                 Miễn phí
                                             </span>
                                         ) : (
-                                            <span className="font-medium text-gray-800">
+                                            <span className="font-medium text-white">
                                                 {formatPrice(shippingFee)}
                                             </span>
                                         )}
                                     </div>
                                 </div>
 
-                                <div className="border-t border-dashed border-gray-200" />
+                                <div className="border-t border-dashed border-white/10" />
 
                                 {/* Total */}
                                 <div className="flex items-center justify-between">
-                                    <span className="text-base font-semibold text-gray-700">
+                                    <span className="text-base font-semibold text-white/80">
                                         Tổng cộng
                                     </span>
-                                    <span className="text-xl font-bold text-primary-600">
+                                    <span className="text-xl font-bold text-primary-300">
                                         {formatPrice(total)}
                                     </span>
                                 </div>
@@ -631,11 +631,11 @@ export default function CheckoutPage() {
                                     className="w-full py-3.5 bg-gradient-to-r from-primary-500 to-primary-600 
                                                text-white font-semibold text-sm rounded-xl
                                                hover:from-primary-600 hover:to-primary-700 
-                                               active:scale-[0.98]
-                                               disabled:opacity-50 disabled:cursor-not-allowed
-                                               shadow-lg shadow-primary-200/50
+                                               hover:scale-[1.02] active:scale-[0.98]
+                                               disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100
+                                               shadow-lg shadow-primary-500/25
                                                transition-all duration-200 
-                                               flex items-center justify-center gap-2"
+                                               flex items-center justify-center gap-2 cursor-pointer"
                                 >
                                     {isSubmitting ? (
                                         <>
@@ -652,11 +652,11 @@ export default function CheckoutPage() {
 
                                 {/* Trust badges */}
                                 <div className="flex items-center justify-center gap-4 pt-2">
-                                    <div className="flex items-center gap-1.5 text-xs text-gray-400">
-                                        <ShieldCheck className="w-3.5 h-3.5 text-green-400" />
+                                    <div className="flex items-center gap-1.5 text-xs text-white/40">
+                                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                                         Thanh toán an toàn
                                     </div>
-                                    <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                                    <div className="flex items-center gap-1.5 text-xs text-white/40">
                                         <Truck className="w-3.5 h-3.5 text-blue-400" />
                                         Giao hàng nhanh
                                     </div>

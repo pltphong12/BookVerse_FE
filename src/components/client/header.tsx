@@ -159,8 +159,8 @@ export const Header: React.FC = () => {
     };
 
     return (
-        <header className="bg-white shadow-md top-0 z-50">
-            <div className="bg-primary-400 text-white py-2">
+        <header className="bg-[#1e2264]/95 backdrop-blur-md shadow-lg shadow-black/20 sticky top-0 z-50 border-b border-white/10">
+            <div className="bg-white/5 border-b border-white/10 text-white/80 py-2">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 flex justify-between items-center text-sm">
                     <div className="flex gap-4">
                         <span>Hotline: 0767557431</span>
@@ -183,12 +183,12 @@ export const Header: React.FC = () => {
                                 src={Logo}
                                 alt="BookVerse Logo"
                                 style={{
-                                    filter: 'brightness(0) saturate(100%) invert(39%) sepia(57%) saturate(2000%) hue-rotate(200deg) brightness(96%) contrast(94%)',
+                                    filter: 'brightness(0) invert(1)',
                                 }}
                             />
                             <div className="flex flex-col">
-                                <h1 className="text-xl font-bold text-primary-500">Vũ Trụ Sách</h1>
-                                <p className="text-sm text-gray-600 italic">Tri thức mở ra thế giới</p>
+                                <h1 className="text-xl font-bold text-white">Vũ Trụ Sách</h1>
+                                <p className="text-sm text-blue-300/80 italic">Tri thức mở ra thế giới</p>
                             </div>
                         </Link>
                     </div>
@@ -203,7 +203,7 @@ export const Header: React.FC = () => {
                             onMouseLeave={handleMouseLeave}
                         >
                             <button
-                                className="flex items-center gap-2 bg-primary-500 text-white px-4 py-3 rounded-l-lg font-semibold cursor-pointer hover:bg-primary-600 transition-colors whitespace-nowrap h-[50px]"
+                                className="flex items-center gap-2 bg-primary-600 text-white px-4 py-3 rounded-l-lg font-semibold cursor-pointer hover:bg-primary-500 transition-colors whitespace-nowrap h-[50px]"
                             >
                                 <Menu className="w-5 h-5" />
                                 Danh mục
@@ -266,11 +266,11 @@ export const Header: React.FC = () => {
                                 onFocus={() => { if (suggestions.length > 0 || searchProducts.length > 0) setIsSearchOpen(true); }}
                                 onKeyDown={(e) => { if (e.key === 'Enter') handleSearchSubmit(); if (e.key === 'Escape') setIsSearchOpen(false); }}
                                 placeholder="Tìm kiếm sách, tác giả, nhà xuất bản..."
-                                className="w-full px-4 py-3 pr-12 border-2 border-l-0 border-primary-300 rounded-r-lg focus:outline-none focus:border-primary-500 h-[50px]"
+                                className="w-full px-4 py-3 pr-12 border-2 border-l-0 border-white/20 rounded-r-lg focus:outline-none focus:border-primary-400 h-[50px] bg-white/10 text-white placeholder-white/50"
                             />
                             <button
                                 onClick={handleSearchSubmit}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary-500 text-white p-2 rounded-md hover:bg-primary-600 cursor-pointer"
+                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary-500 text-white p-2 rounded-md hover:bg-primary-400 cursor-pointer"
                             >
                                 <Search className="w-5 h-5" />
                             </button>
@@ -351,7 +351,7 @@ export const Header: React.FC = () => {
                     {/* Right Actions */}
                     <div className="flex items-center gap-6 shrink-0">
                         {account.isAuthenticated && (
-                            <Link to={'/cart'} className="flex flex-col items-center gap-1 hover:text-primary-500 relative cursor-pointer">
+                            <Link to={'/cart'} className="flex flex-col items-center gap-1 text-white/80 hover:text-primary-300 relative cursor-pointer">
                                 <ShoppingCart className="w-6 h-6" />
                                 <span className="text-xs">Giỏ hàng</span>
                                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
@@ -360,7 +360,7 @@ export const Header: React.FC = () => {
                             </Link>
                         )}
                         <div className="relative group">
-                            <div className="flex flex-col items-center gap-1 hover:text-primary-500 cursor-pointer">
+                            <div className="flex flex-col items-center gap-1 text-white/80 hover:text-primary-300 cursor-pointer">
                                 <User className="w-6 h-6" />
                                 <span className="text-xs">Tài khoản</span>
                             </div>
@@ -368,7 +368,7 @@ export const Header: React.FC = () => {
                             {/* Transparent bridge to prevent hover loss */}
                             <div className="absolute top-full right-0 w-full h-4 -mt-4 bg-transparent"></div>
 
-                            <div className="absolute right-0 top-full m-2 w-52 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 transform origin-top-right scale-95 group-hover:scale-100">
+                            <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-2xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100] transform origin-top-right scale-95 group-hover:scale-100">
                                 <div className="py-2">
                                     {account.isAuthenticated ? (
                                         <>

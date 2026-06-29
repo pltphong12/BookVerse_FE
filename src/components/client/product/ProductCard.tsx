@@ -28,63 +28,80 @@ export default function ProductCard(book: IBook) {
             showToast(error.response.data.message, ToastType.ERROR);
         }
     };
+
+    const discountedPrice = book.discount > 0
+        ? book.price - (book.price * book.discount / 100)
+        : book.price;
+
     return (
         <Link to={`/product/${book.id}`}>
-            <div className="bg-white rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer">
-                <div className="relative overflow-hidden bg-gray-100 aspect-[3/4]">
+            <div className="bg-white rounded-2xl shadow-sm overflow-hidden group cursor-pointer card-hover-lift border border-gray-100/80">
+                {/* Image Container */}
+                <div className="relative overflow-hidden bg-gray-50 aspect-[3/4]">
                     {book.image ? (
                         <img
                             src={`${import.meta.env.VITE_BACKEND_URL}/storage/book/${book.image}`}
                             alt={book.title}
-                            className="w-full h-full group-hover:scale-102 transition-transform duration-300"
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-100 to-primary-200">
-                            <span className="text-4xl text-primary-400">📚</span>
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100">
+                            <span className="text-5xl">📚</span>
                         </div>
                     )}
+
+                    {/* Hover overlay with add-to-cart */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent product-card-overlay">
+                        <div className="absolute bottom-0 left-0 right-0 p-3">
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    handleAddToCart();
+                                }}
+                                className="w-full flex items-center justify-center gap-2 bg-white text-primary-600 px-3 py-2.5 rounded-xl font-semibold text-sm hover:bg-primary-500 hover:text-white transition-all shadow-lg active:scale-95"
+                            >
+                                <ShoppingCart className="w-4 h-4" />
+                                Thêm vào giỏ
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Discount Badge */}
                     {book.discount > 0 && (
-                        <span className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                        <span className="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-rose-500 text-white text-xs font-bold px-2.5 py-1.5 rounded-lg shadow-md badge-pulse">
                             -{book.discount}%
                         </span>
                     )}
                 </div>
 
+                {/* Card Content */}
                 <div className="p-4">
-                    <h3 className="font-semibold text-gray-800 line-clamp-2 mb-1 min-h-[3rem]">
+                    <h3 className="font-semibold text-gray-800 line-clamp-2 mb-1.5 min-h-[3rem] text-sm leading-snug group-hover:text-primary-600 transition-colors">
                         {book.title}
                     </h3>
-                    <p className="text-sm text-gray-500 mb-2">{book.authors.map((author) => author.name).join(', ')}</p>
+                    <p className="text-xs text-gray-400 mb-2 truncate">
+                        {book.authors.map((author) => author.name).join(', ')}
+                    </p>
 
-                    <div className="flex items-center gap-1 mb-2">
-                        <Star className="w-4 h-4 text-yellow-400" />
-                        <Star className="w-4 h-4 text-yellow-400" />
-                        <Star className="w-4 h-4 text-yellow-400" />
-                        <Star className="w-4 h-4 text-yellow-400" />
-                        <Star className="w-4 h-4 text-yellow-400" />
-                        <span className="text-xs text-gray-500">({book.sold})</span>
+                    {/* Star Rating */}
+                    <div className="flex items-center gap-0.5 mb-3">
+                        {[...Array(5)].map((_, i) => (
+                            <Star key={i} className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                        ))}
+                        <span className="text-xs text-gray-400 ml-1">({book.sold})</span>
                     </div>
 
-                    <div className="flex items-end gap-2 mb-3">
-                        <span className="text-xl font-bold text-primary-600">
-                            {formatPrice(book.discount > 0 ? book.price - (book.price * book.discount / 100) : book.price)}
+                    {/* Price */}
+                    <div className="flex items-end gap-2">
+                        <span className="text-lg font-bold text-primary-600">
+                            {formatPrice(discountedPrice)}
                         </span>
                         {book.discount > 0 && (
-                            <span className="text-sm text-gray-400 line-through">
+                            <span className="text-xs text-gray-400 line-through mb-0.5">
                                 {formatPrice(book.price)}
                             </span>
                         )}
                     </div>
-
-                    <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            handleAddToCart();
-                        }}
-                        className="w-full flex items-center justify-center gap-2 bg-primary-500 text-white px-3 py-2.5 rounded-lg hover:bg-primary-600 transition-colors font-medium text-sm hover:shadow-md">
-                        <ShoppingCart className="w-4 h-4" />
-                        Thêm vào giỏ
-                    </button>
                 </div>
             </div>
         </Link>
