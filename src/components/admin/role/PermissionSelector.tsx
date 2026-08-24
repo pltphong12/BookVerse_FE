@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Checkbox, Tag, Collapse, Empty, Spin, Badge } from 'antd';
+import { Checkbox, Tag, Collapse, Spin, Badge } from 'antd';
 import { IPermission } from '../../../types/backend';
 
 interface PermissionSelectorProps {

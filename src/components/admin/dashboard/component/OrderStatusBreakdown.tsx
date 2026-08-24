@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { Card, Empty, Progress, Typography } from 'antd';
 import { ShoppingCartOutlined } from '@ant-design/icons';
 import { ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';

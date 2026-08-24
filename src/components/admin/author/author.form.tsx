@@ -6,7 +6,7 @@ import { showToast, ToastType } from "../../../common/showToast";
 import { useAppDispatch, useAppSelector } from "../../../redux/hook";
 import { createAuthor, ICreateAuthor, resetCreateAuthor, resetUpdateAuthor, updateAuthor } from "../../../redux/slide/author.slice";
 import { callUploadSingleFile } from "../../../services/api";
-import { Modal, Input, DatePicker, Upload, Button, Form, Image, Space } from 'antd';
+import { Modal, Input, DatePicker, Upload, Button, Form, Image } from 'antd';
 import { UploadOutlined, SaveOutlined, UserOutlined, EnvironmentOutlined, CalendarOutlined } from '@ant-design/icons';
 import type { UploadFile } from 'antd';
 import dayjs from 'dayjs';

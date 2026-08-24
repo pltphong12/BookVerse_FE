@@ -3,39 +3,23 @@ import { Link } from 'react-router-dom';
 
 export default function CartEmpty() {
     return (
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 shadow-xl flex flex-col items-center justify-center py-16 px-6">
-            {/* Animated illustration */}
-            <div className="relative mb-8">
-                <div className="w-32 h-32 rounded-full bg-gradient-to-br from-primary-500/20 to-primary-600/20 
-                                 flex items-center justify-center border border-white/10
-                                 animate-[pulse_3s_ease-in-out_infinite]">
-                    <ShoppingBag className="w-14 h-14 text-primary-300" />
-                </div>
-                {/* Floating particles */}
-                <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-primary-500/30 
-                                 animate-[bounce_2s_ease-in-out_infinite]" />
-                <div className="absolute bottom-0 -left-3 w-4 h-4 rounded-full bg-purple-500/30 
-                                 animate-[bounce_2.5s_ease-in-out_infinite_0.5s]" />
+        <div className="bg-white rounded-2xl border border-[#dff1fb] p-12 sm:p-16 flex flex-col items-center justify-center text-center shadow-sm">
+            {/* Empty illustration icon */}
+            <div className="w-24 h-24 rounded-full bg-[#e3f2fd] flex items-center justify-center text-[#1a237e] mb-6">
+                <ShoppingBag className="w-12 h-12" />
             </div>
 
-            <h2 className="text-xl font-bold text-white mb-2">
-                Giỏ hàng trống
+            <h2 className="font-headline font-bold text-xl sm:text-2xl text-[#0d1e25] mb-2">
+                Giỏ hàng của bạn đang trống
             </h2>
-            <p className="text-sm text-white/60 mb-8 text-center max-w-sm">
-                Bạn chưa có sản phẩm nào trong giỏ hàng. Hãy khám phá kho sách phong phú của chúng tôi!
+            <p className="font-body text-sm text-slate-500 max-w-md mb-8">
+                Có vẻ như bạn chưa chọn cuốn sách nào. Hãy khám phá kho tàng tri thức với hàng ngàn đầu sách hấp dẫn của BookVerse!
             </p>
 
             <Link
                 to="/products"
-                className="px-8 py-3 bg-gradient-to-r from-primary-500 to-primary-600 
-                           text-white font-semibold text-sm rounded-xl
-                           hover:from-primary-600 hover:to-primary-700 
-                           hover:scale-[1.02] active:scale-[0.98]
-                           shadow-lg shadow-primary-500/25
-                           transition-all duration-200 
-                           flex items-center gap-2 cursor-pointer"
+                className="inline-flex items-center justify-center px-8 py-3.5 bg-[#1a237e] text-white font-headline font-bold text-sm rounded-xl hover:bg-[#283593] transition-all shadow-md shadow-indigo-950/10 cursor-pointer"
             >
-                <ShoppingBag className="w-4 h-4" />
                 Khám phá sách ngay
             </Link>
         </div>

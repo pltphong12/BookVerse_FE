@@ -65,28 +65,34 @@ export const Pagination = (props: PaginationProps) => {
 
     const pageNumbers = getPageNumbers();
 
-    const baseButtonClass =
-        'inline-flex items-center justify-center min-w-[40px] h-10 px-3 text-sm font-medium rounded-lg border transition-all duration-200 cursor-pointer select-none';
-    const defaultButtonClass =
-        'bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300';
-    const activeButtonClass =
-        'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-200 hover:bg-blue-700';
-    const disabledButtonClass =
-        'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed hover:bg-gray-100';
+    const baseNumberButtonClass =
+        'w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center font-headline font-bold text-xs sm:text-sm rounded-full transition-all duration-200 cursor-pointer select-none';
+    const defaultNumberButtonClass =
+        'bg-white text-slate-700 border border-[#dff1fb] hover:bg-[#e3f2fd] hover:text-[#1a237e] hover:border-blue-300 shadow-sm';
+    const activeNumberButtonClass =
+        'bg-[#1a237e] text-white border border-[#1a237e] shadow-md shadow-indigo-950/15';
+
+    const baseNavButtonClass =
+        'w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full transition-all duration-200 select-none';
+    const defaultNavButtonClass =
+        'text-slate-600 hover:text-[#1a237e] hover:bg-[#e3f2fd] border border-[#dff1fb] bg-white shadow-sm cursor-pointer';
+    const disabledNavButtonClass =
+        'text-slate-300 border border-slate-200/60 bg-slate-50 cursor-not-allowed';
+
     const ellipsisClass =
-        'inline-flex items-center justify-center min-w-[40px] h-10 px-3 text-sm font-medium text-gray-400 select-none';
+        'w-8 h-8 flex items-center justify-center text-sm font-medium text-slate-400 select-none';
 
     return (
-        <div className="flex justify-center items-center gap-1.5 mt-6 py-4">
+        <div className="flex justify-center items-center gap-2 mt-8 py-4">
             {/* Nút Previous */}
             <button
-                className={`${baseButtonClass} ${page === 1 ? disabledButtonClass : defaultButtonClass}`}
+                className={`${baseNavButtonClass} ${page === 1 ? disabledNavButtonClass : defaultNavButtonClass}`}
                 disabled={page === 1}
                 onClick={handlePreviousPage}
                 aria-label="Trang trước"
             >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                 </svg>
             </button>
 
@@ -108,7 +114,7 @@ export const Pagination = (props: PaginationProps) => {
                 return (
                     <button
                         key={pageNumber}
-                        className={`${baseButtonClass} ${isActive ? activeButtonClass : defaultButtonClass}`}
+                        className={`${baseNumberButtonClass} ${isActive ? activeNumberButtonClass : defaultNumberButtonClass}`}
                         onClick={() => handlePageClick(pageNumber as number)}
                         aria-label={`Trang ${pageNumber}`}
                         aria-current={isActive ? 'page' : undefined}
@@ -120,13 +126,13 @@ export const Pagination = (props: PaginationProps) => {
 
             {/* Nút Next */}
             <button
-                className={`${baseButtonClass} ${page === totalPage ? disabledButtonClass : defaultButtonClass}`}
+                className={`${baseNavButtonClass} ${page === totalPage ? disabledNavButtonClass : defaultNavButtonClass}`}
                 disabled={page === totalPage}
                 onClick={handleNextPage}
                 aria-label="Trang tiếp theo"
             >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                 </svg>
             </button>
         </div>

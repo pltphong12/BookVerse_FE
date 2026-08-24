@@ -1,6 +1,7 @@
 import { IBook } from '../../../types/backend';
 import ProductCard from './ProductCard';
-import { ChevronRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface ProductSectionProps {
     title: string;
@@ -8,28 +9,42 @@ interface ProductSectionProps {
 }
 
 export default function ProductSection({ title, products }: ProductSectionProps) {
+    const navigate = useNavigate();
+
     return (
-        <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-lg shadow-black/10 border border-white/30 overflow-hidden">
+        <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-8 lg:p-10 shadow-[0_4px_20px_-4px_rgba(26,35,126,0.05)] border border-[#dff1fb]">
             {/* Section Header */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex justify-between items-end mb-6 sm:mb-8">
                 <div className="flex items-center gap-3">
-                    <div className="w-1.5 h-8 bg-gradient-to-b from-primary-400 to-primary-600 rounded-full" />
-                    <h2 className="text-2xl font-bold gradient-text">{title}</h2>
+                    <div className="w-1.5 h-7 bg-[#1a237e] rounded-full" />
+                    <h2 className="font-headline text-2xl sm:text-3xl font-bold text-[#0d1e25]">
+                        {title}
+                    </h2>
                 </div>
-                <button className="group/btn flex items-center gap-1.5 text-primary-500 hover:text-primary-700 font-semibold transition-colors px-4 py-2 rounded-lg hover:bg-primary-50">
+                <button
+                    onClick={() => navigate('/products')}
+                    className="font-headline text-sm sm:text-base text-[#1a237e] hover:text-[#283593] font-semibold flex items-center gap-1 hover:underline cursor-pointer group"
+                >
                     Xem tất cả
-                    <ChevronRight className="w-5 h-5 transition-transform duration-300 group-hover/btn:translate-x-1" />
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </button>
             </div>
 
             {/* Product Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
-                {products.map((product, index) => (
-                    <div key={product.id} className={`stagger-${index + 1}`}>
-                        <ProductCard {...product} />
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-5">
+                {products && products.length > 0 ? (
+                    products.map((product, index) => (
+                        <div key={product.id} className={`stagger-${index + 1}`}>
+                            <ProductCard {...product} />
+                        </div>
+                    ))
+                ) : (
+                    <div className="col-span-full py-8 text-center text-slate-400 font-body">
+                        Đang cập nhật danh sách sách...
                     </div>
-                ))}
+                )}
             </div>
         </div>
     );
 }
+

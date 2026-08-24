@@ -1,4 +1,5 @@
 import { Minus, Plus, Trash2, Loader2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { formatPrice } from '../../../common/formatPrice';
 import { ICartDetail } from '../../../types/backend';
 
@@ -18,116 +19,109 @@ export default function CartItem({ item, onIncrease, onDecrease, onRemove, loadi
     const isLoading = !!loadingAction;
 
     return (
-        <div className={`group bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 p-5 
-                        hover:shadow-lg hover:shadow-black/20 hover:border-primary-400/30 
-                        transition-all duration-300 ease-out
-                        ${isLoading ? 'opacity-70 pointer-events-none' : ''}`}>
-            <div className="flex gap-4">
-                {/* Book Image */}
-                <div className="relative flex-shrink-0 w-24 h-32 rounded-lg overflow-hidden bg-white/5 border border-white/5">
-                    {hasDiscount && (
-                        <span className="absolute top-1.5 left-1.5 z-10 px-1.5 py-0.5 text-[10px] font-bold 
-                                         bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-md shadow-sm">
-                            -{discount}%
-                        </span>
-                    )}
-                    {item.book.image ? (
-                        <img
-                            src={`${import.meta.env.VITE_BACKEND_URL}/storage/book/${item.book.image}`}
-                            alt={item.book.title}
-                            className="w-full h-full object-cover"
-                        />
-                    ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-500/20 to-primary-600/20">
-                            <span className="text-3xl">📚</span>
-                        </div>
-                    )}
+        <div
+            className={`bg-white rounded-xl border border-[#dff1fb] p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center relative transition-shadow hover:shadow-[0_8px_20px_rgba(26,35,126,0.04)] ${
+                isLoading ? 'opacity-70 pointer-events-none' : ''
+            }`}
+        >
+            {/* Book Image */}
+            <Link
+                to={`/product/${item.book.id}`}
+                className="relative w-24 h-32 sm:w-28 sm:h-36 flex-shrink-0 rounded-lg overflow-hidden border border-[#dff1fb] bg-[#f4faff] group"
+            >
+                {hasDiscount && (
+                    <span className="absolute top-2 left-2 z-10 px-2 py-0.5 text-[11px] font-bold font-headline bg-red-600 text-white rounded-md shadow-sm">
+                        -{discount}%
+                    </span>
+                )}
+                {item.book.image ? (
+                    <img
+                        src={`${import.meta.env.VITE_BACKEND_URL}/storage/book/${item.book.image}`}
+                        alt={item.book.title}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-[#e3f2fd]">
+                        <span className="text-3xl">📚</span>
+                    </div>
+                )}
+            </Link>
+
+            {/* Book Info & Actions */}
+            <div className="flex-grow flex flex-col justify-between h-full w-full min-w-0 pr-8 sm:pr-0">
+                <div>
+                    <Link
+                        to={`/product/${item.book.id}`}
+                        className="font-headline font-bold text-base sm:text-lg text-[#0d1e25] line-clamp-2 hover:text-[#1a237e] transition-colors"
+                    >
+                        {item.book.title}
+                    </Link>
+                    <p className="font-body text-sm text-slate-500 mt-1 truncate">
+                        {item.book.authors && item.book.authors.length > 0
+                            ? item.book.authors.map((author) => author.name).join(', ')
+                            : 'Chưa rõ tác giả'}
+                    </p>
                 </div>
 
-                {/* Book Info */}
-                <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                            <h3 className="font-semibold text-white line-clamp-2 text-sm leading-snug mb-1 group-hover:text-primary-300 transition-colors">
-                                {item.book.title}
-                            </h3>
-                            <p className="text-xs text-white/50 truncate">{item.book.authors && item.book.authors.length > 0
-                                ? item.book.authors.map(author => author.name).join(', ').toUpperCase()
-                                : 'UNKNOWN AUTHOR'
-                            }</p>
-                        </div>
+                <div className="flex flex-wrap items-center justify-between gap-3 mt-4">
+                    {/* Price */}
+                    <div className="flex items-baseline gap-2">
+                        <span className="font-headline font-bold text-base sm:text-lg text-[#1a237e]">
+                            {formatPrice(discountedPrice)}
+                        </span>
+                        {hasDiscount && (
+                            <span className="font-body text-xs text-slate-400 line-through">
+                                {formatPrice(originalPrice)}
+                            </span>
+                        )}
+                    </div>
+
+                    {/* Quantity Controls */}
+                    <div className="flex items-center bg-[#f4faff] rounded-lg border border-[#dff1fb] focus-within:border-[#1a237e] transition-colors">
                         <button
-                            onClick={() => onRemove(item.id)}
-                            disabled={isLoading}
-                            className="flex-shrink-0 p-1.5 rounded-lg text-white/40 
-                                       hover:text-red-400 hover:bg-white/5 
-                                       opacity-0 group-hover:opacity-100
-                                       disabled:opacity-50 disabled:cursor-not-allowed
-                                       transition-all duration-150"
-                            title="Xóa sản phẩm"
+                            onClick={() => onDecrease(item.id)}
+                            disabled={item.quantity <= 1 || isLoading}
+                            className="p-2 text-slate-600 hover:text-[#1a237e] hover:bg-[#e3f2fd] rounded-l-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                            aria-label="Giảm số lượng"
                         >
-                            {loadingAction === 'remove' ? (
+                            {loadingAction === 'decrease' ? (
                                 <Loader2 className="w-4 h-4 animate-spin" />
                             ) : (
-                                <Trash2 className="w-4 h-4" />
+                                <Minus className="w-4 h-4" />
+                            )}
+                        </button>
+                        <span className="w-10 text-center font-body text-sm font-semibold text-[#0d1e25] select-none">
+                            {item.quantity}
+                        </span>
+                        <button
+                            onClick={() => onIncrease(item.id)}
+                            disabled={isLoading}
+                            className="p-2 text-slate-600 hover:text-[#1a237e] hover:bg-[#e3f2fd] rounded-r-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                            aria-label="Tăng số lượng"
+                        >
+                            {loadingAction === 'increase' ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                                <Plus className="w-4 h-4" />
                             )}
                         </button>
                     </div>
-
-                    <div className="flex items-end justify-between mt-3">
-                        {/* Price */}
-                        <div className="flex flex-col gap-0.5">
-                            <span className="text-base font-bold text-primary-300">
-                                {formatPrice(discountedPrice)}
-                            </span>
-                            {hasDiscount && (
-                                <span className="text-xs text-white/40 line-through">
-                                    {formatPrice(originalPrice)}
-                                </span>
-                            )}
-                        </div>
-
-                        {/* Quantity Controls */}
-                        <div className="flex items-center gap-0">
-                            <button
-                                onClick={() => onDecrease(item.id)}
-                                disabled={item.quantity <= 1 || isLoading}
-                                className="w-8 h-8 flex items-center justify-center rounded-l-lg 
-                                           border border-white/10 bg-white/5 text-white/70
-                                           hover:bg-white/10 hover:text-primary-300 hover:border-white/20
-                                           disabled:opacity-20 disabled:cursor-not-allowed
-                                           transition-all duration-150"
-                            >
-                                {loadingAction === 'decrease' ? (
-                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                ) : (
-                                    <Minus className="w-3.5 h-3.5" />
-                                )}
-                            </button>
-                            <div className="w-10 h-8 flex items-center justify-center 
-                                           border-y border-white/10 bg-white/10 
-                                           text-sm font-semibold text-white">
-                                {item.quantity}
-                            </div>
-                            <button
-                                onClick={() => onIncrease(item.id)}
-                                disabled={isLoading}
-                                className="w-8 h-8 flex items-center justify-center rounded-r-lg 
-                                           border border-white/10 bg-white/5 text-white/70
-                                           hover:bg-white/10 hover:text-primary-300 hover:border-white/20
-                                           disabled:opacity-20 disabled:cursor-not-allowed
-                                           transition-all duration-150"
-                            >
-                                {loadingAction === 'increase' ? (
-                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                ) : (
-                                    <Plus className="w-3.5 h-3.5" />
-                                )}
-                            </button>
-                        </div>
-                    </div>
                 </div>
             </div>
+
+            {/* Remove item button */}
+            <button
+                onClick={() => onRemove(item.id)}
+                disabled={isLoading}
+                className="absolute top-4 right-4 sm:relative sm:top-auto sm:right-auto p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                title="Xóa khỏi giỏ hàng"
+            >
+                {loadingAction === 'remove' ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                    <Trash2 className="w-5 h-5" />
+                )}
+            </button>
         </div>
     );
 }

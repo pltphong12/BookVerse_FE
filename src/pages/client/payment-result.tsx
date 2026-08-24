@@ -3,11 +3,12 @@ import {
     CheckCircle2,
     XCircle,
     ShoppingBag,
-    ArrowRight,
-    Home,
-    RefreshCw,
-    CreditCard,
     Phone,
+    PackageCheck,
+    Truck,
+    RefreshCw,
+    ShieldCheck,
+    Receipt,
 } from 'lucide-react';
 
 type PaymentStatus = 'success' | 'failure';
@@ -21,204 +22,149 @@ export default function PaymentResultPage() {
         ? 'success'
         : 'failure';
 
-    // Get orderCode from query params: /payment/success?orderCode=BV-xxx
+    // Get orderCode and payment method from query params
     const orderCode = searchParams.get('orderCode');
     const method = searchParams.get('method');
 
     const isSuccess = status === 'success';
 
     return (
-        <div className="min-h-[60vh] flex items-center justify-center py-10">
-            <div className="max-w-md w-full text-center space-y-6">
+        <main className="flex-grow flex items-center justify-center py-12 sm:py-20 px-4 relative overflow-hidden">
+            {/* Decorative Background Elements */}
+            <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
+                <div className="absolute top-[-10%] right-[-5%] w-[40vw] h-[40vw] rounded-full bg-[#e3f2fd] blur-[100px]" />
+                <div className="absolute bottom-[-10%] left-[-5%] w-[30vw] h-[30vw] rounded-full bg-[#959efd] opacity-20 blur-[80px]" />
+            </div>
+
+            <div className="relative z-10 w-full max-w-2xl bg-white border border-[#dff1fb] rounded-2xl shadow-sm p-6 sm:p-12 flex flex-col items-center text-center">
                 {/* Status Icon */}
-                <div className="flex items-center justify-center">
-                    <div className="relative">
-                        <div
-                            className={`w-24 h-24 rounded-full flex items-center justify-center shadow-xl
-                                        animate-[bounce_1s_ease-in-out]
-                                        ${isSuccess
-                                    ? 'bg-gradient-to-br from-green-400 to-emerald-500 shadow-green-200/50'
-                                    : 'bg-gradient-to-br from-red-400 to-rose-500 shadow-red-200/50'
-                                }`}
-                        >
-                            {isSuccess ? (
-                                <CheckCircle2 className="w-12 h-12 text-white" />
-                            ) : (
-                                <XCircle className="w-12 h-12 text-white" />
+                <div
+                    className={`w-24 h-24 rounded-full flex items-center justify-center mb-6 transition-all ${
+                        isSuccess
+                            ? 'bg-[#e3f2fd] text-[#1a237e]'
+                            : 'bg-rose-50 text-rose-600 border border-rose-200'
+                    }`}
+                >
+                    {isSuccess ? (
+                        <CheckCircle2 className="w-14 h-14 stroke-[2.2]" />
+                    ) : (
+                        <XCircle className="w-14 h-14 stroke-[2.2]" />
+                    )}
+                </div>
+
+                {/* Headline */}
+                <h1 className="font-headline font-bold text-2xl sm:text-3xl text-[#0d1e25] mb-2">
+                    {isSuccess ? 'Đặt hàng thành công!' : 'Thanh toán chưa thành công'}
+                </h1>
+
+                {/* Subheadline */}
+                <p className="font-body text-sm sm:text-base text-slate-500 mb-8 max-w-md leading-relaxed">
+                    {isSuccess
+                        ? 'Cảm ơn bạn đã mua sắm tại BookVerse. Đơn hàng của bạn đang được xử lý và đóng gói.'
+                        : 'Rất tiếc, giao dịch chưa thể hoàn tất. Bạn có thể thử thanh toán lại hoặc chọn phương thức thanh toán khác.'}
+                </p>
+
+                {/* Details Card (Bento Layout matching Stitch) */}
+                <div className="w-full bg-[#f4faff] border border-[#dff1fb] rounded-xl p-5 sm:p-6 text-left mb-8 flex flex-col md:flex-row gap-6">
+                    {/* Order Summary Column */}
+                    <div className="flex-1 border-b md:border-b-0 md:border-r border-[#dff1fb] pb-5 md:pb-0 md:pr-6 space-y-3">
+                        <h2 className="font-headline font-bold text-xs text-slate-400 uppercase tracking-wider">
+                            Chi tiết đơn hàng
+                        </h2>
+                        <div className="space-y-2 text-sm font-body">
+                            {orderCode && (
+                                <div className="flex justify-between items-center">
+                                    <span className="text-slate-500">Mã đơn hàng:</span>
+                                    <span className="font-headline font-bold text-[#0d1e25]">
+                                        #{orderCode}
+                                    </span>
+                                </div>
                             )}
+                            <div className="flex justify-between items-center">
+                                <span className="text-slate-500">Dự kiến giao:</span>
+                                <span className="font-semibold text-slate-800">
+                                    2 - 4 ngày làm việc
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-slate-500">Thanh toán:</span>
+                                <span className="font-semibold text-slate-800">
+                                    {method === 'VNPAY' ? 'VNPAY Online' : 'COD khi nhận hàng'}
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center pt-2 border-t border-slate-200/60">
+                                <span className="text-slate-500">Trạng thái:</span>
+                                <span className="font-headline font-bold text-[#1a237e] inline-flex items-center gap-1">
+                                    <PackageCheck className="w-4 h-4" />
+                                    {isSuccess ? 'Đang xử lý' : 'Chưa hoàn tất'}
+                                </span>
+                            </div>
                         </div>
-                        {/* Pulse ring */}
-                        <div
-                            className={`absolute inset-0 rounded-full animate-ping
-                                        ${isSuccess ? 'bg-green-400/20' : 'bg-red-400/20'}`}
-                        />
+                    </div>
+
+                    {/* Shipping / Support Info Column */}
+                    <div className="flex-1 md:pl-2 space-y-3">
+                        <h2 className="font-headline font-bold text-xs text-slate-400 uppercase tracking-wider">
+                            Dịch vụ & Hỗ trợ
+                        </h2>
+                        <div className="space-y-2.5 text-xs sm:text-sm font-body text-slate-600">
+                            <div className="flex items-center gap-2">
+                                <Truck className="w-4 h-4 text-[#1a237e] shrink-0" />
+                                <span>Giao hàng tiêu chuẩn toàn quốc</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                                <span>Được đồng kiểm tra khi nhận hàng</span>
+                            </div>
+                            <div className="flex items-center gap-2 pt-1">
+                                <Phone className="w-4 h-4 text-slate-400 shrink-0" />
+                                <span className="text-slate-500">
+                                    Hotline hỗ trợ: <strong className="text-slate-800">1900 6868</strong>
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                {/* Title */}
-                {
-                    method === 'VNPAY' && (
-                        <div>
-                            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                                {isSuccess
-                                    ? 'Thanh toán thành công! 🎉'
-                                    : 'Thanh toán thất bại 😔'}
-                            </h1>
-                            <p className="text-gray-500 text-sm leading-relaxed">
-                                {isSuccess
-                                    ? 'Cảm ơn bạn đã thanh toán. Đơn hàng của bạn đã được xác nhận và sẽ được xử lý trong thời gian sớm nhất.'
-                                    : 'Thanh toán qua VNPay không thành công. Vui lòng thử lại hoặc chọn phương thức thanh toán khác.'}
-                            </p>
-                        </div>
-                    )
-                }
-                {
-                    method === 'COD' && (
-                        <div>
-                            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                                {isSuccess
-                                    ? 'Đặt hàng thành công! 🎉'
-                                    : 'Đặt hàng thất bại 😔'}
-                            </h1>
-                            <p className="text-gray-500 text-sm leading-relaxed">
-                                {isSuccess
-                                    ? 'Cảm ơn bạn đã đặt hàng. Đơn hàng của bạn đã được xác nhận và sẽ được xử lý trong thời gian sớm nhất.'
-                                    : 'Đặt hàng thất bại. Vui lòng thử lại hoặc chọn phương thức thanh toán khác.'}
-                            </p>
-                        </div>
-                    )
-                }
-
-                {/* Order Code */}
-                {orderCode && (
-                    <div
-                        className={`rounded-2xl p-5 border ${isSuccess
-                            ? 'bg-gradient-to-r from-primary-50 to-blue-50 border-primary-100'
-                            : 'bg-gradient-to-r from-red-50 to-orange-50 border-red-100'
-                            }`}
-                    >
-                        <p className="text-xs text-gray-500 mb-1">Mã đơn hàng</p>
-                        <p
-                            className={`text-lg font-bold tracking-wider ${isSuccess ? 'text-primary-600' : 'text-red-600'
-                                }`}
-                        >
-                            {orderCode}
-                        </p>
-                        <p className="text-xs text-gray-400 mt-2">
-                            {isSuccess
-                                ? 'Vui lòng lưu lại mã đơn hàng để theo dõi đơn hàng của bạn'
-                                : 'Đơn hàng của bạn đang chờ thanh toán. Vui lòng thử lại.'}
-                        </p>
-                    </div>
-                )}
-
-                {/* Info cards */}
-                {isSuccess ? (
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-                            <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center mx-auto mb-2">
-                                <ShoppingBag className="w-4 h-4 text-blue-600" />
-                            </div>
-                            <p className="text-xs text-gray-500">Đơn hàng đang được</p>
-                            <p className="text-sm font-semibold text-gray-800">Xử lý</p>
-                        </div>
-                        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-                            <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center mx-auto mb-2">
-                                <CreditCard className="w-4 h-4 text-emerald-600" />
-                            </div>
-                            <p className="text-xs text-gray-500">Thanh toán</p>
-                            <p className="text-sm font-semibold text-emerald-600">{method === 'VNPAY' ? 'Đã thanh toán' : 'Thanh toán khi nhận hàng'}</p>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-                            <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center mx-auto mb-2">
-                                <CreditCard className="w-4 h-4 text-red-600" />
-                            </div>
-                            <p className="text-xs text-gray-500">Thanh toán</p>
-                            <p className="text-sm font-semibold text-red-600">Thất bại</p>
-                        </div>
-                        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-                            <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center mx-auto mb-2">
-                                <Phone className="w-4 h-4 text-amber-600" />
-                            </div>
-                            <p className="text-xs text-gray-500">Cần hỗ trợ?</p>
-                            <p className="text-sm font-semibold text-gray-800">Liên hệ</p>
-                        </div>
-                    </div>
-                )}
-
-                {/* Actions */}
-                <div className="flex flex-col gap-3 pt-2">
+                {/* CTAs */}
+                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                     {isSuccess ? (
                         <>
                             <Link
                                 to="/products"
-                                className="w-full py-3.5 bg-gradient-to-r from-primary-500 to-primary-600 
-                                           text-white font-semibold text-sm rounded-xl
-                                           hover:from-primary-600 hover:to-primary-700 
-                                           active:scale-[0.98]
-                                           shadow-lg shadow-primary-200/50
-                                           transition-all duration-200 
-                                           flex items-center justify-center gap-2"
+                                className="inline-flex items-center justify-center gap-2 bg-[#1a237e] hover:bg-[#283593] text-white font-headline font-bold text-sm px-8 py-3.5 rounded-xl shadow-md shadow-indigo-950/10 transition-all cursor-pointer"
                             >
+                                <ShoppingBag className="w-4 h-4" />
                                 Tiếp tục mua sắm
-                                <ArrowRight className="w-4 h-4" />
                             </Link>
-
                             <Link
-                                to="/"
-                                className="w-full py-3 bg-white text-gray-600 font-medium text-sm rounded-xl
-                                           border border-gray-200 hover:bg-gray-50
-                                           transition-all duration-200
-                                           flex items-center justify-center gap-2"
+                                to="/order-history"
+                                className="inline-flex items-center justify-center gap-2 bg-[#e3f2fd] text-[#1a237e] hover:bg-blue-100 font-headline font-bold text-sm px-8 py-3.5 rounded-xl transition-all cursor-pointer"
                             >
-                                <Home className="w-4 h-4" />
-                                Về trang chủ
+                                <Receipt className="w-4 h-4" />
+                                Xem lịch sử đơn hàng
                             </Link>
                         </>
                     ) : (
                         <>
                             <Link
                                 to="/checkout"
-                                className="w-full py-3.5 bg-gradient-to-r from-primary-500 to-primary-600 
-                                           text-white font-semibold text-sm rounded-xl
-                                           hover:from-primary-600 hover:to-primary-700 
-                                           active:scale-[0.98]
-                                           shadow-lg shadow-primary-200/50
-                                           transition-all duration-200 
-                                           flex items-center justify-center gap-2"
+                                className="inline-flex items-center justify-center gap-2 bg-[#1a237e] hover:bg-[#283593] text-white font-headline font-bold text-sm px-8 py-3.5 rounded-xl shadow-md shadow-indigo-950/10 transition-all cursor-pointer"
                             >
                                 <RefreshCw className="w-4 h-4" />
                                 Thử thanh toán lại
                             </Link>
-
                             <Link
-                                to="/products"
-                                className="w-full py-3 bg-white text-gray-600 font-medium text-sm rounded-xl
-                                           border border-gray-200 hover:bg-gray-50
-                                           transition-all duration-200
-                                           flex items-center justify-center gap-2"
+                                to="/cart"
+                                className="inline-flex items-center justify-center gap-2 bg-[#e3f2fd] text-[#1a237e] hover:bg-blue-100 font-headline font-bold text-sm px-8 py-3.5 rounded-xl transition-all cursor-pointer"
                             >
                                 <ShoppingBag className="w-4 h-4" />
-                                Tiếp tục mua sắm
-                            </Link>
-
-                            <Link
-                                to="/"
-                                className="w-full py-3 text-gray-400 font-medium text-sm rounded-xl
-                                           hover:text-gray-600
-                                           transition-all duration-200
-                                           flex items-center justify-center gap-2"
-                            >
-                                <Home className="w-4 h-4" />
-                                Về trang chủ
+                                Quay lại giỏ hàng
                             </Link>
                         </>
                     )}
                 </div>
             </div>
-        </div>
+        </main>
     );
 }

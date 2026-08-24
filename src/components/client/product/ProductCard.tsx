@@ -25,7 +25,7 @@ export default function ProductCard(book: IBook) {
                 showToast("Thêm vào giỏ hàng thành công", ToastType.SUCCESS);
             }
         } catch (error: any) {
-            showToast(error.response.data.message, ToastType.ERROR);
+            showToast(error.response?.data?.message || "Có lỗi xảy ra", ToastType.ERROR);
         }
     };
 
@@ -34,76 +34,95 @@ export default function ProductCard(book: IBook) {
         : book.price;
 
     return (
-        <Link to={`/product/${book.id}`}>
-            <div className="bg-white rounded-2xl shadow-sm overflow-hidden group cursor-pointer card-hover-lift border border-gray-100/80">
-                {/* Image Container */}
-                <div className="relative overflow-hidden bg-gray-50 aspect-[3/4]">
+        <Link to={`/product/${book.id}`} className="block h-full">
+            <div className="bg-white rounded-2xl border border-[#dff1fb] hover:border-blue-300/80 shadow-[0_2px_12px_-2px_rgba(26,35,126,0.04)] overflow-hidden group cursor-pointer hover-elevation-2 flex flex-col h-full transition-all duration-300">
+                {/* Book Cover Container */}
+                <div className="relative overflow-hidden bg-slate-50 aspect-[3/4] p-3 flex items-center justify-center">
                     {book.image ? (
                         <img
                             src={`${import.meta.env.VITE_BACKEND_URL}/storage/book/${book.image}`}
                             alt={book.title}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            className="w-full h-full object-cover rounded-lg shadow-sm transition-transform duration-500 group-hover:scale-105"
                         />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100">
-                            <span className="text-5xl">📚</span>
+                        <div className="w-full h-full flex items-center justify-center rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 text-slate-400">
+                            <span className="text-4xl">📚</span>
                         </div>
                     )}
-
-                    {/* Hover overlay with add-to-cart */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent product-card-overlay">
-                        <div className="absolute bottom-0 left-0 right-0 p-3">
-                            <button
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    handleAddToCart();
-                                }}
-                                className="w-full flex items-center justify-center gap-2 bg-white text-primary-600 px-3 py-2.5 rounded-xl font-semibold text-sm hover:bg-primary-500 hover:text-white transition-all shadow-lg active:scale-95"
-                            >
-                                <ShoppingCart className="w-4 h-4" />
-                                Thêm vào giỏ
-                            </button>
-                        </div>
-                    </div>
 
                     {/* Discount Badge */}
                     {book.discount > 0 && (
-                        <span className="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-rose-500 text-white text-xs font-bold px-2.5 py-1.5 rounded-lg shadow-md badge-pulse">
+                        <span className="absolute top-2.5 right-2.5 bg-gradient-to-r from-red-600 to-rose-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-sm">
                             -{book.discount}%
                         </span>
                     )}
+
+                    {/* Quick Add To Cart Overlay */}
+                    <div className="absolute inset-x-3 bottom-3 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+                        <button
+                            onClick={(e) => {
+                                e.preventDefault();
+                                handleAddToCart();
+                            }}
+                            className="w-full flex items-center justify-center gap-1.5 bg-[#1a237e] hover:bg-[#283593] text-white py-2 px-3 rounded-xl font-semibold text-xs transition-all shadow-md active:scale-95 cursor-pointer"
+                        >
+                            <ShoppingCart className="w-3.5 h-3.5" />
+                            Thêm vào giỏ
+                        </button>
+                    </div>
                 </div>
 
-                {/* Card Content */}
-                <div className="p-4">
-                    <h3 className="font-semibold text-gray-800 line-clamp-2 mb-1.5 min-h-[3rem] text-sm leading-snug group-hover:text-primary-600 transition-colors">
-                        {book.title}
-                    </h3>
-                    <p className="text-xs text-gray-400 mb-2 truncate">
-                        {book.authors.map((author) => author.name).join(', ')}
-                    </p>
-
-                    {/* Star Rating */}
-                    <div className="flex items-center gap-0.5 mb-3">
-                        {[...Array(5)].map((_, i) => (
-                            <Star key={i} className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                        ))}
-                        <span className="text-xs text-gray-400 ml-1">({book.sold})</span>
-                    </div>
-
-                    {/* Price */}
-                    <div className="flex items-end gap-2">
-                        <span className="text-lg font-bold text-primary-600">
-                            {formatPrice(discountedPrice)}
-                        </span>
-                        {book.discount > 0 && (
-                            <span className="text-xs text-gray-400 line-through mb-0.5">
-                                {formatPrice(book.price)}
+                {/* Book Details */}
+                <div className="p-4 flex flex-col flex-grow justify-between gap-2">
+                    <div>
+                        {/* Category Chip (if available) */}
+                        {book.category && (
+                            <span className="inline-block bg-[#e3f2fd] text-[#1a237e] text-[10px] font-semibold px-2 py-0.5 rounded-full mb-1.5 truncate max-w-full">
+                                {book.category.name}
                             </span>
                         )}
+
+                        {/* Title */}
+                        <h3 className="font-headline font-bold text-[#0d1e25] line-clamp-2 text-sm leading-snug group-hover:text-[#1a237e] transition-colors min-h-[2.5rem]">
+                            {book.title}
+                        </h3>
+
+                        {/* Authors */}
+                        <p className="font-body text-xs text-slate-500 truncate mt-0.5">
+                            {book.authors && book.authors.length > 0
+                                ? book.authors.map((author) => author.name).join(', ')
+                                : 'Đang cập nhật'}
+                        </p>
+                    </div>
+
+                    <div>
+                        {/* Rating & Sold count */}
+                        <div className="flex items-center gap-1 my-1">
+                            <div className="flex items-center text-amber-400">
+                                {[...Array(5)].map((_, i) => (
+                                    <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
+                                ))}
+                            </div>
+                            <span className="font-body text-[11px] text-slate-400 ml-1">
+                                ({book.sold ?? 0} đã bán)
+                            </span>
+                        </div>
+
+                        {/* Pricing */}
+                        <div className="flex items-baseline gap-2 pt-1 border-t border-slate-100">
+                            <span className="font-headline text-base sm:text-lg font-bold text-[#1a237e]">
+                                {formatPrice(discountedPrice)}
+                            </span>
+                            {book.discount > 0 && (
+                                <span className="font-body text-xs text-slate-400 line-through">
+                                    {formatPrice(book.price)}
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
         </Link>
     );
 }
+

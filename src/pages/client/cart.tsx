@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ChevronRight, ShoppingCart, Trash2 } from 'lucide-react';
+import { ChevronRight, Trash2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import CartItem from '../../components/client/cart/CartItem';
@@ -98,38 +98,32 @@ export default function CartPage() {
     };
 
     return (
-        <div className="min-h-[60vh]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
             {/* Breadcrumb */}
-            <div className="flex items-center gap-2 text-sm text-white/50 mb-6">
-                <Link to="/" className="hover:text-primary-300 transition-colors">
+            <div className="flex items-center gap-2 text-xs sm:text-sm font-body text-slate-400 mb-6">
+                <Link to="/" className="hover:text-[#1a237e] transition-colors">
                     Trang chủ
                 </Link>
-                <ChevronRight className="w-4 h-4" />
-                <span className="text-white font-semibold">Giỏ hàng</span>
+                <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
+                <span className="text-slate-700 font-semibold">Giỏ hàng</span>
             </div>
 
-            {/* Page Title */}
-            <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-10 h-10 rounded-xl 
-                                    bg-gradient-to-br from-primary-500 to-primary-600 shadow-lg shadow-primary-500/30">
-                        <ShoppingCart className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                        <h1 className="text-2xl font-bold text-white">Giỏ hàng của bạn</h1>
-                        <p className="text-sm text-white/60">
-                            {cartItems.length > 0
-                                ? `${cartItems.length} sản phẩm trong giỏ hàng`
-                                : 'Chưa có sản phẩm nào'}
-                        </p>
-                    </div>
+            {/* Page Header */}
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+                <div>
+                    <h1 className="font-headline text-2xl sm:text-4xl font-bold text-[#0d1e25]">
+                        Giỏ hàng của bạn
+                    </h1>
+                    <p className="font-body text-sm text-slate-500 mt-1">
+                        {cartItems.length > 0
+                            ? `Bạn đang có ${cartItems.length} sản phẩm trong giỏ hàng`
+                            : 'Chưa có sản phẩm nào trong giỏ hàng'}
+                    </p>
                 </div>
                 {cartItems.length > 0 && (
                     <button
                         onClick={handleClearCart}
-                        className="flex items-center gap-1.5 px-3 py-2 text-sm text-white/60 
-                                   hover:text-red-400 hover:bg-white/5 rounded-lg
-                                   transition-all duration-150"
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-body font-medium text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                     >
                         <Trash2 className="w-4 h-4" />
                         Xóa tất cả
@@ -140,9 +134,9 @@ export default function CartPage() {
             {cartItems.length === 0 ? (
                 <CartEmpty />
             ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Cart Items */}
-                    <div className="lg:col-span-2 space-y-3">
+                <div className="flex flex-col lg:flex-row gap-8 items-start">
+                    {/* Cart Items List */}
+                    <div className="w-full lg:w-2/3 space-y-4">
                         {cartItems.map((item) => (
                             <CartItem
                                 key={item.id}
@@ -153,22 +147,10 @@ export default function CartPage() {
                                 loadingAction={loadingItems[item.book.id] || null}
                             />
                         ))}
-
-                        {/* Continue Shopping */}
-                        <div className="pt-4">
-                            <Link
-                                to="/products"
-                                className="inline-flex items-center gap-2 text-sm text-primary-400 
-                                           hover:text-primary-300 font-medium transition-colors"
-                            >
-                                <ChevronRight className="w-4 h-4 rotate-180" />
-                                Tiếp tục mua sắm
-                            </Link>
-                        </div>
                     </div>
 
-                    {/* Order Summary */}
-                    <div className="lg:col-span-1">
+                    {/* Order Summary Sidebar */}
+                    <div className="w-full lg:w-1/3">
                         <CartSummary items={cartItems} onCheckout={handleCheckout} />
                     </div>
                 </div>

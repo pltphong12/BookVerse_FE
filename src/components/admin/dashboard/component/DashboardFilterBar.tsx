@@ -1,4 +1,3 @@
-import React from 'react';
 import { Card, DatePicker, Select, Button, Space, Row, Col, Segmented } from 'antd';
 import { FilterOutlined, ReloadOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';

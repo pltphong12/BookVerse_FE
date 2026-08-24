@@ -1,4 +1,4 @@
-import { Star, ThumbsUp } from 'lucide-react';
+import { Star, ThumbsUp, MessageSquarePlus, CheckCircle2 } from 'lucide-react';
 import { useState } from 'react';
 
 interface Review {
@@ -17,32 +17,32 @@ const mockReviews: Review[] = [
         id: 1,
         author: 'Nguyễn Văn A',
         rating: 5,
-        date: '2024-03-10',
-        title: 'Cuốn sách tuyệt vời!',
+        date: '10/03/2024',
+        title: 'Cuốn sách tuyệt vời ngoài mong đợi!',
         content:
-            'Mình rất thích cuốn sách này. Nội dung rất hay, dễ hiểu và áp dụng được vào đời sống thực tế. Giao hàng nhanh, tình trạng sách tốt.',
+            'Mình rất thích cuốn sách này. Nội dung sâu sắc, hành văn mạch lạc và lôi cuốn từ đầu đến cuối. Đóng gói rất cẩn thận, bìa cứng cáp và giao hàng cực nhanh.',
         helpful: 24,
         verified: true,
     },
     {
         id: 2,
         author: 'Trần Thị B',
-        rating: 4,
-        date: '2024-03-08',
-        title: 'Hay nhưng hơi dài',
+        rating: 5,
+        date: '08/03/2024',
+        title: 'Chất lượng sách xuất sắc',
         content:
-            'Cuốn sách có nội dung rất hay nhưng phần sau hơi dài dòng. Tổng thể vẫn đáng để đọc. Bìa sách đẹp, in ấn chất lượng.',
+            'Chất lượng giấy in tốt, chữ rõ nét không bị lóa mắt. Tác giả truyền tải thông điệp rất thực tế, bổ ích cho người đọc.',
         helpful: 15,
         verified: true,
     },
     {
         id: 3,
         author: 'Phạm Minh C',
-        rating: 5,
-        date: '2024-03-01',
-        title: 'Cuốn sách đã thay đổi cách suy nghĩ của tôi',
+        rating: 4,
+        date: '01/03/2024',
+        title: 'Cuốn sách mở mang tư duy',
         content:
-            'Một cuốn sách thật sự hay. Những ý tưởng được trình bày một cách rõ ràng và logic. Tôi đã gợi ý cuốn sách này cho rất nhiều bạn.',
+            'Một cuốn sách thật sự đáng đọc trong năm nay. Những ý tưởng được trình bày một cách khoa học và hệ thống.',
         helpful: 42,
         verified: true,
     },
@@ -66,95 +66,131 @@ export default function ReviewSection() {
     ).toFixed(1);
 
     return (
-        <div className="bg-white rounded-lg shadow-sm p-6 space-y-8">
-            <h3 className="text-2xl font-bold text-gray-900">Đánh giá sản phẩm</h3>
+        <section className="bg-white rounded-2xl border border-[#dff1fb] p-6 sm:p-8 shadow-sm space-y-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+                <div>
+                    <h2 className="font-headline text-xl sm:text-2xl font-extrabold text-[#0d1e25]">
+                        Đánh giá từ độc giả
+                    </h2>
+                    <p className="font-body text-xs sm:text-sm text-slate-500 mt-1">
+                        Tổng hợp nhận xét và đánh giá trải nghiệm đọc thực tế
+                    </p>
+                </div>
+                <button className="flex items-center gap-2 bg-[#1a237e] hover:bg-[#283593] text-white px-5 py-2.5 rounded-xl font-headline font-semibold text-xs sm:text-sm transition-all shadow-sm hover:shadow self-start sm:self-auto cursor-pointer">
+                    <MessageSquarePlus className="w-4 h-4" />
+                    <span>Viết đánh giá</span>
+                </button>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="flex flex-col items-center justify-center border rounded-lg p-6">
-                    <div className="text-4xl font-bold text-gray-900 mb-2">{averageRating}</div>
-                    <div className="flex gap-1 mb-2">
+            {/* Score Overview Bento */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 bg-[#f4faff] border border-[#dff1fb] rounded-2xl p-6">
+                <div className="md:col-span-4 flex flex-col items-center justify-center text-center border-b md:border-b-0 md:border-r border-blue-100 pb-5 md:pb-0 md:pr-6">
+                    <div className="font-headline text-5xl font-extrabold text-[#1a237e] tracking-tight">
+                        {averageRating}
+                    </div>
+                    <div className="flex text-amber-400 my-2">
                         {[...Array(5)].map((_, i) => (
                             <Star
                                 key={i}
-                                className={`w-5 h-5 ${i < Math.round(parseFloat(averageRating))
-                                        ? 'fill-yellow-400 text-yellow-400'
-                                        : 'text-gray-300'
-                                    }`}
+                                className={`w-5 h-5 ${
+                                    i < Math.round(parseFloat(averageRating))
+                                        ? 'fill-current'
+                                        : 'text-slate-300'
+                                }`}
                             />
                         ))}
                     </div>
-                    <p className="text-gray-600">{mockReviews.length} đánh giá</p>
+                    <p className="font-body text-xs text-slate-500 font-medium">
+                        Dựa trên {mockReviews.length} lượt nhận xét
+                    </p>
                 </div>
 
-                <div className="md:col-span-2 space-y-2">
+                <div className="md:col-span-8 flex flex-col justify-center space-y-2.5">
                     {[5, 4, 3, 2, 1].map((stars) => {
                         const count = mockReviews.filter((r) => r.rating === stars).length;
                         const percentage = (count / mockReviews.length) * 100;
                         return (
-                            <div key={stars} className="flex items-center gap-2">
-                                <span className="text-sm text-gray-600 w-8">{stars}★</span>
-                                <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
+                            <div key={stars} className="flex items-center gap-3 text-xs font-body">
+                                <span className="font-semibold text-slate-700 w-8 flex items-center gap-1">
+                                    {stars} <Star className="w-3 h-3 fill-amber-400 text-amber-400 inline" />
+                                </span>
+                                <div className="flex-1 bg-slate-200/70 rounded-full h-2 overflow-hidden">
                                     <div
-                                        className="bg-yellow-400 h-full"
+                                        className="bg-[#1a237e] h-full rounded-full transition-all duration-500"
                                         style={{ width: `${percentage}%` }}
                                     />
                                 </div>
-                                <span className="text-sm text-gray-600 w-12">{count}</span>
+                                <span className="text-slate-400 w-10 text-right font-medium">{count}</span>
                             </div>
                         );
                     })}
                 </div>
             </div>
 
-            <button className="border-2 border-primary-500 text-primary-500 px-6 py-2.5 rounded-xl hover:bg-primary-50 transition-colors font-semibold text-base w-full md:w-auto">Viết đánh giá</button>
-
+            {/* Individual Reviews List */}
             <div className="space-y-4">
-                <h4 className="font-bold text-gray-900">Đánh giá chi tiết</h4>
                 {mockReviews.map((review) => (
-                    <div key={review.id} className="border rounded-lg p-4 space-y-3">
-                        <div className="flex items-start justify-between">
-                            <div>
-                                <div className="flex items-center gap-2">
-                                    <span className="font-semibold text-gray-900">{review.author}</span>
-                                    {review.verified && (
-                                        <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
-                                            Đã xác minh
-                                        </span>
-                                    )}
+                    <div
+                        key={review.id}
+                        className="bg-white border border-[#dff1fb] rounded-2xl p-5 sm:p-6 space-y-3 hover:border-blue-200 transition-colors"
+                    >
+                        <div className="flex items-start justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-[#e3f2fd] text-[#1a237e] font-headline font-bold text-sm flex items-center justify-center shadow-inner shrink-0">
+                                    {review.author.charAt(0)}
                                 </div>
-                                <p className="text-sm text-gray-500">{review.date}</p>
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-headline font-bold text-sm text-[#0d1e25]">
+                                            {review.author}
+                                        </span>
+                                        {review.verified && (
+                                            <span className="inline-flex items-center gap-1 text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full font-medium">
+                                                <CheckCircle2 className="w-3 h-3" /> Đã mua hàng
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className="font-body text-xs text-slate-400 mt-0.5">{review.date}</p>
+                                </div>
                             </div>
-                            <div className="flex gap-1">
+                            <div className="flex text-amber-400 shrink-0">
                                 {[...Array(5)].map((_, i) => (
                                     <Star
                                         key={i}
-                                        className={`w-4 h-4 ${i < review.rating
-                                                ? 'fill-yellow-400 text-yellow-400'
-                                                : 'text-gray-300'
-                                            }`}
+                                        className={`w-3.5 h-3.5 ${
+                                            i < review.rating ? 'fill-current' : 'text-slate-200'
+                                        }`}
                                     />
                                 ))}
                             </div>
                         </div>
 
                         <div>
-                            <h5 className="font-semibold text-gray-900 mb-1">{review.title}</h5>
-                            <p className="text-gray-700 text-sm">{review.content}</p>
+                            <h3 className="font-headline font-bold text-sm text-slate-800 mb-1">
+                                {review.title}
+                            </h3>
+                            <p className="font-body text-sm text-slate-600 leading-relaxed">
+                                {review.content}
+                            </p>
                         </div>
 
-                        <button
-                            onClick={() => toggleHelpful(review.id)}
-                            className={`flex items-center gap-2 text-sm px-3 py-1 rounded-full transition-colors ${helpfulReviews.has(review.id)
-                                    ? 'bg-primary-100 text-primary-600'
-                                    : 'text-gray-600 hover:bg-gray-100'
+                        <div className="pt-1">
+                            <button
+                                onClick={() => toggleHelpful(review.id)}
+                                className={`inline-flex items-center gap-1.5 text-xs font-body px-3.5 py-1.5 rounded-full border transition-all cursor-pointer ${
+                                    helpfulReviews.has(review.id)
+                                        ? 'bg-[#e3f2fd] border-blue-300 text-[#1a237e] font-semibold'
+                                        : 'bg-[#f4faff] border-[#dff1fb] text-slate-600 hover:border-[#1a237e] hover:text-[#1a237e]'
                                 }`}
-                        >
-                            <ThumbsUp className="w-4 h-4" />
-                            Hữu ích ({review.helpful + (helpfulReviews.has(review.id) ? 1 : 0)})
-                        </button>
+                            >
+                                <ThumbsUp className="w-3.5 h-3.5" />
+                                <span>Hữu ích ({review.helpful + (helpfulReviews.has(review.id) ? 1 : 0)})</span>
+                            </button>
+                        </div>
                     </div>
                 ))}
             </div>
-        </div>
+        </section>
     );
 }
+

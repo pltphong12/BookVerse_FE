@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Home, Search, BookX } from 'lucide-react';
 import ProductFilters from '../../components/client/product/ProductFilter';
 import ProductSort from '../../components/client/product/ProductSort';
 import ProductCard from '../../components/client/product/ProductCard';
 import { Pagination } from '../../components/global/Pagination';
 import { callFetchAllProductsWithPaginationAndFilterApi, callFetchAllCategoriesApi, callFetchAllPublishersApi } from '../../services/api';
 import { IBook, IBookFilterCriteria } from '../../types/backend';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
 type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'best-selling' | 'rating';
@@ -138,13 +138,18 @@ export default function AllProductsPage() {
 
         criteria.sortType = SORT_OPTION_MAP[sortBy];
 
-        const res = await callFetchAllProductsWithPaginationAndFilterApi(criteria, currentPage, productsPerPage);
-        if (res.data?.data) {
-            setProducts(res.data.data.result);
-            setTotalProducts(res.data.data.meta.total);
-            setTotalPages(res.data.data.meta.pages);
+        try {
+            const res = await callFetchAllProductsWithPaginationAndFilterApi(criteria, currentPage, productsPerPage);
+            if (res.data?.data) {
+                setProducts(res.data.data.result);
+                setTotalProducts(res.data.data.meta.total);
+                setTotalPages(res.data.data.meta.pages);
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     }, [filters, sortBy, currentPage, productsPerPage, searchKeyword]);
 
     useEffect(() => {
@@ -167,98 +172,125 @@ export default function AllProductsPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="container mx-auto px-4 py-6">
-                <div className="flex items-center gap-2 text-sm text-gray-600 mb-8">
-                    <a href="/" className="hover:text-primary-500">
-                        Trang chủ
-                    </a>
-                    <ChevronRight className="w-4 h-4" />
-                    <span className="text-gray-900 font-semibold">Tất cả sản phẩm</span>
+        <div className="space-y-6 sm:space-y-8">
+            {/* Breadcrumbs */}
+            <nav aria-label="Breadcrumb">
+                <ol className="flex items-center flex-wrap gap-1.5 text-xs sm:text-sm font-body text-slate-500 font-medium">
+                    <li>
+                        <Link to="/" className="flex items-center gap-1 text-slate-500 hover:text-[#1a237e] transition-colors">
+                            <Home className="w-3.5 h-3.5" />
+                            <span>Trang chủ</span>
+                        </Link>
+                    </li>
+                    <li>
+                        <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
+                    </li>
+                    <li aria-current="page" className="text-[#0d1e25] font-semibold">
+                        Tất cả sản phẩm
+                    </li>
+                </ol>
+            </nav>
+
+            {/* Search keyword indicator */}
+            {searchKeyword && (
+                <div className="flex items-center gap-3 p-4 sm:p-5 bg-white rounded-2xl border border-[#dff1fb] shadow-sm">
+                    <div className="w-9 h-9 rounded-xl bg-[#e3f2fd] text-[#1a237e] flex items-center justify-center shrink-0">
+                        <Search className="w-4 h-4" />
+                    </div>
+                    <div className="flex flex-wrap items-baseline gap-2">
+                        <span className="text-xs sm:text-sm font-body text-slate-500">Kết quả tìm kiếm cho:</span>
+                        <span className="font-headline font-bold text-sm sm:text-base text-[#1a237e]">"{searchKeyword}"</span>
+                        <span className="text-xs font-body text-slate-400 font-medium">({totalProducts} cuốn sách)</span>
+                    </div>
+                    <button
+                        onClick={() => {
+                            setSearchKeyword('');
+                            setCurrentPage(1);
+                            window.history.replaceState(null, '', '/products');
+                        }}
+                        className="ml-auto text-xs sm:text-sm font-body font-medium text-slate-400 hover:text-red-600 transition-colors cursor-pointer flex items-center gap-1 px-2.5 py-1 rounded-lg hover:bg-red-50"
+                    >
+                        ✕ Xóa tìm kiếm
+                    </button>
+                </div>
+            )}
+
+            {/* Main Content Grid: 1 col (filters) + 3 cols (products) */}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 items-start">
+                {/* Left Sidebar Filter */}
+                <div className="lg:col-span-1 lg:sticky lg:top-24">
+                    <ProductFilters
+                        filters={filters}
+                        onFilterChange={handleFilterChange}
+                        categories={categoryOptions.map(c => c.name)}
+                        publishers={publisherOptions.map(p => p.name)}
+                        publishYears={publishYears}
+                        coverTypes={coverTypes}
+                    />
                 </div>
 
-                {/* Search keyword indicator */}
-                {searchKeyword && (
-                    <div className="flex items-center gap-3 mb-6 p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
-                        <span className="text-sm text-gray-500">Kết quả tìm kiếm cho:</span>
-                        <span className="text-base font-semibold text-primary-600">"{searchKeyword}"</span>
-                        <span className="text-sm text-gray-400">({totalProducts} sản phẩm)</span>
-                        <button
-                            onClick={() => {
-                                setSearchKeyword('');
-                                setCurrentPage(1);
-                                window.history.replaceState(null, '', '/products');
-                            }}
-                            className="ml-auto text-sm text-gray-400 hover:text-red-500 transition-colors cursor-pointer flex items-center gap-1"
-                        >
-                            ✕ Xóa tìm kiếm
-                        </button>
-                    </div>
-                )}
+                {/* Right Products Area */}
+                <div className="lg:col-span-3 space-y-6">
+                    <ProductSort
+                        sortBy={sortBy}
+                        onSortChange={handleSortChange}
+                        totalProducts={totalProducts}
+                        productsPerPage={productsPerPage}
+                        onItemsPerPageChange={handleItemsPerPageChange}
+                        currentPage={currentPage}
+                    />
 
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
-                    <div>
-                        <ProductFilters
-                            filters={filters}
-                            onFilterChange={handleFilterChange}
-                            categories={categoryOptions.map(c => c.name)}
-                            publishers={publisherOptions.map(p => p.name)}
-                            publishYears={publishYears}
-                            coverTypes={coverTypes}
-                        />
-                    </div>
-
-                    <div className="lg:col-span-3 space-y-6">
-                        <ProductSort
-                            sortBy={sortBy}
-                            onSortChange={handleSortChange}
-                            totalProducts={totalProducts}
-                            productsPerPage={productsPerPage}
-                            onItemsPerPageChange={handleItemsPerPageChange}
-                        />
-
-                        {loading ? (
-                            <div className="bg-white rounded-lg p-12 text-center">
-                                <p className="text-gray-600">Đang tải...</p>
+                    {loading ? (
+                        <div className="bg-white rounded-2xl border border-[#dff1fb] p-16 text-center shadow-sm flex flex-col items-center justify-center gap-3">
+                            <div className="w-10 h-10 border-3 border-[#e3f2fd] border-t-[#1a237e] rounded-full animate-spin"></div>
+                            <p className="font-body text-sm text-slate-500 font-medium">Đang tải danh sách sách...</p>
+                        </div>
+                    ) : products.length > 0 ? (
+                        <>
+                            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                                {products.map((product) => (
+                                    <ProductCard key={product.id} {...product} />
+                                ))}
                             </div>
-                        ) : products.length > 0 ? (
-                            <>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                    {products.map((product) => (
-                                        <ProductCard key={product.id} {...product} />
-                                    ))}
-                                </div>
 
-                                {totalPages > 1 && (
-                                    <Pagination
-                                        page={currentPage}
-                                        totalPage={totalPages}
-                                        setPage={setCurrentPage}
-                                    />
-                                )}
-                            </>
-                        ) : (
-                            <div className="bg-white rounded-lg p-12 text-center">
-                                <p className="text-gray-600 mb-4">Không tìm thấy sản phẩm phù hợp</p>
-                                <button
-                                    onClick={() =>
-                                        handleFilterChange({
-                                            priceRange: [0, 300000],
-                                            categories: [],
-                                            publishers: [],
-                                            publishYears: [],
-                                            coverTypes: [],
-                                        })
-                                    }
-                                    className="bg-primary-500 text-white px-6 py-2.5 rounded-xl hover:bg-primary-600 transition-colors font-semibold shadow-md"
-                                >
-                                    Xóa bộ lọc
-                                </button>
+                            {totalPages > 1 && (
+                                <Pagination
+                                    page={currentPage}
+                                    totalPage={totalPages}
+                                    setPage={setCurrentPage}
+                                />
+                            )}
+                        </>
+                    ) : (
+                        <div className="bg-white rounded-2xl border border-[#dff1fb] p-12 sm:p-16 text-center shadow-sm max-w-md mx-auto">
+                            <div className="w-16 h-16 rounded-2xl bg-[#e3f2fd] text-[#1a237e] flex items-center justify-center mx-auto mb-4">
+                                <BookX className="w-8 h-8" />
                             </div>
-                        )}
-                    </div>
+                            <h3 className="font-headline font-bold text-lg text-[#0d1e25] mb-2">
+                                Không tìm thấy cuốn sách nào
+                            </h3>
+                            <p className="font-body text-sm text-slate-500 mb-6 leading-relaxed">
+                                Hãy thử thay đổi hoặc xóa bớt các tiêu chí trong bộ lọc để tìm thấy nhiều tựa sách hơn.
+                            </p>
+                            <button
+                                onClick={() =>
+                                    handleFilterChange({
+                                        priceRange: [0, 300000],
+                                        categories: [],
+                                        publishers: [],
+                                        publishYears: [],
+                                        coverTypes: [],
+                                    })
+                                }
+                                className="bg-[#1a237e] hover:bg-[#283593] text-white px-6 py-2.5 rounded-xl font-headline font-semibold text-sm transition-colors shadow-sm cursor-pointer"
+                            >
+                                Xóa toàn bộ bộ lọc
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
     );
 }
+

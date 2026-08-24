@@ -24,7 +24,7 @@ export const LayoutClient = () => {
         getAccount()
     }, [dispatch])
     return (
-        <div className="min-h-screen animated-gradient-bg" data-theme="bookverse">
+        <div className="min-h-screen bg-[#f4faff] text-[#0d1e25]" data-theme="bookverse">
             <Header />
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 py-8 space-y-10">
                 <Outlet />

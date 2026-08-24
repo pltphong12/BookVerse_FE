@@ -1,4 +1,3 @@
-import React from 'react';
 import { Card, Table, Tag, Empty, Typography, Badge } from 'antd';
 import { TrophyOutlined, InboxOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';

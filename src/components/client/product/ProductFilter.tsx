@@ -1,5 +1,5 @@
-import { ChevronDown, DollarSign, Grid3X3, BookOpen, Calendar, Layers, SlidersHorizontal, X, RotateCcw } from 'lucide-react';
 import { useState } from 'react';
+import { ChevronDown, X, RotateCcw } from 'lucide-react';
 
 interface Filters {
     priceRange: [number, number];
@@ -18,99 +18,6 @@ interface ProductFiltersProps {
     coverTypes: string[];
 }
 
-interface FilterSectionProps {
-    title: string;
-    icon: React.ReactNode;
-    isExpanded: boolean;
-    onToggle: () => void;
-    count?: number;
-    children: React.ReactNode;
-}
-
-function FilterSection({ title, icon, isExpanded, onToggle, count, children }: FilterSectionProps) {
-    return (
-        <div className="group">
-            <button
-                onClick={onToggle}
-                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl 
-                           transition-all duration-200 ease-out
-                           hover:bg-primary-50/60 active:scale-[0.99]"
-            >
-                <span className="flex items-center justify-center w-8 h-8 rounded-lg 
-                                 bg-gradient-to-br from-primary-100 to-primary-200/70
-                                 text-primary-600 transition-colors duration-200
-                                 group-hover:from-primary-200 group-hover:to-primary-300/70">
-                    {icon}
-                </span>
-                <span className="flex-1 text-left font-semibold text-gray-800 text-sm tracking-wide">
-                    {title}
-                </span>
-                {count !== undefined && count > 0 && (
-                    <span className="flex items-center justify-center min-w-5 h-5 px-1.5 
-                                     text-[11px] font-bold text-white rounded-full
-                                     bg-gradient-to-r from-primary-500 to-primary-600
-                                     shadow-sm shadow-primary-200
-                                     animate-[scaleIn_0.2s_ease-out]">
-                        {count}
-                    </span>
-                )}
-                <ChevronDown
-                    className={`w-4 h-4 text-gray-400 transition-transform duration-300 ease-out
-                               ${isExpanded ? 'rotate-180 text-primary-500' : ''}`}
-                />
-            </button>
-            <div
-                className={`overflow-hidden transition-all duration-300 ease-out
-                           ${isExpanded ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
-            >
-                <div className="px-4 pb-4 pt-1">
-                    {children}
-                </div>
-            </div>
-        </div>
-    );
-}
-
-interface CheckboxItemProps {
-    label: string;
-    checked: boolean;
-    onChange: (checked: boolean) => void;
-}
-
-function CheckboxItem({ label, checked, onChange }: CheckboxItemProps) {
-    return (
-        <label className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer 
-                          transition-all duration-150 select-none
-                          ${checked
-                ? 'bg-primary-50 ring-1 ring-primary-200'
-                : 'hover:bg-gray-50'}`}>
-            <div className="relative flex items-center justify-center">
-                <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={(e) => onChange(e.target.checked)}
-                    className="sr-only"
-                />
-                <div className={`w-[18px] h-[18px] rounded-md border-2 flex items-center justify-center
-                                transition-all duration-200
-                                ${checked
-                        ? 'bg-gradient-to-br from-primary-500 to-primary-600 border-primary-500 shadow-sm shadow-primary-200'
-                        : 'border-gray-300 bg-white hover:border-primary-300'}`}>
-                    {checked && (
-                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                    )}
-                </div>
-            </div>
-            <span className={`text-sm transition-colors duration-150
-                            ${checked ? 'text-primary-700 font-medium' : 'text-gray-600'}`}>
-                {label}
-            </span>
-        </label>
-    );
-}
-
 export default function ProductFilters({
     filters,
     onFilterChange,
@@ -119,16 +26,16 @@ export default function ProductFilters({
     publishYears,
     coverTypes,
 }: ProductFiltersProps) {
-    const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    const [expanded, setExpanded] = useState<Record<string, boolean>>({
         price: true,
-        category: true,
+        category: false,
         publisher: false,
         year: false,
         cover: false,
     });
 
     const toggleSection = (section: string) => {
-        setExpandedSections((prev) => ({
+        setExpanded((prev) => ({
             ...prev,
             [section]: !prev[section],
         }));
@@ -160,295 +67,375 @@ export default function ProductFilters({
         filters.publishYears.length > 0 ||
         filters.coverTypes.length > 0;
 
-    const activeCount =
-        filters.categories.length +
-        filters.publishers.length +
-        filters.publishYears.length +
-        filters.coverTypes.length +
-        (filters.priceRange[0] !== 0 || filters.priceRange[1] !== 300000 ? 1 : 0);
-
-    const formatPrice = (value: number) => {
-        return new Intl.NumberFormat('vi-VN').format(value);
+    const resetFilters = () => {
+        onFilterChange({
+            priceRange: [0, 300000],
+            categories: [],
+            publishers: [],
+            publishYears: [],
+            coverTypes: [],
+        });
     };
 
+    const pricePresets = [
+        { label: 'Tất cả', range: [0, 300000] as [number, number] },
+        { label: 'Dưới 50.000đ', range: [0, 50000] as [number, number] },
+        { label: '50.000đ - 150.000đ', range: [50000, 150000] as [number, number] },
+        { label: 'Trên 150.000đ', range: [150000, 300000] as [number, number] },
+    ];
+
+    const isPresetSelected = (range: [number, number]) =>
+        filters.priceRange[0] === range[0] && filters.priceRange[1] === range[1];
+
     return (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            {/* Header */}
-            <div className="bg-gradient-to-r from-primary-500 to-primary-600 px-5 py-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                        <SlidersHorizontal className="w-5 h-5 text-white/90" />
-                        <h3 className="font-bold text-[15px] text-white tracking-wide">Bộ lọc</h3>
-                        {activeCount > 0 && (
-                            <span className="flex items-center justify-center min-w-5 h-5 px-1.5 
-                                             text-[11px] font-bold text-primary-600 rounded-full
-                                             bg-white/90 shadow-sm">
-                                {activeCount}
-                            </span>
-                        )}
-                    </div>
-                    {hasActiveFilters && (
-                        <button
-                            onClick={() =>
-                                onFilterChange({
-                                    priceRange: [0, 300000],
-                                    categories: [],
-                                    publishers: [],
-                                    publishYears: [],
-                                    coverTypes: [],
-                                })
-                            }
-                            className="flex items-center gap-1.5 text-[13px] text-white/80 
-                                       hover:text-white font-medium transition-colors duration-150
-                                       hover:bg-white/10 px-2.5 py-1 rounded-lg"
-                        >
-                            <RotateCcw className="w-3.5 h-3.5" />
-                            Đặt lại
-                        </button>
-                    )}
-                </div>
+        <aside className="w-full flex flex-col gap-5 bg-white p-5 sm:p-6 rounded-2xl border border-[#dff1fb] shadow-sm">
+            {/* Header: Title & Reset Button */}
+            <div className="flex items-center justify-between pb-3 border-b border-[#dff1fb]">
+                <h2 className="font-headline text-lg sm:text-xl font-bold text-[#0d1e25]">
+                    Bộ lọc tìm kiếm
+                </h2>
+                {hasActiveFilters && (
+                    <button
+                        onClick={resetFilters}
+                        className="text-xs text-slate-500 hover:text-red-600 font-semibold transition-colors flex items-center gap-1 cursor-pointer"
+                    >
+                        <RotateCcw className="w-3 h-3" />
+                        <span>Đặt lại</span>
+                    </button>
+                )}
             </div>
 
-            {/* Active filter tags */}
+            {/* Active Filters Pill Tag List */}
             {hasActiveFilters && (
-                <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/50">
-                    <div className="flex flex-wrap gap-1.5">
-                        {(filters.priceRange[0] !== 0 || filters.priceRange[1] !== 300000) && (
-                            <span className="inline-flex items-center gap-1 pl-2.5 pr-1.5 py-1 
-                                           text-xs font-medium text-primary-700 bg-primary-50 
-                                           rounded-full border border-primary-100">
-                                {formatPrice(filters.priceRange[0])}đ - {formatPrice(filters.priceRange[1])}đ
-                                <button
-                                    onClick={() => onFilterChange({ ...filters, priceRange: [0, 300000] })}
-                                    className="ml-0.5 p-0.5 rounded-full hover:bg-primary-100 transition-colors"
-                                >
-                                    <X className="w-3 h-3" />
-                                </button>
-                            </span>
-                        )}
-                        {filters.categories.map((cat) => (
-                            <span key={cat}
-                                className="inline-flex items-center gap-1 pl-2.5 pr-1.5 py-1 
-                                           text-xs font-medium text-primary-700 bg-primary-50 
-                                           rounded-full border border-primary-100">
-                                {cat}
-                                <button
-                                    onClick={() => handleCheckboxChange('categories', cat, false)}
-                                    className="ml-0.5 p-0.5 rounded-full hover:bg-primary-100 transition-colors"
-                                >
-                                    <X className="w-3 h-3" />
-                                </button>
-                            </span>
-                        ))}
-                        {filters.publishers.map((pub) => (
-                            <span key={pub}
-                                className="inline-flex items-center gap-1 pl-2.5 pr-1.5 py-1 
-                                           text-xs font-medium text-primary-700 bg-primary-50 
-                                           rounded-full border border-primary-100">
-                                {pub}
-                                <button
-                                    onClick={() => handleCheckboxChange('publishers', pub, false)}
-                                    className="ml-0.5 p-0.5 rounded-full hover:bg-primary-100 transition-colors"
-                                >
-                                    <X className="w-3 h-3" />
-                                </button>
-                            </span>
-                        ))}
-                        {filters.publishYears.map((year) => (
-                            <span key={year}
-                                className="inline-flex items-center gap-1 pl-2.5 pr-1.5 py-1 
-                                           text-xs font-medium text-primary-700 bg-primary-50 
-                                           rounded-full border border-primary-100">
-                                {year}
-                                <button
-                                    onClick={() => handleCheckboxChange('publishYears', year, false)}
-                                    className="ml-0.5 p-0.5 rounded-full hover:bg-primary-100 transition-colors"
-                                >
-                                    <X className="w-3 h-3" />
-                                </button>
-                            </span>
-                        ))}
-                        {filters.coverTypes.map((type) => (
-                            <span key={type}
-                                className="inline-flex items-center gap-1 pl-2.5 pr-1.5 py-1 
-                                           text-xs font-medium text-primary-700 bg-primary-50 
-                                           rounded-full border border-primary-100">
-                                {type}
-                                <button
-                                    onClick={() => handleCheckboxChange('coverTypes', type, false)}
-                                    className="ml-0.5 p-0.5 rounded-full hover:bg-primary-100 transition-colors"
-                                >
-                                    <X className="w-3 h-3" />
-                                </button>
-                            </span>
-                        ))}
-                    </div>
+                <div className="flex flex-wrap gap-1.5 pb-3 border-b border-slate-100">
+                    {(filters.priceRange[0] !== 0 || filters.priceRange[1] !== 300000) && (
+                        <span className="inline-flex items-center gap-1 pl-2.5 pr-1.5 py-0.5 text-xs font-semibold text-[#1a237e] bg-[#e3f2fd] rounded-full border border-blue-200">
+                            {new Intl.NumberFormat('vi-VN').format(filters.priceRange[0])}đ -{' '}
+                            {new Intl.NumberFormat('vi-VN').format(filters.priceRange[1])}đ
+                            <button
+                                onClick={() => onFilterChange({ ...filters, priceRange: [0, 300000] })}
+                                className="p-0.5 rounded-full hover:bg-[#1a237e] hover:text-white transition-colors cursor-pointer"
+                            >
+                                <X className="w-3 h-3" />
+                            </button>
+                        </span>
+                    )}
+                    {filters.categories.map((cat) => (
+                        <span
+                            key={cat}
+                            className="inline-flex items-center gap-1 pl-2.5 pr-1.5 py-0.5 text-xs font-semibold text-[#1a237e] bg-[#e3f2fd] rounded-full border border-blue-200"
+                        >
+                            {cat}
+                            <button
+                                onClick={() => handleCheckboxChange('categories', cat, false)}
+                                className="p-0.5 rounded-full hover:bg-[#1a237e] hover:text-white transition-colors cursor-pointer"
+                            >
+                                <X className="w-3 h-3" />
+                            </button>
+                        </span>
+                    ))}
+                    {filters.publishers.map((pub) => (
+                        <span
+                            key={pub}
+                            className="inline-flex items-center gap-1 pl-2.5 pr-1.5 py-0.5 text-xs font-semibold text-[#1a237e] bg-[#e3f2fd] rounded-full border border-blue-200"
+                        >
+                            {pub}
+                            <button
+                                onClick={() => handleCheckboxChange('publishers', pub, false)}
+                                className="p-0.5 rounded-full hover:bg-[#1a237e] hover:text-white transition-colors cursor-pointer"
+                            >
+                                <X className="w-3 h-3" />
+                            </button>
+                        </span>
+                    ))}
+                    {filters.publishYears.map((year) => (
+                        <span
+                            key={year}
+                            className="inline-flex items-center gap-1 pl-2.5 pr-1.5 py-0.5 text-xs font-semibold text-[#1a237e] bg-[#e3f2fd] rounded-full border border-blue-200"
+                        >
+                            {year}
+                            <button
+                                onClick={() => handleCheckboxChange('publishYears', year, false)}
+                                className="p-0.5 rounded-full hover:bg-[#1a237e] hover:text-white transition-colors cursor-pointer"
+                            >
+                                <X className="w-3 h-3" />
+                            </button>
+                        </span>
+                    ))}
+                    {filters.coverTypes.map((type) => (
+                        <span
+                            key={type}
+                            className="inline-flex items-center gap-1 pl-2.5 pr-1.5 py-0.5 text-xs font-semibold text-[#1a237e] bg-[#e3f2fd] rounded-full border border-blue-200"
+                        >
+                            {type === 'HARDCOVER' ? 'Bìa cứng' : 'Bìa mềm'}
+                            <button
+                                onClick={() => handleCheckboxChange('coverTypes', type, false)}
+                                className="p-0.5 rounded-full hover:bg-[#1a237e] hover:text-white transition-colors cursor-pointer"
+                            >
+                                <X className="w-3 h-3" />
+                            </button>
+                        </span>
+                    ))}
                 </div>
             )}
 
-            {/* Filter Sections */}
-            <div className="p-2 space-y-0.5">
-                {/* Price Range */}
-                <FilterSection
-                    title="Giá tiền"
-                    icon={<DollarSign className="w-4 h-4" />}
-                    isExpanded={expandedSections.price}
-                    onToggle={() => toggleSection('price')}
-                    count={filters.priceRange[0] !== 0 || filters.priceRange[1] !== 300000 ? 1 : 0}
+            {/* 1. Price Range Section */}
+            <div className="flex flex-col">
+                <button
+                    onClick={() => toggleSection('price')}
+                    className="flex items-center justify-between w-full py-1 text-left cursor-pointer group"
                 >
-                    <div className="space-y-3">
-                        <div className="grid grid-cols-2 gap-3">
-                            <div className="space-y-1.5">
-                                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Từ
-                                </label>
-                                <div className="relative">
+                    <h3 className="font-headline font-bold text-sm text-[#0d1e25] group-hover:text-[#1a237e] transition-colors">
+                        Khoảng giá
+                    </h3>
+                    <ChevronDown
+                        className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${expanded.price ? 'rotate-180 text-[#1a237e]' : ''
+                            }`}
+                    />
+                </button>
+
+                {expanded.price && (
+                    <div className="flex flex-col gap-2.5 pt-2.5 animate-fadeIn">
+                        <div className="flex flex-col gap-1">
+                            {pricePresets.map((preset) => {
+                                const selected = isPresetSelected(preset.range);
+                                return (
+                                    <label
+                                        key={preset.label}
+                                        className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg cursor-pointer transition-colors ${selected
+                                                ? 'bg-[#e3f2fd] text-[#1a237e] font-semibold'
+                                                : 'text-slate-600 hover:bg-[#f4faff]'
+                                            }`}
+                                        onClick={() => onFilterChange({ ...filters, priceRange: preset.range })}
+                                    >
+                                        <input
+                                            type="radio"
+                                            name="price-preset"
+                                            checked={selected}
+                                            onChange={() => onFilterChange({ ...filters, priceRange: preset.range })}
+                                            className="w-4 h-4 text-[#1a237e] focus:ring-[#1a237e] border-slate-300 accent-[#1a237e] cursor-pointer"
+                                        />
+                                        <span className="font-body text-sm text-inherit">
+                                            {preset.label}
+                                        </span>
+                                    </label>
+                                );
+                            })}
+                        </div>
+
+                        {/* Custom price inputs */}
+                        <div className="pt-2 border-t border-slate-100">
+                            <div className="grid grid-cols-2 gap-2">
+                                <div className="space-y-1">
+                                    <label className="block text-[11px] font-medium text-slate-400">Từ (đ)</label>
                                     <input
                                         type="number"
                                         value={filters.priceRange[0]}
-                                        onChange={(e) => handlePriceChange('min', parseInt(e.target.value))}
-                                        className="w-full pl-3 pr-8 py-2.5 bg-gray-50 border border-gray-200 
-                                                   rounded-xl text-sm text-gray-800 font-medium
-                                                   focus:outline-none focus:ring-2 focus:ring-primary-500/20 
-                                                   focus:border-primary-400 focus:bg-white
-                                                   transition-all duration-200
-                                                   [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none 
-                                                   [&::-webkit-inner-spin-button]:appearance-none"
+                                        onChange={(e) => handlePriceChange('min', parseInt(e.target.value) || 0)}
+                                        className="w-full px-2.5 py-1.5 bg-[#f4faff] border border-[#dff1fb] rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#1a237e] focus:bg-white"
                                         placeholder="0"
                                     />
-                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-medium">đ</span>
                                 </div>
-                            </div>
-                            <div className="space-y-1.5">
-                                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Đến
-                                </label>
-                                <div className="relative">
+                                <div className="space-y-1">
+                                    <label className="block text-[11px] font-medium text-slate-400">Đến (đ)</label>
                                     <input
                                         type="number"
                                         value={filters.priceRange[1]}
-                                        onChange={(e) => handlePriceChange('max', parseInt(e.target.value))}
-                                        className="w-full pl-3 pr-8 py-2.5 bg-gray-50 border border-gray-200 
-                                                   rounded-xl text-sm text-gray-800 font-medium
-                                                   focus:outline-none focus:ring-2 focus:ring-primary-500/20 
-                                                   focus:border-primary-400 focus:bg-white
-                                                   transition-all duration-200
-                                                   [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none 
-                                                   [&::-webkit-inner-spin-button]:appearance-none"
+                                        onChange={(e) => handlePriceChange('max', parseInt(e.target.value) || 300000)}
+                                        className="w-full px-2.5 py-1.5 bg-[#f4faff] border border-[#dff1fb] rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#1a237e] focus:bg-white"
                                         placeholder="300,000"
                                     />
-                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-medium">đ</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </FilterSection>
+                )}
+            </div>
 
-                <div className="mx-4">
-                    <div className="border-t border-gray-100" />
-                </div>
+            <div className="border-t border-[#dff1fb]" />
 
-                {/* Categories */}
-                <FilterSection
-                    title="Danh mục"
-                    icon={<Grid3X3 className="w-4 h-4" />}
-                    isExpanded={expandedSections.category}
-                    onToggle={() => toggleSection('category')}
-                    count={filters.categories.length}
+            {/* 2. Categories Section */}
+            <div className="flex flex-col">
+                <button
+                    onClick={() => toggleSection('category')}
+                    className="flex items-center justify-between w-full py-1 text-left cursor-pointer group"
                 >
-                    <div className="space-y-1">
-                        {categories.map((category) => (
-                            <CheckboxItem
-                                key={category}
-                                label={category}
-                                checked={filters.categories.includes(category)}
-                                onChange={(checked) => handleCheckboxChange('categories', category, checked)}
-                            />
-                        ))}
+                    <h3 className="font-headline font-bold text-sm text-[#0d1e25] group-hover:text-[#1a237e] transition-colors">
+                        Thể loại sách
+                    </h3>
+                    <ChevronDown
+                        className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${expanded.category ? 'rotate-180 text-[#1a237e]' : ''
+                            }`}
+                    />
+                </button>
+
+                {expanded.category && (
+                    <div className="flex flex-col gap-1 max-h-48 overflow-y-auto pr-1 pt-2.5 scrollbar-thin scrollbar-thumb-slate-200 animate-fadeIn">
+                        {categories.map((category) => {
+                            const checked = filters.categories.includes(category);
+                            return (
+                                <label
+                                    key={category}
+                                    className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg cursor-pointer transition-colors ${checked
+                                            ? 'bg-[#e3f2fd] text-[#1a237e] font-semibold'
+                                            : 'text-slate-600 hover:bg-[#f4faff]'
+                                        }`}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={checked}
+                                        onChange={(e) => handleCheckboxChange('categories', category, e.target.checked)}
+                                        className="w-4 h-4 rounded text-[#1a237e] focus:ring-[#1a237e] border-slate-300 accent-[#1a237e] cursor-pointer"
+                                    />
+                                    <span className="font-body text-sm text-inherit">
+                                        {category}
+                                    </span>
+                                </label>
+                            );
+                        })}
                     </div>
-                </FilterSection>
+                )}
+            </div>
 
-                <div className="mx-4">
-                    <div className="border-t border-gray-100" />
-                </div>
+            <div className="border-t border-[#dff1fb]" />
 
-                {/* Publishers */}
-                <FilterSection
-                    title="Nhà xuất bản"
-                    icon={<BookOpen className="w-4 h-4" />}
-                    isExpanded={expandedSections.publisher}
-                    onToggle={() => toggleSection('publisher')}
-                    count={filters.publishers.length}
+            {/* 3. Publishers Section */}
+            <div className="flex flex-col">
+                <button
+                    onClick={() => toggleSection('publisher')}
+                    className="flex items-center justify-between w-full py-1 text-left cursor-pointer group"
                 >
-                    <div className="space-y-1 max-h-48 overflow-y-auto pr-1 
-                                    scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
-                        {publishers.map((publisher) => (
-                            <CheckboxItem
-                                key={publisher}
-                                label={publisher}
-                                checked={filters.publishers.includes(publisher)}
-                                onChange={(checked) => handleCheckboxChange('publishers', publisher, checked)}
-                            />
-                        ))}
+                    <h3 className="font-headline font-bold text-sm text-[#0d1e25] group-hover:text-[#1a237e] transition-colors">
+                        Nhà xuất bản
+                    </h3>
+                    <ChevronDown
+                        className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${expanded.publisher ? 'rotate-180 text-[#1a237e]' : ''
+                            }`}
+                    />
+                </button>
+
+                {expanded.publisher && (
+                    <div className="flex flex-col gap-1 max-h-48 overflow-y-auto pr-1 pt-2.5 scrollbar-thin scrollbar-thumb-slate-200 animate-fadeIn">
+                        {publishers.map((publisher) => {
+                            const checked = filters.publishers.includes(publisher);
+                            return (
+                                <label
+                                    key={publisher}
+                                    className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg cursor-pointer transition-colors ${checked
+                                            ? 'bg-[#e3f2fd] text-[#1a237e] font-semibold'
+                                            : 'text-slate-600 hover:bg-[#f4faff]'
+                                        }`}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={checked}
+                                        onChange={(e) => handleCheckboxChange('publishers', publisher, e.target.checked)}
+                                        className="w-4 h-4 rounded text-[#1a237e] focus:ring-[#1a237e] border-slate-300 accent-[#1a237e] cursor-pointer"
+                                    />
+                                    <span className="font-body text-sm text-inherit">
+                                        {publisher}
+                                    </span>
+                                </label>
+                            );
+                        })}
                     </div>
-                </FilterSection>
+                )}
+            </div>
 
-                <div className="mx-4">
-                    <div className="border-t border-gray-100" />
-                </div>
+            <div className="border-t border-[#dff1fb]" />
 
-                {/* Publish Years */}
-                <FilterSection
-                    title="Năm xuất bản"
-                    icon={<Calendar className="w-4 h-4" />}
-                    isExpanded={expandedSections.year}
-                    onToggle={() => toggleSection('year')}
-                    count={filters.publishYears.length}
+            {/* 4. Publish Years */}
+            <div className="flex flex-col">
+                <button
+                    onClick={() => toggleSection('year')}
+                    className="flex items-center justify-between w-full py-1 text-left cursor-pointer group"
                 >
-                    <div className="flex flex-wrap gap-2">
+                    <h3 className="font-headline font-bold text-sm text-[#0d1e25] group-hover:text-[#1a237e] transition-colors">
+                        Năm phát hành
+                    </h3>
+                    <ChevronDown
+                        className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${expanded.year ? 'rotate-180 text-[#1a237e]' : ''
+                            }`}
+                    />
+                </button>
+
+                {expanded.year && (
+                    <div className="flex flex-wrap gap-2 pt-2.5 animate-fadeIn">
                         {[...publishYears].sort((a, b) => b - a).map((year) => {
                             const isChecked = filters.publishYears.includes(year);
                             return (
                                 <button
                                     key={year}
                                     onClick={() => handleCheckboxChange('publishYears', year, !isChecked)}
-                                    className={`px-3.5 py-1.5 text-sm font-medium rounded-lg
-                                               transition-all duration-150 border
-                                               ${isChecked
-                                            ? 'bg-primary-500 text-white border-primary-500 shadow-sm shadow-primary-200'
-                                            : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300 hover:text-primary-600'}`}
+                                    className={`px-3 py-1 text-xs font-headline font-semibold rounded-lg transition-all border cursor-pointer ${isChecked
+                                            ? 'bg-[#1a237e] text-white border-[#1a237e] shadow-sm'
+                                            : 'bg-[#f4faff] text-slate-600 border-[#dff1fb] hover:border-blue-300 hover:text-[#1a237e]'
+                                        }`}
                                 >
                                     {year}
                                 </button>
                             );
                         })}
                     </div>
-                </FilterSection>
-
-                <div className="mx-4">
-                    <div className="border-t border-gray-100" />
-                </div>
-
-                {/* Cover Types */}
-                <FilterSection
-                    title="Hình thức bìa"
-                    icon={<Layers className="w-4 h-4" />}
-                    isExpanded={expandedSections.cover}
-                    onToggle={() => toggleSection('cover')}
-                    count={filters.coverTypes.length}
-                >
-                    <div className="space-y-1">
-                        {coverTypes.map((type) => (
-                            <CheckboxItem
-                                key={type}
-                                label={type == "HARDCOVER" ? "Bìa cứng" : "Bìa mềm"}
-                                checked={filters.coverTypes.includes(type)}
-                                onChange={(checked) => handleCheckboxChange('coverTypes', type, checked)}
-                            />
-                        ))}
-                    </div>
-                </FilterSection>
+                )}
             </div>
-        </div>
+
+            <div className="border-t border-[#dff1fb]" />
+
+            {/* 5. Cover Types */}
+            <div className="flex flex-col">
+                <button
+                    onClick={() => toggleSection('cover')}
+                    className="flex items-center justify-between w-full py-1 text-left cursor-pointer group"
+                >
+                    <h3 className="font-headline font-bold text-sm text-[#0d1e25] group-hover:text-[#1a237e] transition-colors">
+                        Hình thức bìa
+                    </h3>
+                    <ChevronDown
+                        className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${expanded.cover ? 'rotate-180 text-[#1a237e]' : ''
+                            }`}
+                    />
+                </button>
+
+                {expanded.cover && (
+                    <div className="flex flex-col gap-1 pt-2.5 animate-fadeIn">
+                        {coverTypes.map((type) => {
+                            const checked = filters.coverTypes.includes(type);
+                            return (
+                                <label
+                                    key={type}
+                                    className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg cursor-pointer transition-colors ${checked
+                                            ? 'bg-[#e3f2fd] text-[#1a237e] font-semibold'
+                                            : 'text-slate-600 hover:bg-[#f4faff]'
+                                        }`}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={checked}
+                                        onChange={(e) => handleCheckboxChange('coverTypes', type, e.target.checked)}
+                                        className="w-4 h-4 rounded text-[#1a237e] focus:ring-[#1a237e] border-slate-300 accent-[#1a237e] cursor-pointer"
+                                    />
+                                    <span className="font-body text-sm text-inherit">
+                                        {type === 'HARDCOVER' ? 'Bìa cứng' : 'Bìa mềm'}
+                                    </span>
+                                </label>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
+
+            {/* Bottom Reset Button */}
+            {hasActiveFilters && (
+                <button
+                    onClick={resetFilters}
+                    className="bg-[#1a237e] hover:bg-[#283593] text-white font-headline font-semibold text-sm py-2.5 px-4 rounded-xl transition-all shadow-sm hover:shadow mt-2 w-full cursor-pointer"
+                >
+                    Xóa tất cả bộ lọc
+                </button>
+            )}
+        </aside>
     );
 }
+
+

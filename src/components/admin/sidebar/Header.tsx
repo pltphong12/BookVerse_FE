@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge, Space } from 'antd';
+import { Badge } from 'antd';
 import { BellOutlined } from '@ant-design/icons';
 import { Account } from './Account';
 

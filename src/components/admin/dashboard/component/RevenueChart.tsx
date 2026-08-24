@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { Card, Empty, Typography } from 'antd';
 import { BarChartOutlined } from '@ant-design/icons';
 import {
