@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import Logo from '../../assets/logo.png';
+import Logo from '../../assets/logo_v2.png';
 import { callRegisterApi } from '../../services/api';
 import { showToast, ToastType } from '../../common/showToast';
 import { AxiosError } from 'axios';

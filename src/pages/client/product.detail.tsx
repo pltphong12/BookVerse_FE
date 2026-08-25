@@ -1,5 +1,5 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ChevronRight, Home } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { callFetchBookByIdApi, callFetchAllProductsWithPaginationAndFilterApi } from '../../services/api';
 import ProductImageGallery from '../../components/client/product/ProductDetail/ProductImageGallery';
@@ -41,7 +41,7 @@ export default function ProductDetailPage() {
   if (isLoading) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-3">
-        <div className="w-10 h-10 border-3 border-[#e3f2fd] border-t-[#1a237e] rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-2 border-[#E5E2DD] border-t-[#1A1A1A] rounded-full animate-spin"></div>
         <p className="font-body text-sm text-slate-500">Đang tải thông tin cuốn sách...</p>
       </div>
     );
@@ -50,15 +50,15 @@ export default function ProductDetailPage() {
   if (!product || !product.data?.data) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="text-center bg-white p-8 sm:p-12 rounded-3xl border border-[#dff1fb] shadow-sm max-w-md">
+        <div className="text-center bg-white p-8 sm:p-12 rounded-lg border border-[#E5E2DD] shadow-sm max-w-md">
           <div className="text-5xl mb-4">📖</div>
-          <h1 className="font-headline text-2xl font-bold text-[#0d1e25] mb-2">Không tìm thấy sách</h1>
+          <h1 className="font-serif text-2xl font-bold text-[#1A1A1A] mb-2">Không tìm thấy sách</h1>
           <p className="font-body text-sm text-slate-500 mb-6">
             Cuốn sách này có thể đã ngừng kinh doanh hoặc đường dẫn không còn chính xác.
           </p>
           <button
             onClick={() => navigate('/')}
-            className="bg-[#1a237e] hover:bg-[#283593] text-white px-6 py-3 rounded-xl font-headline font-semibold text-sm transition-colors shadow-sm cursor-pointer"
+            className="bg-[#1A1A1A] hover:bg-[#0070B5] text-white px-6 py-3 rounded font-body font-semibold text-sm transition-colors shadow-sm cursor-pointer"
           >
             Quay lại trang chủ
           </button>
@@ -70,14 +70,13 @@ export default function ProductDetailPage() {
   const bookData = product.data.data as IBook;
 
   return (
-    <div className="space-y-8 lg:space-y-12">
+    <div className="space-y-10 lg:space-y-14">
       {/* Breadcrumbs */}
       <nav aria-label="Breadcrumb">
-        <ol className="flex items-center flex-wrap gap-1.5 text-xs sm:text-sm font-body text-slate-500 font-medium">
+        <ol className="flex items-center flex-wrap gap-1.5 text-xs sm:text-sm font-body text-slate-500">
           <li>
-            <Link to="/" className="flex items-center gap-1 text-slate-500 hover:text-[#1a237e] transition-colors">
-              <Home className="w-3.5 h-3.5" />
-              <span>Trang chủ</span>
+            <Link to="/" className="text-slate-500 hover:text-[#0070B5] transition-colors">
+              Trang chủ
             </Link>
           </li>
           <li>
@@ -86,7 +85,7 @@ export default function ProductDetailPage() {
           <li>
             <Link
               to={`/products?category=${bookData.category?.id}`}
-              className="text-slate-500 hover:text-[#1a237e] transition-colors"
+              className="text-slate-500 hover:text-[#0070B5] transition-colors"
             >
               {bookData.category?.name || 'Sách'}
             </Link>
@@ -94,53 +93,50 @@ export default function ProductDetailPage() {
           <li>
             <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
           </li>
-          <li aria-current="page" className="text-[#0d1e25] font-semibold line-clamp-1 max-w-[200px] sm:max-w-md">
+          <li aria-current="page" className="text-[#1A1A1A] font-semibold line-clamp-1 max-w-[200px] sm:max-w-md">
             {bookData.title}
           </li>
         </ol>
       </nav>
 
-      {/* Product Bento Layout (Left: 5 cols, Right: 7 cols) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-        {/* Left Column: Cover & Thumbnails */}
-        <div className="lg:col-span-5 sticky top-24">
+      {/* 2-Column Product Detail Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-14 items-start">
+        {/* Left Column: Book Cover & Gallery */}
+        <div className="md:col-span-5 lg:col-span-5 md:sticky md:top-24">
           <ProductImageGallery
             title={bookData.title || ''}
             images={bookData.images || []}
           />
         </div>
 
-        {/* Right Column: Details, Price, Actions, Tabs & Benefits */}
-        <div className="lg:col-span-7">
+        {/* Right Column: Details, Price, Actions & Specifications */}
+        <div className="md:col-span-7 lg:col-span-7">
           <ProductInfo product={bookData} />
         </div>
       </div>
 
-      {/* Related Books Section */}
+      {/* Related Books Section (The "Bookshelf") */}
       {relatedBooks.length > 0 && (
-        <section className="pt-6 border-t border-[#dff1fb] space-y-6">
-          <div className="flex items-center justify-between">
+        <section className="pt-8 border-t border-[#E5E2DD] space-y-6">
+          <div className="flex items-end justify-between border-b border-[#E5E2DD] pb-4">
             <div>
-              <h2 className="font-headline text-xl sm:text-2xl font-extrabold text-[#0d1e25]">
+              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#1A1A1A]">
                 Sách cùng thể loại
               </h2>
-              <p className="font-body text-xs sm:text-sm text-slate-500 mt-1">
-                Những tác phẩm chọn lọc khác có thể bạn sẽ yêu thích
-              </p>
             </div>
             <Link
               to={`/products?category=${bookData.category?.id}`}
-              className="font-headline font-semibold text-xs sm:text-sm text-[#1a237e] hover:underline flex items-center gap-1"
+              className="font-body font-semibold text-sm text-[#0070B5] hover:underline flex items-center gap-1 transition-colors"
             >
               <span>Xem tất cả</span>
               <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5 lg:gap-6">
             {relatedBooks
               .filter((b) => b.id !== bookData.id)
-              .slice(0, 5)
+              .slice(0, 6)
               .map((book) => (
                 <ProductCard key={book.id} {...book} />
               ))}
@@ -149,10 +145,9 @@ export default function ProductDetailPage() {
       )}
 
       {/* Reviews Section */}
-      <div className="pt-2">
+      <div className="pt-4">
         <ReviewSection />
       </div>
     </div>
   );
 }
-

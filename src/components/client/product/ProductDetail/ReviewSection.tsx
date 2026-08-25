@@ -66,29 +66,29 @@ export default function ReviewSection() {
     ).toFixed(1);
 
     return (
-        <section className="bg-white rounded-2xl border border-[#dff1fb] p-6 sm:p-8 shadow-sm space-y-8">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+        <section className="bg-white rounded-lg border border-[#E5E2DD] p-6 sm:p-8 shadow-sm space-y-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E2DD] pb-5">
                 <div>
-                    <h2 className="font-headline text-xl sm:text-2xl font-extrabold text-[#0d1e25]">
+                    <h2 className="font-serif text-xl sm:text-2xl font-bold text-[#1A1A1A]">
                         Đánh giá từ độc giả
                     </h2>
                     <p className="font-body text-xs sm:text-sm text-slate-500 mt-1">
                         Tổng hợp nhận xét và đánh giá trải nghiệm đọc thực tế
                     </p>
                 </div>
-                <button className="flex items-center gap-2 bg-[#1a237e] hover:bg-[#283593] text-white px-5 py-2.5 rounded-xl font-headline font-semibold text-xs sm:text-sm transition-all shadow-sm hover:shadow self-start sm:self-auto cursor-pointer">
+                <button className="flex items-center gap-2 bg-[#1A1A1A] hover:bg-[#0070B5] text-white px-5 py-2.5 rounded font-body font-semibold text-xs sm:text-sm transition-colors shadow-sm cursor-pointer self-start sm:self-auto">
                     <MessageSquarePlus className="w-4 h-4" />
                     <span>Viết đánh giá</span>
                 </button>
             </div>
 
             {/* Score Overview Bento */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 bg-[#f4faff] border border-[#dff1fb] rounded-2xl p-6">
-                <div className="md:col-span-4 flex flex-col items-center justify-center text-center border-b md:border-b-0 md:border-r border-blue-100 pb-5 md:pb-0 md:pr-6">
-                    <div className="font-headline text-5xl font-extrabold text-[#1a237e] tracking-tight">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 bg-[#FAF9F7] border border-[#E5E2DD] rounded-lg p-6">
+                <div className="md:col-span-4 flex flex-col items-center justify-center text-center border-b md:border-b-0 md:border-r border-[#E5E2DD] pb-5 md:pb-0 md:pr-6">
+                    <div className="font-serif text-5xl font-bold text-[#1A1A1A] tracking-tight">
                         {averageRating}
                     </div>
-                    <div className="flex text-amber-400 my-2">
+                    <div className="flex text-[#B8860B] my-2">
                         {[...Array(5)].map((_, i) => (
                             <Star
                                 key={i}
@@ -112,11 +112,11 @@ export default function ReviewSection() {
                         return (
                             <div key={stars} className="flex items-center gap-3 text-xs font-body">
                                 <span className="font-semibold text-slate-700 w-8 flex items-center gap-1">
-                                    {stars} <Star className="w-3 h-3 fill-amber-400 text-amber-400 inline" />
+                                    {stars} <Star className="w-3 h-3 fill-[#B8860B] text-[#B8860B] inline" />
                                 </span>
-                                <div className="flex-1 bg-slate-200/70 rounded-full h-2 overflow-hidden">
+                                <div className="flex-1 bg-[#E5E2DD] rounded-full h-2 overflow-hidden">
                                     <div
-                                        className="bg-[#1a237e] h-full rounded-full transition-all duration-500"
+                                        className="bg-[#1A1A1A] h-full rounded-full transition-all duration-500"
                                         style={{ width: `${percentage}%` }}
                                     />
                                 </div>
@@ -132,32 +132,36 @@ export default function ReviewSection() {
                 {mockReviews.map((review) => (
                     <div
                         key={review.id}
-                        className="bg-white border border-[#dff1fb] rounded-2xl p-5 sm:p-6 space-y-3 hover:border-blue-200 transition-colors"
+                        className="bg-white border border-[#E5E2DD] rounded-lg p-5 sm:p-6 space-y-3 hover:border-slate-400 transition-colors"
                     >
                         <div className="flex items-start justify-between gap-4">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-[#e3f2fd] text-[#1a237e] font-headline font-bold text-sm flex items-center justify-center shadow-inner shrink-0">
+                                <div className="w-10 h-10 rounded-full bg-[#FAF9F7] border border-[#E5E2DD] text-[#1A1A1A] font-serif font-bold text-sm flex items-center justify-center shadow-inner shrink-0">
                                     {review.author.charAt(0)}
                                 </div>
                                 <div>
                                     <div className="flex items-center gap-2">
-                                        <span className="font-headline font-bold text-sm text-[#0d1e25]">
+                                        <h4 className="font-body font-semibold text-sm text-[#1A1A1A]">
                                             {review.author}
-                                        </span>
+                                        </h4>
                                         {review.verified && (
-                                            <span className="inline-flex items-center gap-1 text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full font-medium">
-                                                <CheckCircle2 className="w-3 h-3" /> Đã mua hàng
+                                            <span className="inline-flex items-center gap-1 text-[11px] font-body font-medium text-[#0070B5] bg-[#E3F2FD] px-2 py-0.5 rounded-full">
+                                                <CheckCircle2 className="w-3 h-3" />
+                                                Đã mua hàng
                                             </span>
                                         )}
                                     </div>
-                                    <p className="font-body text-xs text-slate-400 mt-0.5">{review.date}</p>
+                                    <span className="text-xs font-body text-slate-400">
+                                        {review.date}
+                                    </span>
                                 </div>
                             </div>
-                            <div className="flex text-amber-400 shrink-0">
+
+                            <div className="flex text-[#B8860B]">
                                 {[...Array(5)].map((_, i) => (
                                     <Star
                                         key={i}
-                                        className={`w-3.5 h-3.5 ${
+                                        className={`w-4 h-4 ${
                                             i < review.rating ? 'fill-current' : 'text-slate-200'
                                         }`}
                                     />
@@ -166,21 +170,22 @@ export default function ReviewSection() {
                         </div>
 
                         <div>
-                            <h3 className="font-headline font-bold text-sm text-slate-800 mb-1">
+                            <h5 className="font-serif font-bold text-sm text-[#1A1A1A] mb-1">
                                 {review.title}
-                            </h3>
+                            </h5>
                             <p className="font-body text-sm text-slate-600 leading-relaxed">
                                 {review.content}
                             </p>
                         </div>
 
-                        <div className="pt-1">
+                        <div className="flex items-center justify-between pt-2 border-t border-[#FAF9F7] text-xs font-body text-slate-400">
+                            <span>Đánh giá hữu ích?</span>
                             <button
                                 onClick={() => toggleHelpful(review.id)}
-                                className={`inline-flex items-center gap-1.5 text-xs font-body px-3.5 py-1.5 rounded-full border transition-all cursor-pointer ${
+                                className={`flex items-center gap-1.5 px-3 py-1 rounded transition-colors cursor-pointer border ${
                                     helpfulReviews.has(review.id)
-                                        ? 'bg-[#e3f2fd] border-blue-300 text-[#1a237e] font-semibold'
-                                        : 'bg-[#f4faff] border-[#dff1fb] text-slate-600 hover:border-[#1a237e] hover:text-[#1a237e]'
+                                        ? 'bg-[#FAF9F7] border-[#1A1A1A] text-[#1A1A1A] font-semibold'
+                                        : 'border-[#E5E2DD] text-slate-500 hover:text-[#1A1A1A]'
                                 }`}
                             >
                                 <ThumbsUp className="w-3.5 h-3.5" />
@@ -193,4 +198,3 @@ export default function ReviewSection() {
         </section>
     );
 }
-

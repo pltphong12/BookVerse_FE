@@ -66,24 +66,24 @@ export const Pagination = (props: PaginationProps) => {
     const pageNumbers = getPageNumbers();
 
     const baseNumberButtonClass =
-        'w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center font-headline font-bold text-xs sm:text-sm rounded-full transition-all duration-200 cursor-pointer select-none';
+        'w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center font-body font-semibold text-xs sm:text-sm rounded transition-all duration-200 cursor-pointer select-none';
     const defaultNumberButtonClass =
-        'bg-white text-slate-700 border border-[#dff1fb] hover:bg-[#e3f2fd] hover:text-[#1a237e] hover:border-blue-300 shadow-sm';
+        'bg-white text-[#1A1A1A] border border-[#E5E2DD] hover:bg-[#FAF9F7] hover:border-slate-400 shadow-xs';
     const activeNumberButtonClass =
-        'bg-[#1a237e] text-white border border-[#1a237e] shadow-md shadow-indigo-950/15';
+        'bg-[#1A1A1A] text-white border border-[#1A1A1A] shadow-sm';
 
     const baseNavButtonClass =
-        'w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full transition-all duration-200 select-none';
+        'w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded transition-all duration-200 select-none';
     const defaultNavButtonClass =
-        'text-slate-600 hover:text-[#1a237e] hover:bg-[#e3f2fd] border border-[#dff1fb] bg-white shadow-sm cursor-pointer';
+        'text-[#1A1A1A] hover:text-[#0070B5] hover:bg-[#FAF9F7] border border-[#E5E2DD] bg-white shadow-xs cursor-pointer';
     const disabledNavButtonClass =
-        'text-slate-300 border border-slate-200/60 bg-slate-50 cursor-not-allowed';
+        'text-slate-300 border border-[#E5E2DD] bg-[#FAF9F7] cursor-not-allowed';
 
     const ellipsisClass =
         'w-8 h-8 flex items-center justify-center text-sm font-medium text-slate-400 select-none';
 
     return (
-        <div className="flex justify-center items-center gap-2 mt-8 py-4">
+        <div className="flex justify-center items-center gap-2 mt-12 pt-8 border-t border-[#E5E2DD]">
             {/* Nút Previous */}
             <button
                 className={`${baseNavButtonClass} ${page === 1 ? disabledNavButtonClass : defaultNavButtonClass}`}
@@ -92,7 +92,7 @@ export const Pagination = (props: PaginationProps) => {
                 aria-label="Trang trước"
             >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
             </button>
 
@@ -100,24 +100,22 @@ export const Pagination = (props: PaginationProps) => {
             {pageNumbers.map((pageNumber, index) => {
                 if (pageNumber === '...') {
                     return (
-                        <span
-                            key={`ellipsis-${index}`}
-                            className={ellipsisClass}
-                        >
+                        <span key={`ellipsis-${index}`} className={ellipsisClass}>
                             ...
                         </span>
                     );
                 }
 
-                const isActive = pageNumber === page;
+                const isCurrentPage = pageNumber === page;
 
                 return (
                     <button
-                        key={pageNumber}
-                        className={`${baseNumberButtonClass} ${isActive ? activeNumberButtonClass : defaultNumberButtonClass}`}
+                        key={`page-${pageNumber}`}
+                        className={`${baseNumberButtonClass} ${isCurrentPage ? activeNumberButtonClass : defaultNumberButtonClass
+                            }`}
                         onClick={() => handlePageClick(pageNumber as number)}
                         aria-label={`Trang ${pageNumber}`}
-                        aria-current={isActive ? 'page' : undefined}
+                        aria-current={isCurrentPage ? 'page' : undefined}
                     >
                         {pageNumber}
                     </button>
@@ -126,13 +124,14 @@ export const Pagination = (props: PaginationProps) => {
 
             {/* Nút Next */}
             <button
-                className={`${baseNavButtonClass} ${page === totalPage ? disabledNavButtonClass : defaultNavButtonClass}`}
+                className={`${baseNavButtonClass} ${page === totalPage ? disabledNavButtonClass : defaultNavButtonClass
+                    }`}
                 disabled={page === totalPage}
                 onClick={handleNextPage}
-                aria-label="Trang tiếp theo"
+                aria-label="Trang sau"
             >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
             </button>
         </div>

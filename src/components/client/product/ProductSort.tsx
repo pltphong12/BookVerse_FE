@@ -1,4 +1,4 @@
-import { ChevronDown, ArrowDownUp } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'best-selling' | 'rating';
 
@@ -9,6 +9,7 @@ interface ProductSortProps {
     productsPerPage: number;
     onItemsPerPageChange: (count: number) => void;
     currentPage?: number;
+    title?: string;
 }
 
 export default function ProductSort({
@@ -18,13 +19,14 @@ export default function ProductSort({
     productsPerPage,
     onItemsPerPageChange,
     currentPage = 1,
+    title = 'Tất cả sản phẩm',
 }: ProductSortProps) {
     const sortOptions: { value: SortOption; label: string }[] = [
         { value: 'newest', label: 'Mới nhất' },
-        { value: 'best-selling', label: 'Bán chạy nhất' },
-        { value: 'rating', label: 'Đánh giá cao nhất' },
-        { value: 'price-asc', label: 'Giá: Thấp đến cao' },
-        { value: 'price-desc', label: 'Giá: Cao đến thấp' },
+        { value: 'price-asc', label: 'Giá tăng dần' },
+        { value: 'price-desc', label: 'Giá giảm dần' },
+        { value: 'best-selling', label: 'Bán chạy' },
+        { value: 'rating', label: 'Đánh giá cao' },
     ];
 
     const itemsPerPageOptions = [12, 24, 36, 48];
@@ -33,49 +35,47 @@ export default function ProductSort({
     const endItem = Math.min(currentPage * productsPerPage, totalProducts);
 
     return (
-        <div className="bg-white rounded-2xl border border-[#dff1fb] shadow-sm p-4 sm:p-5 flex items-center justify-between flex-wrap gap-4">
-            <div className="text-xs sm:text-sm font-body text-slate-500">
-                {totalProducts > 0 ? (
-                    <>
-                        Hiển thị <span className="font-headline font-bold text-[#1a237e]">{startItem} - {endItem}</span> của{' '}
-                        <span className="font-headline font-bold text-[#1a237e]">{totalProducts}</span> kết quả
-                    </>
-                ) : (
-                    'Không có sản phẩm nào'
-                )}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 pb-4 border-b border-[#E5E2DD] gap-4">
+            {/* Title & Count */}
+            <div>
+                <h1 className="font-serif text-3xl sm:text-4xl font-bold text-[#1A1A1A] tracking-tight">
+                    {title}
+                </h1>
+                <p className="font-body text-sm text-slate-500 mt-1">
+                    {totalProducts > 0 ? (
+                        <>Hiển thị <strong>{startItem} - {endItem}</strong> của <strong>{totalProducts}</strong> kết quả</>
+                    ) : (
+                        'Không có sản phẩm nào'
+                    )}
+                </p>
             </div>
 
-            <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
-                {/* Items Per Page Select */}
-                <div className="flex items-center gap-2">
-                    <span className="text-xs sm:text-sm font-body text-slate-500">Hiển thị:</span>
-                    <div className="relative">
-                        <select
-                            value={productsPerPage}
-                            onChange={(e) => onItemsPerPageChange(parseInt(e.target.value))}
-                            className="appearance-none px-3 py-1.5 pr-7 bg-[#f4faff] border border-[#dff1fb] hover:border-blue-300 rounded-xl text-xs sm:text-sm font-body font-semibold text-slate-700 focus:outline-none focus:border-[#1a237e] focus:bg-white cursor-pointer transition-all"
-                        >
-                            {itemsPerPageOptions.map((count) => (
-                                <option key={count} value={count}>
-                                    {count} / trang
-                                </option>
-                            ))}
-                        </select>
-                        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
-                    </div>
+            {/* Controls: Per Page & Sort By */}
+            <div className="flex items-center gap-6 flex-wrap self-stretch sm:self-auto justify-between sm:justify-end">
+                {/* Items Per Page */}
+                <div className="flex items-center gap-2 font-body text-sm text-slate-600">
+                    <span className="text-xs text-slate-400">Hiển thị:</span>
+                    <select
+                        value={productsPerPage}
+                        onChange={(e) => onItemsPerPageChange(parseInt(e.target.value))}
+                        className="bg-transparent border-b border-[#1A1A1A] focus:border-[#0070B5] outline-none pb-0.5 text-xs font-semibold text-[#1A1A1A] cursor-pointer"
+                    >
+                        {itemsPerPageOptions.map((count) => (
+                            <option key={count} value={count}>
+                                {count} / trang
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
-                {/* Sort Option Select */}
-                <div className="flex items-center gap-2">
-                    <span className="text-xs sm:text-sm font-body text-slate-500 flex items-center gap-1">
-                        <ArrowDownUp className="w-3.5 h-3.5 text-slate-400" />
-                        <span>Sắp xếp:</span>
-                    </span>
+                {/* Sort Option */}
+                <div className="flex items-center gap-2 font-body text-sm text-slate-600">
+                    <span className="text-slate-500 whitespace-nowrap">Sắp xếp theo:</span>
                     <div className="relative">
                         <select
                             value={sortBy}
                             onChange={(e) => onSortChange(e.target.value as SortOption)}
-                            className="appearance-none px-3.5 py-1.5 pr-8 bg-[#f4faff] border border-[#dff1fb] hover:border-blue-300 rounded-xl text-xs sm:text-sm font-body font-semibold text-slate-700 focus:outline-none focus:border-[#1a237e] focus:bg-white cursor-pointer transition-all"
+                            className="bg-transparent border-b border-[#1A1A1A] focus:border-[#0070B5] outline-none pr-5 pb-0.5 font-medium text-[#1A1A1A] cursor-pointer appearance-none min-w-[130px]"
                         >
                             {sortOptions.map((option) => (
                                 <option key={option.value} value={option.value}>
@@ -83,11 +83,10 @@ export default function ProductSort({
                                 </option>
                             ))}
                         </select>
-                        <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+                        <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#1A1A1A] pointer-events-none" />
                     </div>
                 </div>
             </div>
         </div>
     );
 }
-

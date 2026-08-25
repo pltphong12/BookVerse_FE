@@ -1,50 +1,53 @@
-import { Tag, Truck, ShieldCheck, Headphones } from 'lucide-react';
+import { Truck, ShieldCheck, RefreshCw, Gift } from 'lucide-react';
 
 const features = [
   {
     icon: Truck,
-    title: 'Miễn phí vận chuyển',
-    description: 'Đơn hàng từ 300.000đ',
-  },
-  {
-    icon: Tag,
-    title: 'Ưu đãi & Giảm giá',
-    description: 'Tiết kiệm đến 50% mỗi ngày',
+    title: 'Miễn phí giao hàng',
+    description: 'Cho đơn hàng từ 300.000 ₫',
   },
   {
     icon: ShieldCheck,
-    title: 'Thanh toán an toàn',
-    description: 'Bảo mật 100% giao dịch',
+    title: 'Sách thật 100%',
+    description: 'Từ các NXB uy tín hàng đầu',
   },
   {
-    icon: Headphones,
-    title: 'Hỗ trợ tận tâm 24/7',
-    description: 'Hotline: 0767557431',
+    icon: RefreshCw,
+    title: 'Đổi trả dễ dàng',
+    description: 'Miễn phí trong vòng 7 ngày',
+  },
+  {
+    icon: Gift,
+    title: 'Bọc sách & Quà tặng',
+    description: 'Đóng gói trang trọng, cẩn thận',
   },
 ];
 
 export default function PromoBanner() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-      {features.map((feature, index) => (
-        <div
-          key={index}
-          className={`bg-white/95 backdrop-blur-md rounded-2xl p-5 sm:p-6 flex items-center gap-4 border border-[#dff1fb] shadow-[0_2px_12px_-2px_rgba(26,35,126,0.04)] hover-elevation-2 transition-all stagger-${index + 1}`}
-        >
-          <div className="w-13 h-13 rounded-2xl bg-[#e3f2fd] text-[#1a237e] flex items-center justify-center flex-shrink-0 shadow-sm transition-transform duration-300 group-hover:scale-110">
-            <feature.icon className="w-6 h-6 stroke-[2]" />
+    <section className="bg-white rounded-2xl border border-[#E5E2DD] p-6 sm:p-8 shadow-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 divide-y sm:divide-y-0 sm:divide-x divide-[#E5E2DD]">
+        {features.map((feature, index) => (
+          <div
+            key={index}
+            className={`flex items-center gap-4 ${index > 0 ? 'pt-4 sm:pt-0 sm:pl-6' : ''}`}
+          >
+            <div className="w-11 h-11 rounded-full bg-[#FAF9F7] border border-[#E5E2DD] text-[#1A1A1A] flex items-center justify-center flex-shrink-0">
+              <feature.icon className="w-5 h-5 stroke-[1.8]" />
+            </div>
+            <div>
+              <h3 className="font-serif font-bold text-[#1A1A1A] text-sm leading-snug">
+                {feature.title}
+              </h3>
+              <p className="font-body text-xs text-slate-500 mt-0.5">
+                {feature.description}
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="font-headline font-bold text-[#0d1e25] text-sm sm:text-base mb-0.5">
-              {feature.title}
-            </h3>
-            <p className="font-body text-xs sm:text-sm text-slate-500">
-              {feature.description}
-            </p>
-          </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+    </section>
   );
 }
+
 

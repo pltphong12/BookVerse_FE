@@ -5,7 +5,7 @@ import { ToastContainer } from 'react-toastify';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import Logo from '../../assets/logo.png';
+import Logo from '../../assets/logo_v2.png';
 import { showToast, ToastType } from '../../common/showToast';
 import { callLoginApi } from '../../services/api';
 import { IUser } from '../../types/backend';

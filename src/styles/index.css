@@ -20,14 +20,30 @@
   --color-bv-paper: #f8fafc;
   --color-bv-slate: #0d1e25;
   --color-bv-muted: #526069;
+
+  --color-waterstones-blue: #0070B5;
+  --color-waterstones-blue-hover: #005a92;
+  --color-ink-black: #1A1A1A;
+  --color-paper-white: #FAF9F7;
+  --color-bookshelf-taupe: #E5E2DD;
 }
 
 body {
-  font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Source Sans 3', 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #faf9f7;
+  color: #1a1a1a;
+}
+
+.font-serif-literary, .font-serif {
+  font-family: 'Source Serif 4', Georgia, Cambria, 'Times New Roman', Times, serif;
+}
+
+.bookshelf-line {
+  border-bottom: 2px solid #E5E2DD;
 }
 
 h1, h2, h3, h4, h5, h6, .font-headline {
-  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Source Serif 4', 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 /* ============================= */

@@ -8,7 +8,7 @@ import {
 } from '@ant-design/icons';
 import { Link, useLocation } from 'react-router-dom';
 import type { MenuProps } from 'antd';
-import Logo from '../../../assets/main_logo.png';
+import Logo from '../../../assets/logo_v2.png';
 
 const { Sider } = Layout;
 
@@ -29,75 +29,83 @@ const menuItems: MenuItem[] = [
     },
     { type: 'divider' },
     {
-        key: 'account-group',
-        label: 'Account',
+        key: 'system-management',
+        label: 'Quản lý người dùng',
         type: 'group',
         children: [
             {
-                key: '/admin/users',
+                key: 'users-submenu',
                 icon: <UserOutlined />,
-                label: <Link to="/admin/users">Người dùng</Link>,
-            },
-            {
-                key: '/admin/roles',
-                icon: <SafetyCertificateOutlined />,
-                label: <Link to="/admin/roles">Vai trò</Link>,
-            },
-            {
-                key: '/admin/permissions',
-                icon: <KeyOutlined />,
-                label: <Link to="/admin/permissions">Quyền hạn</Link>,
+                label: 'Người dùng',
+                children: [
+                    {
+                        key: '/admin/user',
+                        icon: <TeamOutlined />,
+                        label: <Link to="/admin/user">Danh sách người dùng</Link>,
+                    },
+                    {
+                        key: '/admin/role',
+                        icon: <SafetyCertificateOutlined />,
+                        label: <Link to="/admin/role">Vai trò</Link>,
+                    },
+                    {
+                        key: '/admin/permission',
+                        icon: <KeyOutlined />,
+                        label: <Link to="/admin/permission">Quyền hạn</Link>,
+                    },
+                ],
             },
         ],
     },
     { type: 'divider' },
     {
-        key: 'content-group',
-        label: 'Content',
+        key: 'catalog-management',
+        label: 'Quản lý cửa hàng',
         type: 'group',
         children: [
             {
-                key: '/admin/customers',
-                icon: <TeamOutlined />,
-                label: <Link to="/admin/customers">Khách hàng</Link>,
-            },
-            {
-                key: '/admin/books',
+                key: 'products-submenu',
                 icon: <BookOutlined />,
-                label: <Link to="/admin/books">Sách</Link>,
+                label: 'Sản phẩm',
+                children: [
+                    {
+                        key: '/admin/book',
+                        icon: <BookOutlined />,
+                        label: <Link to="/admin/book">Danh sách sách</Link>,
+                    },
+                    {
+                        key: '/admin/author',
+                        icon: <EditOutlined />,
+                        label: <Link to="/admin/author">Tác giả</Link>,
+                    },
+                    {
+                        key: '/admin/category',
+                        icon: <TagsOutlined />,
+                        label: <Link to="/admin/category">Thể loại</Link>,
+                    },
+                    {
+                        key: '/admin/publisher',
+                        icon: <BankOutlined />,
+                        label: <Link to="/admin/publisher">Nhà xuất bản</Link>,
+                    },
+                    {
+                        key: '/admin/supplier',
+                        icon: <ShopOutlined />,
+                        label: <Link to="/admin/supplier">Nhà cung cấp</Link>,
+                    },
+                ],
             },
             {
-                key: '/admin/authors',
-                icon: <EditOutlined />,
-                label: <Link to="/admin/authors">Tác giả</Link>,
-            },
-            {
-                key: '/admin/publishers',
-                icon: <BankOutlined />,
-                label: <Link to="/admin/publishers">Nhà xuất bản</Link>,
-            },
-            {
-                key: '/admin/suppliers',
-                icon: <ShopOutlined />,
-                label: <Link to="/admin/suppliers">Nhà cung cấp</Link>,
-            },
-            {
-                key: '/admin/categories',
-                icon: <TagsOutlined />,
-                label: <Link to="/admin/categories">Thể loại</Link>,
-            },
-        ],
-    },
-    { type: 'divider' },
-    {
-        key: 'commerce-group',
-        label: 'Commerce',
-        type: 'group',
-        children: [
-            {
-                key: '/admin/orders',
+                key: 'orders-submenu',
                 icon: <ShoppingCartOutlined />,
-                label: <Link to="/admin/orders">Đơn hàng</Link>,
+                label: 'Đơn hàng',
+                children: [
+                    {
+                        key: '/admin/order',
+                        icon: <ShoppingCartOutlined />,
+                        label: <Link to="/admin/order">Danh sách đơn hàng</Link>,
+                    },
+                ],
             },
         ],
     },
@@ -129,24 +137,25 @@ export const LeftSidebar: React.FC = () => {
         >
             {/* Logo */}
             <div style={{
-                padding: collapsed ? '16px 8px' : '16px 20px',
+                padding: collapsed ? '14px 8px' : '14px 16px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderBottom: '1px solid #f0f0f0',
                 transition: 'all 0.2s',
                 flexShrink: 0,
+                minHeight: 64,
             }}>
-                <Link to="/">
+                <Link to="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
                     <img
                         src={Logo}
                         alt="BookVerse Logo"
                         style={{
-                            width: collapsed ? 32 : '100%',
-                            height: 'auto',
+                            maxHeight: collapsed ? 36 : 48,
+                            width: 'auto',
+                            maxWidth: '100%',
                             objectFit: 'contain',
-                            filter: 'brightness(0) saturate(100%) invert(39%) sepia(57%) saturate(2000%) hue-rotate(200deg) brightness(96%) contrast(94%)',
-                            transition: 'width 0.2s',
+                            transition: 'all 0.2s',
                         }}
                     />
                 </Link>

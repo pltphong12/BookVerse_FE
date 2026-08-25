@@ -1,6 +1,6 @@
-import { ChevronDown, Clock, Menu, Search, ShoppingCart, TrendingUp, User, LogOut, Lock, Package, ShieldCheck, LogIn, UserPlus } from "lucide-react";
+import { ChevronDown, Clock, Search, ShoppingBag, TrendingUp, User, LogOut, Lock, Package, ShieldCheck, LogIn, UserPlus } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import Logo from "../../assets/main_logo.png";
+import Logo from "../../assets/logo_v2.png";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { callLogoutApi, callFetchAllCategoriesApi, callFetchCartApi, callSearchAutocompleteApi } from "../../services/api";
@@ -29,7 +29,7 @@ export const Header: React.FC = () => {
             const res = await callFetchAllCategoriesApi();
             return res.data?.data ?? [];
         },
-        staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+        staleTime: 5 * 60 * 1000,
     });
 
     // Fetch cart count
@@ -137,17 +137,17 @@ export const Header: React.FC = () => {
     const handleLogout = async () => {
         try {
             queryClient.clear();
-            await callLogoutApi()
+            await callLogoutApi();
             localStorage.removeItem('access_token');
-            showToast('Đăng xuất thành công', ToastType.SUCCESS)
-            dispatch(resetAccount())
+            showToast('Đăng xuất thành công', ToastType.SUCCESS);
+            dispatch(resetAccount());
             navigate('/login');
         } catch (error) {
             if (error instanceof AxiosError) {
-                showToast(`Đăng xuất thất bại ${error.response?.data.message}`, ToastType.ERROR)
+                showToast(`Đăng xuất thất bại ${error.response?.data.message}`, ToastType.ERROR);
             }
         }
-    }
+    };
 
     const handleCategoryClick = (categoryId?: number) => {
         setIsCategoryOpen(false);
@@ -159,324 +159,329 @@ export const Header: React.FC = () => {
     };
 
     return (
-        <header className="bg-white/95 backdrop-blur-md shadow-[0_2px_16px_rgba(26,35,126,0.06)] sticky top-0 z-50 border-b border-[#e3f2fd]">
+        <header className="bg-white/95 backdrop-blur-md sticky top-0 z-50 border-b border-[#E5E2DD] shadow-2xs">
             {/* Top Utility Bar */}
-            <div className="bg-[#f8fafc] border-b border-[#e3f2fd] text-slate-500 py-2">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 flex justify-between items-center text-xs sm:text-sm font-body">
+            <div className="bg-[#FAF9F7] border-b border-[#E5E2DD] text-slate-500 py-1.5">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 flex justify-between items-center text-xs font-body">
                     <div className="flex gap-4 sm:gap-6">
-                        <span>Hotline: <strong className="text-[#1a237e] font-semibold">0767557431</strong></span>
-                        <span className="hidden sm:inline">Miễn phí vận chuyển đơn từ 300.000đ</span>
+                        <span>Hotline: <strong className="text-[#1A1A1A] font-semibold">0767557431</strong></span>
+                        <span className="hidden sm:inline text-slate-400">|</span>
+                        <span className="hidden sm:inline">Miễn phí giao hàng cho đơn từ 300.000 ₫</span>
                     </div>
                     <div className="flex gap-4 sm:gap-6 font-medium">
-                        <Link to="/order-history" className="hover:text-[#1a237e] transition-colors">Theo dõi đơn hàng</Link>
-                        <a href="#" className="hover:text-[#1a237e] transition-colors">Hỗ trợ</a>
+                        <Link to="/order-history" className="hover:text-[#0070B5] transition-colors">Theo dõi đơn hàng</Link>
+                        <a href="#" className="hover:text-[#0070B5] transition-colors">Hỗ trợ</a>
                     </div>
                 </div>
             </div>
 
             {/* Main Header Bar */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 py-3.5 sm:py-4">
-                <div className="flex items-center justify-between gap-4">
-                    {/* Logo */}
-                    <div className="flex items-center gap-4 shrink-0">
-                        <Link to={'/'} className="flex items-center gap-3">
-                            <img
-                                className="w-28 sm:w-32 h-auto object-contain"
-                                src={Logo}
-                                alt="BookVerse Logo"
-                                style={{
-                                    filter: 'brightness(0) saturate(100%) invert(13%) sepia(85%) saturate(3025%) hue-rotate(229deg) brightness(90%) contrast(105%)',
-                                }}
-                            />
-                            <div className="hidden sm:flex flex-col">
-                                <h1 className="text-xl font-headline font-extrabold text-[#0d1e25] leading-tight">Vũ Trụ Sách</h1>
-                                <p className="text-xs text-slate-500 font-body">Tri thức mở ra thế giới</p>
-                            </div>
-                        </Link>
-                    </div>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 h-20 sm:h-22 flex items-center justify-between gap-6">
+                {/* Brand Logo */}
+                <div className="flex-shrink-0">
+                    <Link to={'/'} className="flex items-center group">
+                        <img
+                            src={Logo}
+                            alt="BookVerse Logo"
+                            className="h-12 sm:h-14 md:h-16 w-auto object-contain transition-transform group-hover:scale-105"
+                        />
+                    </Link>
+                </div>
 
-                    {/* Category Dropdown + Search Bar */}
-                    <div className="flex-1 max-w-3xl flex items-center gap-3">
-                        {/* Category Button with Hover Dropdown */}
-                        <div
-                            ref={categoryRef}
-                            className="relative shrink-0"
-                            onMouseEnter={handleMouseEnter}
-                            onMouseLeave={handleMouseLeave}
+                {/* Navigation Links (Desktop - Stitch / Waterstones Style) */}
+                <nav className="hidden md:flex items-center gap-8 font-body text-[15px] font-medium text-slate-600">
+                    {/* Category Dropdown on Hover */}
+                    <div
+                        ref={categoryRef}
+                        className="relative"
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                    >
+                        <button
+                            onClick={() => handleCategoryClick()}
+                            className={`flex items-center gap-1.5 py-1 hover:text-[#0070B5] transition-colors cursor-pointer ${isCategoryOpen ? 'text-[#0070B5]' : ''
+                                }`}
                         >
-                            <button
-                                className="flex items-center gap-2 bg-[#f4faff] hover:bg-[#e3f2fd] text-[#1a237e] px-4 py-2.5 rounded-full font-headline font-semibold text-sm cursor-pointer border border-[#dff1fb] hover:border-blue-300 transition-all whitespace-nowrap h-[46px] shadow-sm"
-                            >
-                                <Menu className="w-4 h-4" />
-                                <span>Danh mục</span>
-                                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${isCategoryOpen ? 'rotate-180' : ''}`} />
-                            </button>
+                            <span>Thể loại</span>
+                            <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isCategoryOpen ? 'rotate-180 text-[#0070B5]' : 'text-slate-400'}`} />
+                        </button>
 
-                            {/* Dropdown popup on hover */}
-                            <div className={`
-                                absolute top-full left-0 mt-2
-                                bg-white rounded-2xl shadow-2xl border border-[#dff1fb]
-                                min-w-[280px] z-50 p-2
-                                transition-all duration-300 ease-in-out origin-top-left
-                                ${isCategoryOpen
-                                    ? 'opacity-100 scale-100 translate-y-0'
-                                    : 'opacity-0 scale-95 -translate-y-1 pointer-events-none'
-                                }
-                            `}>
-                                <div className="max-h-[380px] overflow-y-auto">
-                                    {/* Toàn bộ sản phẩm */}
-                                    <button
-                                        onClick={() => handleCategoryClick()}
-                                        className="w-full text-left px-3.5 py-2.5 text-sm font-semibold text-[#0d1e25] hover:bg-[#e3f2fd] hover:text-[#1a237e] rounded-xl transition-colors flex items-center gap-3 cursor-pointer"
-                                    >
-                                        Tất cả danh mục sách
-                                    </button>
+                        {/* Dropdown Popup */}
+                        <div className={`
+                            absolute top-full left-0 mt-2
+                            bg-white rounded-xl shadow-lg border border-[#E5E2DD]
+                            min-w-[260px] z-50 p-2
+                            transition-all duration-200 ease-out origin-top-left
+                            ${isCategoryOpen
+                                ? 'opacity-100 scale-100 translate-y-0'
+                                : 'opacity-0 scale-95 -translate-y-1 pointer-events-none'
+                            }
+                        `}>
+                            <div className="max-h-[360px] overflow-y-auto">
+                                <button
+                                    onClick={() => handleCategoryClick()}
+                                    className="w-full text-left px-3.5 py-2 text-xs font-serif font-bold text-[#1A1A1A] hover:bg-[#FAF9F7] hover:text-[#0070B5] rounded-lg transition-colors cursor-pointer"
+                                >
+                                    Tất cả thể loại sách
+                                </button>
 
-                                    <div className="mx-2 border-t border-slate-100 my-1"></div>
+                                <div className="border-t border-[#E5E2DD] my-1"></div>
 
-                                    {/* Danh sách thể loại từ DB */}
-                                    {loadingCategories ? (
-                                        <div className="px-4 py-6 text-center">
-                                            <div className="inline-block w-5 h-5 border-2 border-[#e3f2fd] border-t-[#1a237e] rounded-full animate-spin"></div>
-                                            <p className="text-xs text-slate-400 mt-2 font-body">Đang tải...</p>
-                                        </div>
-                                    ) : categories.length > 0 ? (
-                                        categories.map((category) => (
-                                            <button
-                                                key={category.id}
-                                                onClick={() => handleCategoryClick(category.id)}
-                                                className="w-full text-left px-3.5 py-2 text-sm font-body text-slate-700 hover:bg-[#e3f2fd] hover:text-[#1a237e] rounded-xl transition-colors flex items-center gap-3 cursor-pointer"
-                                            >
-                                                <span className="flex-1">{category.name}</span>
-                                            </button>
-                                        ))
-                                    ) : (
-                                        <div className="px-4 py-4 text-center text-sm text-slate-400 font-body">
-                                            Chưa có thể loại nào
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Search Bar with Autocomplete */}
-                        <div className="flex-1 relative" ref={searchRef}>
-                            <div className="flex items-center bg-[#f4faff] hover:bg-[#eaf4fb] focus-within:bg-white focus-within:border-[#1a237e] border border-[#dff1fb] rounded-full px-4 h-[46px] transition-all shadow-sm">
-                                <Search className="w-4 h-4 text-slate-400 mr-2.5 shrink-0" />
-                                <input
-                                    type="text"
-                                    value={searchQuery}
-                                    onChange={handleSearchInputChange}
-                                    onFocus={() => { if (suggestions.length > 0 || searchProducts.length > 0) setIsSearchOpen(true); }}
-                                    onKeyDown={(e) => { if (e.key === 'Enter') handleSearchSubmit(); if (e.key === 'Escape') setIsSearchOpen(false); }}
-                                    placeholder="Tìm kiếm sách, tác giả, thể loại..."
-                                    className="w-full bg-transparent border-none outline-none text-sm text-[#0d1e25] placeholder:text-slate-400 font-body"
-                                />
-                                {searchQuery && (
-                                    <button
-                                        onClick={() => { setSearchQuery(''); setIsSearchOpen(false); }}
-                                        className="text-slate-400 hover:text-slate-600 text-xs cursor-pointer p-1 rounded-full hover:bg-slate-200 transition-colors"
-                                    >
-                                        ✕
-                                    </button>
+                                {loadingCategories ? (
+                                    <div className="px-4 py-4 text-center">
+                                        <div className="inline-block w-4 h-4 border-2 border-[#E5E2DD] border-t-[#1A1A1A] rounded-full animate-spin"></div>
+                                        <p className="text-xs text-slate-400 mt-1 font-body">Đang tải...</p>
+                                    </div>
+                                ) : categories.length > 0 ? (
+                                    categories.map((category) => (
+                                        <button
+                                            key={category.id}
+                                            onClick={() => handleCategoryClick(category.id)}
+                                            className="w-full text-left px-3.5 py-1.5 text-xs font-body text-slate-700 hover:bg-[#FAF9F7] hover:text-[#0070B5] rounded-lg transition-colors cursor-pointer"
+                                        >
+                                            {category.name}
+                                        </button>
+                                    ))
+                                ) : (
+                                    <div className="px-4 py-3 text-center text-xs text-slate-400 font-body">
+                                        Chưa có thể loại nào
+                                    </div>
                                 )}
                             </div>
+                        </div>
+                    </div>
 
-                            {/* Autocomplete Dropdown */}
-                            {isSearchOpen && (suggestions.length > 0 || searchProducts.length > 0) && (
-                                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.12)] border border-[#dff1fb] z-50 overflow-hidden animate-in fade-in slide-in-from-top-1 duration-200">
-                                    {/* Suggestions Section */}
-                                    {suggestions.length > 0 && (
-                                        <div className="p-4 pb-3">
-                                            <div className="flex items-center gap-2 text-xs font-headline font-bold text-slate-500 uppercase tracking-wider mb-2.5">
-                                                <Clock className="w-3.5 h-3.5 text-slate-400" />
-                                                <span>Gợi ý tìm kiếm</span>
+                    <Link to="/products" className="hover:text-[#0070B5] transition-colors py-1">
+                        Sách mới
+                    </Link>
+                    <Link to="/products" className="hover:text-[#0070B5] transition-colors py-1">
+                        Bán chạy
+                    </Link>
+                    <Link to="/products" className="hover:text-[#0070B5] transition-colors py-1">
+                        Ưu đãi
+                    </Link>
+                </nav>
+
+                {/* Right side: Minimalist Underline Search & Action Buttons */}
+                <div className="flex items-center gap-5">
+                    {/* Minimal Underline Search Bar with Autocomplete */}
+                    <div className="hidden sm:block relative" ref={searchRef}>
+                        <div className="flex items-center border-b border-[#1A1A1A] pb-1 focus-within:border-[#0070B5] transition-colors w-44 md:w-52">
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={handleSearchInputChange}
+                                onFocus={() => { if (suggestions.length > 0 || searchProducts.length > 0) setIsSearchOpen(true); }}
+                                onKeyDown={(e) => { if (e.key === 'Enter') handleSearchSubmit(); if (e.key === 'Escape') setIsSearchOpen(false); }}
+                                placeholder="Tìm kiếm..."
+                                className="bg-transparent border-none outline-none text-sm text-[#1A1A1A] placeholder:text-slate-400 font-body w-full px-0 py-0 h-6"
+                            />
+                            {searchQuery ? (
+                                <button
+                                    onClick={() => { setSearchQuery(''); setIsSearchOpen(false); }}
+                                    className="text-slate-400 hover:text-slate-600 text-xs cursor-pointer p-0.5"
+                                >
+                                    ✕
+                                </button>
+                            ) : (
+                                <Search onClick={handleSearchSubmit} className="w-4 h-4 text-[#1A1A1A] cursor-pointer shrink-0 hover:text-[#0070B5] transition-colors" />
+                            )}
+                        </div>
+
+                        {/* Autocomplete Dropdown */}
+                        {isSearchOpen && (suggestions.length > 0 || searchProducts.length > 0) && (
+                            <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-[#E5E2DD] z-50 overflow-hidden">
+                                {/* Suggestions */}
+                                {suggestions.length > 0 && (
+                                    <div className="p-3.5 pb-2.5">
+                                        <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                                            <Clock className="w-3 h-3 text-slate-400" />
+                                            <span>Gợi ý tìm kiếm</span>
+                                        </div>
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {suggestions.map((suggestion, index) => (
+                                                <button
+                                                    key={index}
+                                                    onClick={() => handleSuggestionClick(suggestion)}
+                                                    className="px-2.5 py-1 text-xs font-body bg-[#FAF9F7] text-[#1A1A1A] border border-[#E5E2DD] hover:border-[#1A1A1A] hover:text-[#0070B5] rounded-full transition-colors cursor-pointer"
+                                                >
+                                                    {suggestion}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Divider */}
+                                {suggestions.length > 0 && searchProducts.length > 0 && (
+                                    <div className="border-t border-[#E5E2DD]"></div>
+                                )}
+
+                                {/* Products */}
+                                {searchProducts.length > 0 && (
+                                    <div className="p-3.5 pt-2.5">
+                                        <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                                            <TrendingUp className="w-3 h-3 text-slate-400" />
+                                            <span>Sản phẩm phù hợp</span>
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            {searchProducts.slice(0, 4).map((product) => (
+                                                <button
+                                                    key={product.id}
+                                                    onClick={() => handleSearchProductClick(product.id)}
+                                                    className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-[#FAF9F7] transition-colors text-left cursor-pointer group w-full"
+                                                >
+                                                    <div className="w-8 h-11 shrink-0 rounded overflow-hidden bg-slate-100 border border-[#E5E2DD]">
+                                                        <img
+                                                            src={`${import.meta.env.VITE_BACKEND_URL}/storage/book/${product.imageUrl}`}
+                                                            alt={product.title}
+                                                            className="w-full h-full object-cover"
+                                                            onError={(e) => {
+                                                                (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 48 64%22><rect fill=%22%23f3f4f6%22 width=%2248%22 height=%2264%22/><text x=%2224%22 y=%2236%22 text-anchor=%22middle%22 fill=%22%239ca3af%22 font-size=%2210%22>📖</text></svg>';
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <span className="text-xs font-serif font-bold text-[#1A1A1A] group-hover:text-[#0070B5] transition-colors line-clamp-2 leading-snug">
+                                                        {product.title}
+                                                    </span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Loading */}
+                                {isSearching && (
+                                    <div className="px-4 py-2.5 text-center border-t border-[#E5E2DD]">
+                                        <div className="inline-block w-3.5 h-3.5 border-2 border-[#E5E2DD] border-t-[#1A1A1A] rounded-full animate-spin"></div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Account Dropdown */}
+                    <div className="relative group">
+                        <button
+                            className="p-1 text-[#1A1A1A] hover:text-[#0070B5] transition-colors cursor-pointer flex items-center"
+                            title="Tài khoản"
+                        >
+                            <User className="w-5 h-5" />
+                        </button>
+
+                        {/* Account Popup */}
+                        <div className="absolute right-0 top-full mt-1 w-64 bg-white rounded-xl shadow-lg border border-[#E5E2DD] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100] transform origin-top-right scale-95 group-hover:scale-100 overflow-hidden">
+                            {account.isAuthenticated ? (
+                                <div>
+                                    {/* User Info */}
+                                    <div className="p-3.5 bg-[#FAF9F7] border-b border-[#E5E2DD]">
+                                        <div className="flex items-center gap-2.5">
+                                            <div className="w-9 h-9 rounded-full bg-[#1A1A1A] text-white flex items-center justify-center font-serif font-bold text-xs shrink-0">
+                                                {account.account?.fullName
+                                                    ? account.account.fullName.charAt(0).toUpperCase()
+                                                    : 'U'}
                                             </div>
-                                            <div className="flex flex-wrap gap-2">
-                                                {suggestions.map((suggestion, index) => (
-                                                    <button
-                                                        key={index}
-                                                        onClick={() => handleSuggestionClick(suggestion)}
-                                                        className="px-3 py-1 text-xs font-body font-semibold bg-[#e3f2fd] text-[#1a237e] hover:bg-[#1a237e] hover:text-white rounded-full transition-colors cursor-pointer"
-                                                    >
-                                                        {suggestion}
-                                                    </button>
-                                                ))}
+                                            <div className="min-w-0 flex-1">
+                                                <p className="font-serif font-bold text-xs sm:text-sm text-[#1A1A1A] truncate">
+                                                    {account.account?.fullName || 'Người dùng'}
+                                                </p>
+                                                <p className="font-body text-[11px] text-slate-400 truncate">
+                                                    {account.account?.email || ''}
+                                                </p>
                                             </div>
                                         </div>
-                                    )}
+                                    </div>
 
-                                    {/* Divider */}
-                                    {suggestions.length > 0 && searchProducts.length > 0 && (
-                                        <div className="mx-4 border-t border-slate-100"></div>
-                                    )}
+                                    {/* Menu Items */}
+                                    <div className="p-1.5 space-y-0.5">
+                                        {account.account?.role === 'ADMIN' && (
+                                            <button
+                                                onClick={() => navigate('/admin')}
+                                                className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-[#FAF9F7] hover:text-[#0070B5] rounded-lg transition-colors font-medium flex items-center gap-2.5 cursor-pointer"
+                                            >
+                                                <ShieldCheck className="w-3.5 h-3.5 text-[#1A1A1A]" />
+                                                <span>Trang quản trị</span>
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={() => navigate('/order-history')}
+                                            className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-[#FAF9F7] hover:text-[#0070B5] rounded-lg transition-colors font-medium flex items-center gap-2.5 cursor-pointer"
+                                        >
+                                            <Package className="w-3.5 h-3.5 text-slate-400" />
+                                            <span>Lịch sử đơn hàng</span>
+                                        </button>
+                                        <button
+                                            onClick={() => showToast('Tính năng đang được phát triển', ToastType.INFO)}
+                                            className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-[#FAF9F7] hover:text-[#0070B5] rounded-lg transition-colors font-medium flex items-center gap-2.5 cursor-pointer"
+                                        >
+                                            <User className="w-3.5 h-3.5 text-slate-400" />
+                                            <span>Thông tin tài khoản</span>
+                                        </button>
+                                        <button
+                                            onClick={() => showToast('Tính năng đang được phát triển', ToastType.INFO)}
+                                            className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-[#FAF9F7] hover:text-[#0070B5] rounded-lg transition-colors font-medium flex items-center gap-2.5 cursor-pointer"
+                                        >
+                                            <Lock className="w-3.5 h-3.5 text-slate-400" />
+                                            <span>Đổi mật khẩu</span>
+                                        </button>
 
-                                    {/* Products Section */}
-                                    {searchProducts.length > 0 && (
-                                        <div className="p-4 pt-3">
-                                            <div className="flex items-center gap-2 text-xs font-headline font-bold text-slate-500 uppercase tracking-wider mb-2.5">
-                                                <TrendingUp className="w-3.5 h-3.5 text-slate-400" />
-                                                <span>Sản phẩm phù hợp</span>
-                                            </div>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                                                {searchProducts.map((product) => (
-                                                    <button
-                                                        key={product.id}
-                                                        onClick={() => handleSearchProductClick(product.id)}
-                                                        className="flex items-center gap-3 p-2 rounded-xl hover:bg-[#f4faff] border border-transparent hover:border-[#dff1fb] transition-colors text-left cursor-pointer group"
-                                                    >
-                                                        <div className="w-10 h-14 shrink-0 rounded-lg overflow-hidden bg-slate-100 border border-slate-200">
-                                                            <img
-                                                                src={`${import.meta.env.VITE_BACKEND_URL}/storage/book/${product.imageUrl}`}
-                                                                alt={product.title}
-                                                                className="w-full h-full object-cover"
-                                                                onError={(e) => {
-                                                                    (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 48 64%22><rect fill=%22%23f3f4f6%22 width=%2248%22 height=%2264%22/><text x=%2224%22 y=%2236%22 text-anchor=%22middle%22 fill=%22%239ca3af%22 font-size=%2210%22>📖</text></svg>';
-                                                                }}
-                                                            />
-                                                        </div>
-                                                        <span className="text-xs font-headline font-bold text-slate-800 group-hover:text-[#1a237e] transition-colors line-clamp-2 leading-snug">
-                                                            {product.title}
-                                                        </span>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
+                                        <div className="border-t border-[#E5E2DD] my-1"></div>
 
-                                    {/* Loading indicator */}
-                                    {isSearching && (
-                                        <div className="px-4 py-3 text-center border-t border-slate-100">
-                                            <div className="inline-block w-4 h-4 border-2 border-[#e3f2fd] border-t-[#1a237e] rounded-full animate-spin"></div>
-                                        </div>
-                                    )}
+                                        <button
+                                            onClick={handleLogout}
+                                            className="w-full text-left px-3 py-2 text-xs text-rose-600 hover:bg-rose-50 rounded-lg transition-colors font-medium flex items-center gap-2.5 cursor-pointer"
+                                        >
+                                            <LogOut className="w-3.5 h-3.5 text-rose-500" />
+                                            <span>Đăng xuất</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="p-4 space-y-2.5">
+                                    <div className="text-center pb-1">
+                                        <p className="font-serif font-bold text-sm text-[#1A1A1A]">
+                                            Chào mừng độc giả!
+                                        </p>
+                                        <p className="font-body text-xs text-slate-400 mt-0.5">
+                                            Đăng nhập để nhận ưu đãi và mua sách
+                                        </p>
+                                    </div>
+
+                                    <button
+                                        onClick={() => navigate('/login')}
+                                        className="w-full py-2 bg-[#1A1A1A] hover:bg-[#0070B5] text-white font-medium text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                                    >
+                                        <LogIn className="w-3.5 h-3.5" />
+                                        <span>Đăng nhập</span>
+                                    </button>
+
+                                    <button
+                                        onClick={() => navigate('/register')}
+                                        className="w-full py-2 bg-[#FAF9F7] hover:bg-[#E5E2DD] text-[#1A1A1A] border border-[#E5E2DD] font-medium text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                                    >
+                                        <UserPlus className="w-3.5 h-3.5" />
+                                        <span>Đăng ký tài khoản</span>
+                                    </button>
                                 </div>
                             )}
                         </div>
                     </div>
 
-                    {/* Right Actions */}
-                    <div className="flex items-center gap-5 sm:gap-6 shrink-0">
-                        {account.isAuthenticated && (
-                            <Link to={'/cart'} className="flex flex-col items-center gap-0.5 text-slate-700 hover:text-[#1a237e] transition-colors relative cursor-pointer group">
-                                <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6" />
-                                <span className="text-[11px] font-medium font-body">Giỏ hàng</span>
-                                <span className="absolute -top-1 -right-1 bg-[#1a237e] text-white text-[10px] font-bold rounded-full w-4.5 h-4.5 flex items-center justify-center shadow-sm">
-                                    {cartSum}
-                                </span>
-                            </Link>
+                    {/* Cart */}
+                    <Link
+                        to={'/cart'}
+                        className="relative p-1 text-[#1A1A1A] hover:text-[#0070B5] transition-colors cursor-pointer"
+                        title="Giỏ hàng"
+                    >
+                        <ShoppingBag className="w-5 h-5" />
+                        {account.isAuthenticated && cartSum > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-[#1A1A1A] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                                {cartSum}
+                            </span>
                         )}
-                        <div className="relative group">
-                            <div className="flex flex-col items-center gap-0.5 text-slate-700 hover:text-[#1a237e] transition-colors cursor-pointer">
-                                <div className="w-8 h-8 rounded-full bg-[#f4faff] border border-[#dff1fb] group-hover:border-blue-300 group-hover:bg-[#e3f2fd] flex items-center justify-center transition-all">
-                                    <User className="w-4 h-4 text-[#1a237e]" />
-                                </div>
-                                <span className="text-[11px] font-medium font-body">Tài khoản</span>
-                            </div>
-
-                            {/* Transparent bridge to prevent hover loss */}
-                            <div className="absolute top-full right-0 w-full h-4 -mt-4 bg-transparent"></div>
-
-                            {/* Account Popup Box */}
-                            <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-[0_12px_40px_rgba(26,35,126,0.12)] border border-[#dff1fb] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100] transform origin-top-right scale-95 group-hover:scale-100 overflow-hidden">
-                                {account.isAuthenticated ? (
-                                    <div>
-                                        {/* User Info Header */}
-                                        <div className="p-4 bg-[#f4faff] border-b border-[#dff1fb]">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-[#e3f2fd] border border-blue-200 text-[#1a237e] flex items-center justify-center font-headline font-bold text-sm shrink-0">
-                                                    {account.account?.fullName
-                                                        ? account.account.fullName.charAt(0).toUpperCase()
-                                                        : 'U'}
-                                                </div>
-                                                <div className="min-w-0 flex-1">
-                                                    <p className="font-headline font-bold text-sm text-[#0d1e25] truncate">
-                                                        {account.account?.fullName || 'Người dùng'}
-                                                    </p>
-                                                    <p className="font-body text-xs text-slate-400 truncate">
-                                                        {account.account?.email || ''}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Menu Items */}
-                                        <div className="p-2 space-y-1">
-                                            {account.account?.role === 'ADMIN' && (
-                                                <button
-                                                    onClick={() => navigate('/admin')}
-                                                    className="w-full text-left px-3 py-2 text-xs sm:text-sm text-slate-700 hover:bg-[#e3f2fd] hover:text-[#1a237e] rounded-xl transition-colors font-medium flex items-center gap-2.5 cursor-pointer"
-                                                >
-                                                    <ShieldCheck className="w-4 h-4 text-[#1a237e]" />
-                                                    <span>Trang quản trị</span>
-                                                </button>
-                                            )}
-                                            <button
-                                                onClick={() => navigate('/order-history')}
-                                                className="w-full text-left px-3 py-2 text-xs sm:text-sm text-slate-700 hover:bg-[#e3f2fd] hover:text-[#1a237e] rounded-xl transition-colors font-medium flex items-center gap-2.5 cursor-pointer"
-                                            >
-                                                <Package className="w-4 h-4 text-slate-500" />
-                                                <span>Lịch sử đơn hàng</span>
-                                            </button>
-                                            <button
-                                                onClick={() => showToast('Tính năng đang được phát triển', ToastType.INFO)}
-                                                className="w-full text-left px-3 py-2 text-xs sm:text-sm text-slate-700 hover:bg-[#e3f2fd] hover:text-[#1a237e] rounded-xl transition-colors font-medium flex items-center gap-2.5 cursor-pointer"
-                                            >
-                                                <User className="w-4 h-4 text-slate-500" />
-                                                <span>Thông tin tài khoản</span>
-                                            </button>
-                                            <button
-                                                onClick={() => showToast('Tính năng đang được phát triển', ToastType.INFO)}
-                                                className="w-full text-left px-3 py-2 text-xs sm:text-sm text-slate-700 hover:bg-[#e3f2fd] hover:text-[#1a237e] rounded-xl transition-colors font-medium flex items-center gap-2.5 cursor-pointer"
-                                            >
-                                                <Lock className="w-4 h-4 text-slate-500" />
-                                                <span>Đổi mật khẩu</span>
-                                            </button>
-
-                                            <div className="border-t border-slate-100 my-1"></div>
-
-                                            <button
-                                                onClick={handleLogout}
-                                                className="w-full text-left px-3 py-2 text-xs sm:text-sm text-rose-600 hover:bg-rose-50 rounded-xl transition-colors font-medium flex items-center gap-2.5 cursor-pointer"
-                                            >
-                                                <LogOut className="w-4 h-4 text-rose-500" />
-                                                <span>Đăng xuất</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="p-4 space-y-3">
-                                        <div className="text-center pb-1">
-                                            <p className="font-headline font-bold text-sm text-[#0d1e25]">
-                                                Chào mừng bạn!
-                                            </p>
-                                            <p className="font-body text-xs text-slate-400 mt-0.5">
-                                                Đăng nhập để xem đơn hàng và nhận ưu đãi
-                                            </p>
-                                        </div>
-
-                                        <button
-                                            onClick={() => navigate('/login')}
-                                            className="w-full py-2.5 bg-[#1a237e] hover:bg-[#283593] text-white font-headline font-bold text-xs sm:text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
-                                        >
-                                            <LogIn className="w-4 h-4" />
-                                            <span>Đăng nhập</span>
-                                        </button>
-
-                                        <button
-                                            onClick={() => navigate('/register')}
-                                            className="w-full py-2.5 bg-[#f4faff] hover:bg-[#e3f2fd] text-[#1a237e] border border-[#dff1fb] font-headline font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer"
-                                        >
-                                            <UserPlus className="w-4 h-4" />
-                                            <span>Đăng ký tài khoản</span>
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
+                    </Link>
                 </div>
             </div>
         </header>
     );
-}
+};

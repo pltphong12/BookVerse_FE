@@ -12,7 +12,7 @@ const getBookImageUrl = (pathOrName: string) => {
     return `${import.meta.env.VITE_BACKEND_URL}/storage/book/${filename}`;
 };
 
-const MAX_THUMBNAILS = 4;
+const MAX_THUMBNAILS = 5;
 
 export default function ProductImageGallery({ title, images }: ProductImageGalleryProps) {
     const sorted = [...images].sort((a, b) => a.sortOrder - b.sortOrder);
@@ -30,9 +30,9 @@ export default function ProductImageGallery({ title, images }: ProductImageGalle
 
     if (sorted.length === 0) {
         return (
-            <div className="aspect-[3/4] rounded-2xl bg-[#e3f2fd] border border-[#dff1fb] flex flex-col items-center justify-center text-[#1a237e] p-6 shadow-sm">
-                <BookOpen className="w-16 h-16 opacity-60 mb-2" />
-                <span className="font-headline font-semibold text-sm">Chưa có hình ảnh</span>
+            <div className="aspect-[2/3] rounded-lg bg-white border border-[#E5E2DD] flex flex-col items-center justify-center text-slate-400 p-8 shadow-sm">
+                <BookOpen className="w-16 h-16 opacity-40 mb-3" />
+                <span className="font-body font-medium text-sm">Chưa có hình ảnh</span>
             </div>
         );
     }
@@ -40,14 +40,14 @@ export default function ProductImageGallery({ title, images }: ProductImageGalle
     return (
         <div className="flex flex-col gap-4">
             {/* Main Showcase Image Card */}
-            <div className="relative bg-white border border-[#dff1fb] rounded-2xl p-6 sm:p-8 flex justify-center items-center shadow-sm overflow-hidden group">
-                <div className="w-full aspect-[3/4] max-h-[460px] flex items-center justify-center">
+            <div className="relative bg-white border border-[#E5E2DD] rounded-lg p-6 sm:p-8 flex justify-center items-center shadow-sm overflow-hidden group">
+                <div className="w-full aspect-[2/3] max-h-[500px] flex items-center justify-center">
                     <img
                         src={getBookImageUrl(sorted[currentImageIndex].relativePath)}
                         alt={title}
-                        className="w-full h-full object-contain rounded-xl drop-shadow-md transition-transform duration-300 group-hover:scale-[1.02]"
+                        className="w-full h-full object-contain drop-shadow-md transition-transform duration-300 group-hover:scale-[1.02]"
                         onError={(e) => {
-                            (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 300 400%22><rect fill=%22%23f3f4f6%22 width=%22300%22 height=%22400%22/><text x=%22150%22 y=%22200%22 text-anchor=%22middle%22 fill=%22%239ca3af%22 font-size=%2224%22>📖</text></svg>';
+                            (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 300 450%22><rect fill=%22%23FAF9F7%22 width=%22300%22 height=%22450%22/><text x=%22150%22 y=%22225%22 text-anchor=%22middle%22 fill=%22%239ca3af%22 font-size=%2228%22>📖</text></svg>';
                         }}
                     />
                 </div>
@@ -57,14 +57,14 @@ export default function ProductImageGallery({ title, images }: ProductImageGalle
                         <button
                             onClick={prevImage}
                             aria-label="Previous image"
-                            className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-[#1a237e] text-[#1a237e] hover:text-white p-2.5 rounded-full shadow-md transition-all duration-200 cursor-pointer opacity-0 group-hover:opacity-100"
+                            className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-[#1A1A1A] text-[#1A1A1A] hover:text-white p-2.5 rounded-full shadow border border-[#E5E2DD] transition-all duration-200 cursor-pointer opacity-0 group-hover:opacity-100"
                         >
                             <ChevronLeft className="w-5 h-5" />
                         </button>
                         <button
                             onClick={nextImage}
                             aria-label="Next image"
-                            className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-[#1a237e] text-[#1a237e] hover:text-white p-2.5 rounded-full shadow-md transition-all duration-200 cursor-pointer opacity-0 group-hover:opacity-100"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-[#1A1A1A] text-[#1A1A1A] hover:text-white p-2.5 rounded-full shadow border border-[#E5E2DD] transition-all duration-200 cursor-pointer opacity-0 group-hover:opacity-100"
                         >
                             <ChevronRight className="w-5 h-5" />
                         </button>
@@ -74,15 +74,15 @@ export default function ProductImageGallery({ title, images }: ProductImageGalle
 
             {/* Thumbnail Strip */}
             {sorted.length > 1 && (
-                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
                     {sorted.slice(0, MAX_THUMBNAILS).map((img, index) => (
                         <button
                             key={img.id}
                             onClick={() => setCurrentImageIndex(index)}
-                            className={`w-20 h-20 shrink-0 rounded-xl overflow-hidden border-2 bg-white p-1 transition-all cursor-pointer ${
+                            className={`w-18 h-24 shrink-0 rounded-md overflow-hidden border-2 bg-white p-1 transition-all cursor-pointer ${
                                 index === currentImageIndex
-                                    ? 'border-[#1a237e] ring-2 ring-[#e3f2fd] opacity-100 shadow-sm'
-                                    : 'border-[#dff1fb] opacity-60 hover:opacity-100 hover:border-slate-300'
+                                    ? 'border-[#1A1A1A] ring-2 ring-[#E5E2DD] opacity-100 shadow-sm'
+                                    : 'border-[#E5E2DD] opacity-60 hover:opacity-100 hover:border-slate-400'
                             }`}
                         >
                             <img
@@ -95,19 +95,19 @@ export default function ProductImageGallery({ title, images }: ProductImageGalle
                     {remaining > 0 && (
                         <button
                             onClick={() => setCurrentImageIndex(MAX_THUMBNAILS)}
-                            className={`w-20 h-20 shrink-0 rounded-xl overflow-hidden border-2 bg-white p-1 transition-all relative cursor-pointer ${
+                            className={`w-18 h-24 shrink-0 rounded-md overflow-hidden border-2 bg-white p-1 transition-all relative cursor-pointer ${
                                 currentImageIndex >= MAX_THUMBNAILS
-                                    ? 'border-[#1a237e] ring-2 ring-[#e3f2fd] opacity-100'
-                                    : 'border-[#dff1fb] opacity-75 hover:opacity-100'
+                                    ? 'border-[#1A1A1A] ring-2 ring-[#E5E2DD] opacity-100'
+                                    : 'border-[#E5E2DD] opacity-60 hover:opacity-100'
                             }`}
                         >
                             <img
                                 src={getBookImageUrl(sorted[MAX_THUMBNAILS].relativePath)}
-                                alt={`${title} - ${MAX_THUMBNAILS + 1}`}
+                                alt={`${title} - more`}
                                 className="w-full h-full object-contain"
                             />
-                            <div className="absolute inset-0 bg-[#0d1e25]/70 rounded-lg flex items-center justify-center">
-                                <span className="text-white font-headline text-xs font-bold">+{remaining}</span>
+                            <div className="absolute inset-0 bg-black/50 text-white flex items-center justify-center text-xs font-bold font-body">
+                                +{remaining}
                             </div>
                         </button>
                     )}
@@ -116,4 +116,3 @@ export default function ProductImageGallery({ title, images }: ProductImageGalle
         </div>
     );
 }
-

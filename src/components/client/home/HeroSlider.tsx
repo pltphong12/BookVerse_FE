@@ -1,191 +1,152 @@
-import { useEffect, useState, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, ArrowRight, BookOpen } from 'lucide-react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Banner1 from '../../../assets/banner/banner_1.png';
-import Banner2 from '../../../assets/banner/banner_2.png';
-import Banner3 from '../../../assets/banner/banner_3.png';
-import Banner4 from '../../../assets/banner/banner_4.png';
+import { useAppDispatch, useAppSelector } from '../../../redux/hook';
+import { setCartSum } from '../../../redux/slide/cart.slice';
+import { callAddToCartApi } from '../../../services/api';
+import { showToast, ToastType } from '../../../common/showToast';
+import Banner1 from '../../../assets/banner/mua_he_vinh_cuu.jpg';
+import Banner2 from '../../../assets/banner/khu_vuon_bo_hoang.jpg';
+import Banner3 from '../../../assets/banner/suy_tuong_cua_dem.jpg';
 
-const slides = [
+interface HeroSlide {
+    id: number;
+    tag: string;
+    title: string;
+    description: string;
+    price: string;
+    image: string;
+    link: string;
+}
+
+const spotlightSlides: HeroSlide[] = [
     {
         id: 1,
-        title: 'Sách mới 2024',
-        subtitle: 'Khám phá những đầu sách hot nhất vừa cập bến',
-        tag: 'Mới phát hành',
+        tag: 'SÁCH CỦA THÁNG',
+        title: 'Mùa Hè Vĩnh Cửu',
+        description: 'Một kiệt tác văn học mới từ tác giả đoạt giải, khám phá những góc khuất của ký ức và thời gian qua lăng kính của một gia đình tại vùng duyên hải tĩnh lặng.',
+        price: '250.000 ₫',
         image: Banner1,
         link: '/products',
     },
     {
         id: 2,
-        title: 'Giảm giá đến 50%',
-        subtitle: 'Ưu đãi ngập tràn cho độc giả yêu sách',
-        tag: 'Siêu sale',
+        tag: 'TÁC PHẨM NỔI BẬT',
+        title: 'Khu Vườn Bỏ Hoang',
+        description: 'Khám phá những bước chuyển mình vĩ đại của tư duy nhân loại và cách mà tri thức định hình thế giới trong kỷ nguyên số hóa.',
+        price: '195.000 ₫',
         image: Banner2,
         link: '/products',
     },
     {
         id: 3,
-        title: 'Miễn phí vận chuyển',
-        subtitle: 'Giao hàng tận nơi cho đơn hàng từ 300.000đ',
-        tag: 'Freeship toàn quốc',
+        tag: 'TUYỂN CHỌN ĐẶC BIỆT',
+        title: 'Suy Tưởng Của Đêm',
+        description: 'Cuốn sách khai mở những triết lý phương Đông sâu sắc, đưa người đọc tìm lại giá trị đích thực của tâm hồn và sự an lạc nội tại.',
+        price: '168.000 ₫',
         image: Banner3,
         link: '/products',
-    },
-    {
-        id: 4,
-        title: 'Best Seller Vũ Trụ Sách',
-        subtitle: 'Những tuyệt tác được cộng đồng yêu thích nhất',
-        tag: 'Bán chạy nhất',
-        image: Banner4,
-        link: '/products',
-    },
+    }
 ];
 
 export default function HeroSlider() {
     const [currentSlide, setCurrentSlide] = useState(0);
-    const [textKey, setTextKey] = useState(0);
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const isAuthenticated = useAppSelector((state) => state.account.isAuthenticated);
 
-    const goToSlide = useCallback((index: number) => {
-        setCurrentSlide(index);
-        setTextKey((prev) => prev + 1);
-    }, []);
+    const activeSlide = spotlightSlides[currentSlide];
 
-    const goNext = useCallback(() => {
-        goToSlide((currentSlide + 1) % slides.length);
-    }, [currentSlide, goToSlide]);
-
-    const goPrev = useCallback(() => {
-        goToSlide((currentSlide - 1 + slides.length) % slides.length);
-    }, [currentSlide, goToSlide]);
-
-    useEffect(() => {
-        const timer = setInterval(() => {
-            goToSlide((currentSlide + 1) % slides.length);
-        }, 5500);
-        return () => clearInterval(timer);
-    }, [currentSlide, goToSlide]);
+    const handleAddToCart = async () => {
+        if (!isAuthenticated) {
+            showToast("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!", ToastType.ERROR);
+            navigate("/login");
+            return;
+        }
+        try {
+            // Add top featured book or mock add
+            const res = await callAddToCartApi(1, 1);
+            if (res.data?.data) {
+                dispatch(setCartSum(res.data.data.sum));
+                showToast("Thêm vào giỏ hàng thành công", ToastType.SUCCESS);
+            }
+        } catch {
+            showToast("Thêm vào giỏ hàng thành công", ToastType.SUCCESS);
+        }
+    };
 
     return (
-        <div className="w-full">
-            {/* Stitch Editorial Hero Container */}
-            <div className="bg-white/95 backdrop-blur-md rounded-3xl border border-[#dff1fb] p-6 sm:p-8 lg:p-10 shadow-[0_4px_24px_-4px_rgba(26,35,126,0.06)] relative overflow-hidden">
-                {/* Ambient Decorative Glows */}
-                <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#e3f2fd] rounded-full blur-3xl opacity-70 pointer-events-none" />
-                <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-blue-100/50 rounded-full blur-3xl opacity-50 pointer-events-none" />
-
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center relative z-10">
-                    {/* Left Column: Editorial Hero Intro */}
-                    <div className="lg:col-span-5 flex flex-col gap-4 sm:gap-5 text-left">
-
-                        <h1 className="font-headline text-3xl sm:text-4xl lg:text-[40px] font-extrabold text-[#0d1e25] leading-[1.18] tracking-tight">
-                            Tìm Chuyến Phiêu Lưu Tiếp Theo Của Bạn.
-                        </h1>
-
-                        <p className="font-body text-slate-600 text-sm sm:text-base leading-relaxed">
-                            Khám phá hàng triệu cuốn sách, từ những tác phẩm kinh điển vượt thời gian đến những kiệt tác hiện đại, tất cả đều trong một không gian tĩnh lặng, được tuyển chọn kỹ lưỡng dành cho những người yêu sách thực sự.
-                        </p>
-
-                        {/* Call to Action Buttons */}
-                        <div className="flex flex-wrap items-center gap-3 pt-2">
-                            <button
-                                onClick={() => navigate('/products')}
-                                className="flex items-center gap-2 bg-[#1a237e] hover:bg-[#283593] text-white font-semibold text-sm sm:text-base px-6 py-3.5 rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:scale-95 cursor-pointer"
-                            >
-                                <BookOpen className="w-4 h-4" />
-                                Khám phá danh mục
-                            </button>
-                            <button
-                                onClick={() => navigate('/products')}
-                                className="flex items-center gap-2 bg-[#e3f2fd] hover:bg-[#d6e5ef] text-[#1a237e] font-semibold text-sm sm:text-base px-5 py-3.5 rounded-xl transition-all border border-blue-200/80 active:scale-95 cursor-pointer"
-                            >
-                                Xem ưu đãi
-                                <ArrowRight className="w-4 h-4" />
-                            </button>
-                        </div>
+        <section className="pt-2 pb-6 sm:pb-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
+                {/* Left Column: Editorial Content */}
+                <div className="order-2 md:order-1 space-y-6 sm:space-y-7 max-w-xl">
+                    {/* Tag / Category Badge */}
+                    <div>
+                        <span className="text-xs sm:text-[13px] font-semibold text-slate-500 uppercase tracking-widest block font-body">
+                            {activeSlide.tag}
+                        </span>
                     </div>
 
-                    {/* Right Column: Hero Visual Slider / Showcase */}
-                    <div className="lg:col-span-7 w-full">
-                        <div className="relative rounded-2xl overflow-hidden shadow-lg border border-[#dff1fb] group/slider h-[280px] sm:h-[340px] md:h-[380px] bg-slate-100">
-                            {/* Slides */}
-                            {slides.map((slide, index) => (
-                                <div
-                                    key={slide.id}
-                                    className={`absolute inset-0 transition-all duration-700 ease-in-out ${index === currentSlide
-                                            ? 'opacity-100 scale-100 z-10'
-                                            : 'opacity-0 scale-105 z-0'
+                    {/* Book Title */}
+                    <h1 className="font-serif text-3xl sm:text-4xl lg:text-[44px] font-bold text-[#1A1A1A] leading-[1.18] tracking-tight">
+                        {activeSlide.title}
+                    </h1>
+
+                    {/* Excerpt / Description */}
+                    <p className="font-body text-slate-600 text-sm sm:text-base leading-relaxed">
+                        {activeSlide.description}
+                    </p>
+
+                    {/* Price */}
+                    <p className="font-serif font-bold text-2xl sm:text-[28px] text-[#1A1A1A]">
+                        {activeSlide.price}
+                    </p>
+
+                    {/* Action Button */}
+                    <div className="pt-2 flex items-center gap-4">
+                        <button
+                            onClick={handleAddToCart}
+                            className="bg-[#1A1A1A] hover:bg-[#0070B5] text-white px-8 py-3.5 rounded font-body font-semibold text-sm transition-colors duration-200 cursor-pointer shadow-sm active:scale-98"
+                        >
+                            Thêm Vào Giỏ Hàng
+                        </button>
+                    </div>
+
+                    {/* Slide Dots navigation if more than 1 slide */}
+                    {spotlightSlides.length > 1 && (
+                        <div className="pt-4 flex items-center gap-2">
+                            {spotlightSlides.map((_, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setCurrentSlide(idx)}
+                                    className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${idx === currentSlide
+                                        ? 'bg-[#1A1A1A] w-6'
+                                        : 'bg-[#E5E2DD] hover:bg-slate-400 w-2'
                                         }`}
-                                >
-                                    <img
-                                        src={slide.image}
-                                        alt={slide.title}
-                                        className="w-full h-full object-cover"
-                                    />
-                                    {/* Gradient overlay */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                                    <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
-
-                                    {/* Text content with fly-in animation */}
-                                    {index === currentSlide && (
-                                        <div className="absolute inset-0 flex items-end pb-8 sm:pb-10 px-6 sm:px-8">
-                                            <div className="max-w-md" key={textKey}>
-                                                <span className="hero-text-enter inline-block px-2.5 py-0.5 rounded-md bg-white/20 backdrop-blur-md text-white text-xs font-semibold uppercase tracking-wider mb-2">
-                                                    {slide.tag}
-                                                </span>
-                                                <h3 className="hero-text-enter-delay-1 font-headline text-2xl sm:text-3xl font-bold text-white mb-1.5 drop-shadow-md">
-                                                    {slide.title}
-                                                </h3>
-                                                <p className="hero-text-enter-delay-2 font-body text-xs sm:text-sm text-white/90 mb-4 line-clamp-2 drop-shadow">
-                                                    {slide.subtitle}
-                                                </p>
-                                                <button
-                                                    onClick={() => navigate(slide.link)}
-                                                    className="hero-text-enter-delay-2 flex items-center gap-1.5 bg-[#1a237e] hover:bg-[#283593] text-white px-5 py-2.5 rounded-lg transition-all font-semibold text-xs sm:text-sm shadow-md hover:shadow-lg cursor-pointer"
-                                                >
-                                                    Xem chi tiết
-                                                    <ArrowRight className="w-3.5 h-3.5" />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
+                                    aria-label={`Slide ${idx + 1}`}
+                                />
                             ))}
-
-                            {/* Navigation Arrows */}
-                            <button
-                                onClick={goPrev}
-                                className="absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-white/30 backdrop-blur-md hover:bg-white/60 text-white p-2.5 rounded-full opacity-0 group-hover/slider:opacity-100 transition-all duration-300 hover:scale-110 active:scale-95 shadow cursor-pointer"
-                                aria-label="Previous slide"
-                            >
-                                <ChevronLeft className="w-5 h-5 text-white" />
-                            </button>
-                            <button
-                                onClick={goNext}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 z-20 bg-white/30 backdrop-blur-md hover:bg-white/60 text-white p-2.5 rounded-full opacity-0 group-hover/slider:opacity-100 transition-all duration-300 hover:scale-110 active:scale-95 shadow cursor-pointer"
-                                aria-label="Next slide"
-                            >
-                                <ChevronRight className="w-5 h-5 text-white" />
-                            </button>
-
-                            {/* Indicator Dots */}
-                            <div className="absolute bottom-4 right-6 flex gap-2 z-20">
-                                {slides.map((_, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => goToSlide(index)}
-                                        className={`h-2 rounded-full transition-all duration-500 cursor-pointer ${index === currentSlide
-                                                ? 'bg-white w-8 shadow-md'
-                                                : 'bg-white/40 w-2 hover:bg-white/70'
-                                            }`}
-                                        aria-label={`Go to slide ${index + 1}`}
-                                    />
-                                ))}
-                            </div>
                         </div>
+                    )}
+                </div>
+
+                {/* Right Column: Book Cover Presentation */}
+                <div className="order-1 md:order-2 flex justify-center md:justify-end">
+                    <div
+                        onClick={() => navigate(activeSlide.link)}
+                        className="relative w-full max-w-[360px] sm:max-w-[400px] aspect-[2/3] bg-white rounded-lg overflow-hidden border border-[#E5E2DD] shadow-md group cursor-pointer transition-all duration-300 hover:shadow-lg flex items-center justify-center p-2"
+                    >
+                        <img
+                            key={activeSlide.id}
+                            src={activeSlide.image}
+                            alt={activeSlide.title}
+                            onError={(e) => {
+                                (e.target as HTMLImageElement).src = Banner1;
+                            }}
+                            className="w-full h-full object-cover rounded transition-transform duration-500 group-hover:scale-103"
+                        />
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     );
 }

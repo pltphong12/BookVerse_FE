@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { ChevronRight, Home, Search, BookX } from 'lucide-react';
-import ProductFilters from '../../components/client/product/ProductFilter';
+import { useState, useEffect, useCallback } from 'react';
+import { ChevronRight, Search, BookX } from 'lucide-react';
+import ProductFilters, { Filters } from '../../components/client/product/ProductFilter';
 import ProductSort from '../../components/client/product/ProductSort';
 import ProductCard from '../../components/client/product/ProductCard';
 import { Pagination } from '../../components/global/Pagination';
@@ -19,25 +19,19 @@ const SORT_OPTION_MAP: Record<SortOption, string> = {
     'rating': 'RATING',
 };
 
-interface Filters {
-    priceRange: [number, number];
-    categories: string[];
-    publishers: string[];
-    publishYears: number[];
-    coverTypes: string[];
-}
-
 export default function AllProductsPage() {
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [products, setProducts] = useState<IBook[]>([]);
     const [totalProducts, setTotalProducts] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [loading, setLoading] = useState(false);
     const [searchKeyword, setSearchKeyword] = useState(searchParams.get('search') || '');
 
+    const initialCategoryId = searchParams.get('category') ? parseInt(searchParams.get('category')!, 10) : null;
+
     const [filters, setFilters] = useState<Filters>({
         priceRange: [0, 300000],
-        categories: [],
+        categories: initialCategoryId && !isNaN(initialCategoryId) ? [initialCategoryId] : [],
         publishers: [],
         publishYears: [],
         coverTypes: [],
@@ -46,11 +40,10 @@ export default function AllProductsPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [productsPerPage, setProductsPerPage] = useState(12);
 
-    const publishYears = [2020, 2021, 2022, 2023, 2024, 2025, 2026];
+    const publishYears = [2026, 2025, 2024, 2023, 2022, 2021, 2020];
     const coverTypes = ['PAPERBACK', 'HARDCOVER'];
-    const hasAppliedUrlFilter = useRef(false);
 
-    // Fetch categories (shared cache with Header via query key ['all-categories'])
+    // Fetch categories
     const { data: categoryOptions = [] } = useQuery({
         queryKey: ['all-categories'],
         queryFn: async () => {
@@ -61,7 +54,7 @@ export default function AllProductsPage() {
         select: (data) => data.map((c: { id: number; name: string }) => ({ id: c.id, name: c.name })),
     });
 
-    // Fetch publishers (cached)
+    // Fetch publishers
     const { data: publisherOptions = [] } = useQuery({
         queryKey: ['all-publishers'],
         queryFn: async () => {
@@ -72,41 +65,27 @@ export default function AllProductsPage() {
         select: (data) => data.map((p: { id: number; name: string }) => ({ id: p.id, name: p.name })),
     });
 
-    // Keep refs in sync so fetchProducts doesn't depend on query data directly
-    const categoryOptionsRef = useRef(categoryOptions);
-    const publisherOptionsRef = useRef(publisherOptions);
-    useEffect(() => { categoryOptionsRef.current = categoryOptions; }, [categoryOptions]);
-    useEffect(() => { publisherOptionsRef.current = publisherOptions; }, [publisherOptions]);
-
-    // Apply category filter from URL query params
+    // Synchronize category and search from URL search params
     useEffect(() => {
-        const categoryId = searchParams.get('category');
-        if (categoryId && categoryOptions.length > 0) {
-            const id = parseInt(categoryId, 10);
-            const matchedCategory = categoryOptions.find(c => c.id === id);
-            if (matchedCategory) {
-                setFilters(prev => ({
-                    ...prev,
-                    categories: [matchedCategory.name],
-                }));
-                setCurrentPage(1);
-                hasAppliedUrlFilter.current = true;
+        const categoryParam = searchParams.get('category');
+        const searchParam = searchParams.get('search') || '';
+
+        setSearchKeyword(searchParam);
+
+        if (categoryParam) {
+            const catId = parseInt(categoryParam, 10);
+            if (!isNaN(catId)) {
+                setFilters(prev => {
+                    if (prev.categories.length === 1 && prev.categories[0] === catId) return prev;
+                    return { ...prev, categories: [catId] };
+                });
             }
-        } else if (!categoryId && hasAppliedUrlFilter.current) {
-            // URL no longer has category param, clear filter
-            setFilters(prev => ({
-                ...prev,
-                categories: [],
-            }));
-            setCurrentPage(1);
-            hasAppliedUrlFilter.current = false;
+        } else {
+            setFilters(prev => {
+                if (prev.categories.length === 0) return prev;
+                return { ...prev, categories: [] };
+            });
         }
-    }, [searchParams, categoryOptions]);
-
-    // Sync search keyword from URL
-    useEffect(() => {
-        const search = searchParams.get('search') || '';
-        setSearchKeyword(search);
         setCurrentPage(1);
     }, [searchParams]);
 
@@ -120,18 +99,17 @@ export default function AllProductsPage() {
         if (filters.priceRange[1] < 300000) criteria.maxPrice = filters.priceRange[1];
 
         if (filters.categories.length > 0) {
-            criteria.categoryId = filters.categories
-                .map(name => categoryOptionsRef.current.find(c => c.name === name)?.id)
-                .filter((id): id is number => id !== undefined);
+            criteria.categoryId = filters.categories;
         }
+
         if (filters.publishers.length > 0) {
-            criteria.publisherId = filters.publishers
-                .map(name => publisherOptionsRef.current.find(p => p.name === name)?.id)
-                .filter((id): id is number => id !== undefined);
+            criteria.publisherId = filters.publishers;
         }
+
         if (filters.publishYears.length > 0) {
             criteria.publishYear = filters.publishYears;
         }
+
         if (filters.coverTypes.length > 0) {
             criteria.coverFormat = filters.coverTypes;
         }
@@ -159,6 +137,21 @@ export default function AllProductsPage() {
     const handleFilterChange = (newFilters: Filters) => {
         setFilters(newFilters);
         setCurrentPage(1);
+
+        // Update or remove category param from URL if changed
+        if (newFilters.categories.length === 1) {
+            setSearchParams(prev => {
+                const updated = new URLSearchParams(prev);
+                updated.set('category', newFilters.categories[0].toString());
+                return updated;
+            });
+        } else {
+            setSearchParams(prev => {
+                const updated = new URLSearchParams(prev);
+                updated.delete('category');
+                return updated;
+            });
+        }
     };
 
     const handleSortChange = (sort: SortOption) => {
@@ -171,66 +164,73 @@ export default function AllProductsPage() {
         setCurrentPage(1);
     };
 
+    const activeCategoryName = filters.categories.length === 1
+        ? categoryOptions.find(c => c.id === filters.categories[0])?.name
+        : undefined;
+
     return (
         <div className="space-y-6 sm:space-y-8">
             {/* Breadcrumbs */}
             <nav aria-label="Breadcrumb">
-                <ol className="flex items-center flex-wrap gap-1.5 text-xs sm:text-sm font-body text-slate-500 font-medium">
+                <ol className="flex items-center flex-wrap gap-1.5 text-xs sm:text-sm font-body text-slate-500">
                     <li>
-                        <Link to="/" className="flex items-center gap-1 text-slate-500 hover:text-[#1a237e] transition-colors">
-                            <Home className="w-3.5 h-3.5" />
-                            <span>Trang chủ</span>
+                        <Link to="/" className="text-slate-500 hover:text-[#0070B5] transition-colors">
+                            Trang chủ
                         </Link>
                     </li>
                     <li>
                         <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
                     </li>
-                    <li aria-current="page" className="text-[#0d1e25] font-semibold">
-                        Tất cả sản phẩm
+                    <li aria-current="page" className="text-[#1A1A1A] font-semibold">
+                        {activeCategoryName ? activeCategoryName : 'Tất cả sản phẩm'}
                     </li>
                 </ol>
             </nav>
 
             {/* Search keyword indicator */}
             {searchKeyword && (
-                <div className="flex items-center gap-3 p-4 sm:p-5 bg-white rounded-2xl border border-[#dff1fb] shadow-sm">
-                    <div className="w-9 h-9 rounded-xl bg-[#e3f2fd] text-[#1a237e] flex items-center justify-center shrink-0">
+                <div className="flex items-center gap-3 p-4 bg-white rounded-lg border border-[#E5E2DD] shadow-xs">
+                    <div className="w-8 h-8 rounded bg-[#FAF9F7] text-[#1A1A1A] flex items-center justify-center shrink-0 border border-[#E5E2DD]">
                         <Search className="w-4 h-4" />
                     </div>
                     <div className="flex flex-wrap items-baseline gap-2">
                         <span className="text-xs sm:text-sm font-body text-slate-500">Kết quả tìm kiếm cho:</span>
-                        <span className="font-headline font-bold text-sm sm:text-base text-[#1a237e]">"{searchKeyword}"</span>
-                        <span className="text-xs font-body text-slate-400 font-medium">({totalProducts} cuốn sách)</span>
+                        <span className="font-serif font-bold text-base text-[#1A1A1A]">"{searchKeyword}"</span>
+                        <span className="text-xs font-body text-slate-400">({totalProducts} cuốn sách)</span>
                     </div>
                     <button
                         onClick={() => {
                             setSearchKeyword('');
                             setCurrentPage(1);
-                            window.history.replaceState(null, '', '/products');
+                            setSearchParams(prev => {
+                                const updated = new URLSearchParams(prev);
+                                updated.delete('search');
+                                return updated;
+                            });
                         }}
-                        className="ml-auto text-xs sm:text-sm font-body font-medium text-slate-400 hover:text-red-600 transition-colors cursor-pointer flex items-center gap-1 px-2.5 py-1 rounded-lg hover:bg-red-50"
+                        className="ml-auto text-xs font-body font-medium text-slate-500 hover:text-red-600 transition-colors cursor-pointer px-2 py-1 rounded hover:bg-red-50"
                     >
                         ✕ Xóa tìm kiếm
                     </button>
                 </div>
             )}
 
-            {/* Main Content Grid: 1 col (filters) + 3 cols (products) */}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 items-start">
+            {/* Main Content Layout (Sidebar 3 cols + Grid 9 cols) */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-10 items-start">
                 {/* Left Sidebar Filter */}
-                <div className="lg:col-span-1 lg:sticky lg:top-24">
+                <div className="col-span-1 md:col-span-4 lg:col-span-3 md:sticky md:top-24">
                     <ProductFilters
                         filters={filters}
                         onFilterChange={handleFilterChange}
-                        categories={categoryOptions.map(c => c.name)}
-                        publishers={publisherOptions.map(p => p.name)}
+                        categories={categoryOptions}
+                        publishers={publisherOptions}
                         publishYears={publishYears}
                         coverTypes={coverTypes}
                     />
                 </div>
 
                 {/* Right Products Area */}
-                <div className="lg:col-span-3 space-y-6">
+                <div className="col-span-1 md:col-span-8 lg:col-span-9 flex flex-col">
                     <ProductSort
                         sortBy={sortBy}
                         onSortChange={handleSortChange}
@@ -238,53 +238,62 @@ export default function AllProductsPage() {
                         productsPerPage={productsPerPage}
                         onItemsPerPageChange={handleItemsPerPageChange}
                         currentPage={currentPage}
+                        title={activeCategoryName ? `Sách ${activeCategoryName}` : 'Tất cả sản phẩm'}
                     />
 
                     {loading ? (
-                        <div className="bg-white rounded-2xl border border-[#dff1fb] p-16 text-center shadow-sm flex flex-col items-center justify-center gap-3">
-                            <div className="w-10 h-10 border-3 border-[#e3f2fd] border-t-[#1a237e] rounded-full animate-spin"></div>
-                            <p className="font-body text-sm text-slate-500 font-medium">Đang tải danh sách sách...</p>
+                        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 sm:gap-x-6 gap-y-10 sm:gap-y-12">
+                            {[...Array(8)].map((_, i) => (
+                                <div key={i} className="space-y-3">
+                                    <div className="skeleton-shimmer aspect-[2/3] rounded w-full"></div>
+                                    <div className="skeleton-shimmer h-4 w-3/4 rounded"></div>
+                                    <div className="skeleton-shimmer h-3 w-1/2 rounded"></div>
+                                    <div className="skeleton-shimmer h-5 w-1/3 rounded"></div>
+                                </div>
+                            ))}
                         </div>
                     ) : products.length > 0 ? (
                         <>
-                            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 sm:gap-x-6 gap-y-10 sm:gap-y-12">
                                 {products.map((product) => (
-                                    <ProductCard key={product.id} {...product} />
+                                    <div key={product.id}>
+                                        <ProductCard {...product} />
+                                    </div>
                                 ))}
                             </div>
 
-                            {totalPages > 1 && (
-                                <Pagination
-                                    page={currentPage}
-                                    totalPage={totalPages}
-                                    setPage={setCurrentPage}
-                                />
-                            )}
+                            {/* Pagination */}
+                            <Pagination
+                                page={currentPage}
+                                totalPage={totalPages}
+                                setPage={setCurrentPage}
+                            />
                         </>
                     ) : (
-                        <div className="bg-white rounded-2xl border border-[#dff1fb] p-12 sm:p-16 text-center shadow-sm max-w-md mx-auto">
-                            <div className="w-16 h-16 rounded-2xl bg-[#e3f2fd] text-[#1a237e] flex items-center justify-center mx-auto mb-4">
-                                <BookX className="w-8 h-8" />
-                            </div>
-                            <h3 className="font-headline font-bold text-lg text-[#0d1e25] mb-2">
-                                Không tìm thấy cuốn sách nào
+                        <div className="bg-white rounded-lg border border-[#E5E2DD] p-12 sm:p-16 text-center shadow-xs flex flex-col items-center justify-center">
+                            <BookX className="w-16 h-16 text-slate-300 mb-4" />
+                            <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#1A1A1A] mb-2">
+                                Không tìm thấy sách phù hợp
                             </h3>
-                            <p className="font-body text-sm text-slate-500 mb-6 leading-relaxed">
-                                Hãy thử thay đổi hoặc xóa bớt các tiêu chí trong bộ lọc để tìm thấy nhiều tựa sách hơn.
+                            <p className="font-body text-sm text-slate-500 max-w-md mb-6">
+                                Hãy thử thay đổi khoảng giá, xóa bớt các bộ lọc hoặc tìm kiếm với từ khóa khác.
                             </p>
                             <button
-                                onClick={() =>
-                                    handleFilterChange({
+                                onClick={() => {
+                                    setFilters({
                                         priceRange: [0, 300000],
                                         categories: [],
                                         publishers: [],
                                         publishYears: [],
                                         coverTypes: [],
-                                    })
-                                }
-                                className="bg-[#1a237e] hover:bg-[#283593] text-white px-6 py-2.5 rounded-xl font-headline font-semibold text-sm transition-colors shadow-sm cursor-pointer"
+                                    });
+                                    setSearchKeyword('');
+                                    setCurrentPage(1);
+                                    setSearchParams({});
+                                }}
+                                className="bg-[#1A1A1A] hover:bg-[#0070B5] text-white px-6 py-2.5 rounded font-body font-semibold text-sm transition-colors cursor-pointer shadow-xs"
                             >
-                                Xóa toàn bộ bộ lọc
+                                Xóa tất cả bộ lọc
                             </button>
                         </div>
                     )}
@@ -293,4 +302,3 @@ export default function AllProductsPage() {
         </div>
     );
 }
-
