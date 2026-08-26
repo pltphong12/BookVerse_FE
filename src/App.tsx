@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, ScrollRestoration } from 'react-router-dom';
 import { AuthorPage } from './pages/admin/author.admin';
 import { BookPage } from './pages/admin/book.admin';
 import { CategoryPage } from './pages/admin/category.admin';
@@ -137,6 +137,7 @@ export function App(props: { children: React.ReactNode }) {
 
     return (
         <>
+            <ScrollRestoration />
             {props.children}
         </>
     )

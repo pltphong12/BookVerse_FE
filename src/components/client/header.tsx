@@ -1,4 +1,4 @@
-import { ChevronDown, Clock, Search, ShoppingBag, TrendingUp, User, LogOut, Lock, Package, ShieldCheck, LogIn, UserPlus } from "lucide-react";
+import { ChevronDown, Clock, Search, ShoppingBag, TrendingUp, User, LogIn, UserPlus } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../../assets/logo_v2.png";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
@@ -399,7 +399,6 @@ export const Header: React.FC = () => {
                                                 onClick={() => navigate('/admin')}
                                                 className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-[#FAF9F7] hover:text-[#0070B5] rounded-lg transition-colors font-medium flex items-center gap-2.5 cursor-pointer"
                                             >
-                                                <ShieldCheck className="w-3.5 h-3.5 text-[#1A1A1A]" />
                                                 <span>Trang quản trị</span>
                                             </button>
                                         )}
@@ -407,21 +406,18 @@ export const Header: React.FC = () => {
                                             onClick={() => navigate('/order-history')}
                                             className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-[#FAF9F7] hover:text-[#0070B5] rounded-lg transition-colors font-medium flex items-center gap-2.5 cursor-pointer"
                                         >
-                                            <Package className="w-3.5 h-3.5 text-slate-400" />
                                             <span>Lịch sử đơn hàng</span>
                                         </button>
                                         <button
                                             onClick={() => showToast('Tính năng đang được phát triển', ToastType.INFO)}
                                             className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-[#FAF9F7] hover:text-[#0070B5] rounded-lg transition-colors font-medium flex items-center gap-2.5 cursor-pointer"
                                         >
-                                            <User className="w-3.5 h-3.5 text-slate-400" />
                                             <span>Thông tin tài khoản</span>
                                         </button>
                                         <button
                                             onClick={() => showToast('Tính năng đang được phát triển', ToastType.INFO)}
                                             className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-[#FAF9F7] hover:text-[#0070B5] rounded-lg transition-colors font-medium flex items-center gap-2.5 cursor-pointer"
                                         >
-                                            <Lock className="w-3.5 h-3.5 text-slate-400" />
                                             <span>Đổi mật khẩu</span>
                                         </button>
 
@@ -431,7 +427,6 @@ export const Header: React.FC = () => {
                                             onClick={handleLogout}
                                             className="w-full text-left px-3 py-2 text-xs text-rose-600 hover:bg-rose-50 rounded-lg transition-colors font-medium flex items-center gap-2.5 cursor-pointer"
                                         >
-                                            <LogOut className="w-3.5 h-3.5 text-rose-500" />
                                             <span>Đăng xuất</span>
                                         </button>
                                     </div>

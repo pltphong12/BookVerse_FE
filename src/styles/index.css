@@ -42,6 +42,27 @@ body {
   border-bottom: 2px solid #E5E2DD;
 }
 
+.ledger-input {
+  border-bottom: 1px solid #1A1A1A;
+  transition: all 0.2s ease-in-out;
+}
+
+.ledger-input:focus {
+  border: 1px solid #1A1A1A;
+  outline: none;
+  box-shadow: none;
+}
+
+.ledger-input.ledger-input-error {
+  border-bottom: 1px solid #BA1A1A;
+}
+
+.ledger-input.ledger-input-error:focus {
+  border: 1px solid #BA1A1A;
+  outline: none;
+  box-shadow: none;
+}
+
 h1, h2, h3, h4, h5, h6, .font-headline {
   font-family: 'Source Serif 4', 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }

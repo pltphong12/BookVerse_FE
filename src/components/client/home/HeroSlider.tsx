@@ -1,9 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../../../redux/hook';
-import { setCartSum } from '../../../redux/slide/cart.slice';
-import { callAddToCartApi } from '../../../services/api';
-import { showToast, ToastType } from '../../../common/showToast';
 import Banner1 from '../../../assets/banner/mua_he_vinh_cuu.jpg';
 import Banner2 from '../../../assets/banner/khu_vuon_bo_hoang.jpg';
 import Banner3 from '../../../assets/banner/suy_tuong_cua_dem.jpg';
@@ -13,7 +9,6 @@ interface HeroSlide {
     tag: string;
     title: string;
     description: string;
-    price: string;
     image: string;
     link: string;
 }
@@ -24,7 +19,6 @@ const spotlightSlides: HeroSlide[] = [
         tag: 'SÁCH CỦA THÁNG',
         title: 'Mùa Hè Vĩnh Cửu',
         description: 'Một kiệt tác văn học mới từ tác giả đoạt giải, khám phá những góc khuất của ký ức và thời gian qua lăng kính của một gia đình tại vùng duyên hải tĩnh lặng.',
-        price: '250.000 ₫',
         image: Banner1,
         link: '/products',
     },
@@ -33,7 +27,6 @@ const spotlightSlides: HeroSlide[] = [
         tag: 'TÁC PHẨM NỔI BẬT',
         title: 'Khu Vườn Bỏ Hoang',
         description: 'Khám phá những bước chuyển mình vĩ đại của tư duy nhân loại và cách mà tri thức định hình thế giới trong kỷ nguyên số hóa.',
-        price: '195.000 ₫',
         image: Banner2,
         link: '/products',
     },
@@ -42,7 +35,6 @@ const spotlightSlides: HeroSlide[] = [
         tag: 'TUYỂN CHỌN ĐẶC BIỆT',
         title: 'Suy Tưởng Của Đêm',
         description: 'Cuốn sách khai mở những triết lý phương Đông sâu sắc, đưa người đọc tìm lại giá trị đích thực của tâm hồn và sự an lạc nội tại.',
-        price: '168.000 ₫',
         image: Banner3,
         link: '/products',
     }
@@ -51,28 +43,8 @@ const spotlightSlides: HeroSlide[] = [
 export default function HeroSlider() {
     const [currentSlide, setCurrentSlide] = useState(0);
     const navigate = useNavigate();
-    const dispatch = useAppDispatch();
-    const isAuthenticated = useAppSelector((state) => state.account.isAuthenticated);
 
     const activeSlide = spotlightSlides[currentSlide];
-
-    const handleAddToCart = async () => {
-        if (!isAuthenticated) {
-            showToast("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!", ToastType.ERROR);
-            navigate("/login");
-            return;
-        }
-        try {
-            // Add top featured book or mock add
-            const res = await callAddToCartApi(1, 1);
-            if (res.data?.data) {
-                dispatch(setCartSum(res.data.data.sum));
-                showToast("Thêm vào giỏ hàng thành công", ToastType.SUCCESS);
-            }
-        } catch {
-            showToast("Thêm vào giỏ hàng thành công", ToastType.SUCCESS);
-        }
-    };
 
     return (
         <section className="pt-2 pb-6 sm:pb-10">
@@ -95,21 +67,6 @@ export default function HeroSlider() {
                     <p className="font-body text-slate-600 text-sm sm:text-base leading-relaxed">
                         {activeSlide.description}
                     </p>
-
-                    {/* Price */}
-                    <p className="font-serif font-bold text-2xl sm:text-[28px] text-[#1A1A1A]">
-                        {activeSlide.price}
-                    </p>
-
-                    {/* Action Button */}
-                    <div className="pt-2 flex items-center gap-4">
-                        <button
-                            onClick={handleAddToCart}
-                            className="bg-[#1A1A1A] hover:bg-[#0070B5] text-white px-8 py-3.5 rounded font-body font-semibold text-sm transition-colors duration-200 cursor-pointer shadow-sm active:scale-98"
-                        >
-                            Thêm Vào Giỏ Hàng
-                        </button>
-                    </div>
 
                     {/* Slide Dots navigation if more than 1 slide */}
                     {spotlightSlides.length > 1 && (

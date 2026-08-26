@@ -7,18 +7,10 @@ import { useSelector } from 'react-redux';
 import {
     ChevronRight,
     CreditCard,
-    MapPin,
-    Phone,
-    Mail,
-    User,
-    Truck,
-    Receipt,
-    CheckCircle2,
     Banknote,
     ArrowLeft,
-    ScrollText,
     Loader2,
-    ShieldCheck,
+    AlertCircle,
 } from 'lucide-react';
 import { ICartDetail } from '../../types/backend';
 import { callFetchCartApi, callCreateOrderApi } from '../../services/api';
@@ -148,7 +140,7 @@ export default function CheckoutPage() {
                 receiverName: data.receiverName,
                 receiverAddress: data.receiverAddress,
                 receiverPhone: data.receiverPhone,
-                receiverEmail: data.receiverEmail || '',
+                receiverEmail: data.receiverEmail || account?.email || '',
                 paymentMethod: data.paymentMethod,
                 note: data.note || '',
                 items,
@@ -180,272 +172,245 @@ export default function CheckoutPage() {
     if (isLoading) {
         return (
             <div className="min-h-[60vh] flex items-center justify-center">
-                <div className="bg-white rounded-2xl border border-[#dff1fb] p-12 text-center shadow-sm flex flex-col items-center gap-3">
-                    <div className="w-10 h-10 border-3 border-[#e3f2fd] border-t-[#1a237e] rounded-full animate-spin"></div>
-                    <p className="font-body text-sm text-slate-500 font-medium">Đang tải thông tin đơn hàng...</p>
+                <div className="bg-white rounded-xl border border-[#E5E2DD] p-12 text-center shadow-xs flex flex-col items-center gap-3">
+                    <Loader2 className="w-8 h-8 animate-spin text-[#1A1A1A]" />
+                    <p className="text-sm text-[#4C4546] font-medium">Đang tải thông tin đơn hàng...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 py-6 sm:py-10 font-sans text-[#1A1A1A]">
             {/* Breadcrumb */}
-            <div className="flex items-center gap-2 text-xs sm:text-sm font-body text-slate-400 mb-6">
-                <Link to="/" className="hover:text-[#1a237e] transition-colors">
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-[#7E7576] mb-6">
+                <Link to="/" className="hover:text-[#0070B5] transition-colors">
                     Trang chủ
                 </Link>
-                <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
-                <Link to="/cart" className="hover:text-[#1a237e] transition-colors">
+                <ChevronRight className="w-3.5 h-3.5 text-[#CFC4C5]" />
+                <Link to="/cart" className="hover:text-[#0070B5] transition-colors">
                     Giỏ hàng
                 </Link>
-                <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
-                <span className="text-slate-700 font-semibold">Thanh toán</span>
+                <ChevronRight className="w-3.5 h-3.5 text-[#CFC4C5]" />
+                <span className="text-[#1A1A1A] font-semibold">Thanh toán</span>
             </div>
 
             {/* Page Header */}
-            <div className="mb-8">
-                <h1 className="font-headline text-2xl sm:text-4xl font-bold text-[#0d1e25]">
-                    Thanh toán
-                </h1>
-                <p className="font-body text-sm text-slate-500 mt-1">
-                    Vui lòng kiểm tra lại thông tin trước khi hoàn tất đơn hàng.
-                </p>
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-10">
+                <div>
+                    <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#1A1A1A] tracking-tight">
+                        Thanh toán
+                    </h1>
+                    <p className="text-sm text-[#4C4546] mt-1.5">
+                        Vui lòng kiểm tra lại thông tin nhận hàng và phương thức thanh toán.
+                    </p>
+                </div>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)}>
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
                     {/* ===================== LEFT COLUMN ===================== */}
-                    <div className="lg:col-span-7 space-y-6">
-                        {/* 1. Shipping Info Card */}
-                        <section className="bg-white border border-[#dff1fb] rounded-xl p-5 sm:p-6 shadow-sm">
-                            <h2 className="font-headline font-bold text-base sm:text-lg text-[#0d1e25] mb-4 flex items-center gap-2">
-                                <Truck className="w-5 h-5 text-[#1a237e]" />
-                                Thông tin giao hàng
+                    <div className="lg:col-span-7 space-y-10">
+                        {/* Section 1: Thông tin giao hàng */}
+                        <section>
+                            <h2 className="font-serif text-xl sm:text-2xl font-semibold text-[#1A1A1A] mb-6 border-b border-[#E5E2DD] pb-3">
+                                1. Thông tin giao hàng
                             </h2>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {/* Receiver Name */}
-                                <div className="flex flex-col gap-1.5">
-                                    <label className="font-body text-xs font-semibold text-slate-600 flex items-center gap-1">
-                                        <User className="w-3.5 h-3.5 text-slate-400" />
-                                        Họ và tên <span className="text-red-500">*</span>
+                            <div className="space-y-5">
+                                {/* Họ và tên */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-[#1A1A1A] mb-1.5" htmlFor="receiverName">
+                                        Họ và tên <span className="text-[#BA1A1A]">*</span>
                                     </label>
                                     <input
+                                        id="receiverName"
                                         type="text"
-                                        placeholder="Nhập họ và tên"
+                                        placeholder="VD: Nguyễn Văn A"
                                         {...register('receiverName')}
-                                        className={`w-full px-3.5 py-2.5 bg-[#f4faff] border rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white transition-colors ${errors.receiverName
-                                                ? 'border-red-400 focus:border-red-500'
-                                                : 'border-[#dff1fb] focus:border-[#1a237e]'
+                                        className={`ledger-input block w-full appearance-none bg-transparent py-2.5 px-2 text-[#1A1A1A] placeholder:text-[#7E7576] text-sm ${errors.receiverName ? 'ledger-input-error' : ''
                                             }`}
                                     />
                                     {errors.receiverName && (
-                                        <p className="text-xs text-red-500 font-medium">
+                                        <p className="mt-1.5 text-xs text-[#BA1A1A] flex items-center gap-1 font-medium">
+                                            <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
                                             {errors.receiverName.message}
                                         </p>
                                     )}
                                 </div>
 
+                                {/* Hidden Email Input */}
+                                <input type="hidden" {...register('receiverEmail')} />
+
                                 {/* Phone */}
-                                <div className="flex flex-col gap-1.5">
-                                    <label className="font-body text-xs font-semibold text-slate-600 flex items-center gap-1">
-                                        <Phone className="w-3.5 h-3.5 text-slate-400" />
-                                        Số điện thoại <span className="text-red-500">*</span>
+                                <div>
+                                    <label className="block text-sm font-semibold text-[#1A1A1A] mb-1.5" htmlFor="receiverPhone">
+                                        Số điện thoại <span className="text-[#BA1A1A]">*</span>
                                     </label>
                                     <input
+                                        id="receiverPhone"
                                         type="tel"
-                                        placeholder="Nhập số điện thoại"
+                                        placeholder="VD: 0901234567"
                                         {...register('receiverPhone')}
-                                        className={`w-full px-3.5 py-2.5 bg-[#f4faff] border rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white transition-colors ${errors.receiverPhone
-                                                ? 'border-red-400 focus:border-red-500'
-                                                : 'border-[#dff1fb] focus:border-[#1a237e]'
+                                        className={`ledger-input block w-full appearance-none bg-transparent py-2.5 px-2 text-[#1A1A1A] placeholder:text-[#7E7576] text-sm ${errors.receiverPhone ? 'ledger-input-error' : ''
                                             }`}
                                     />
                                     {errors.receiverPhone && (
-                                        <p className="text-xs text-red-500 font-medium">
+                                        <p className="mt-1.5 text-xs text-[#BA1A1A] flex items-center gap-1 font-medium">
+                                            <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
                                             {errors.receiverPhone.message}
                                         </p>
                                     )}
                                 </div>
 
-                                {/* Email */}
-                                <div className="flex flex-col gap-1.5 sm:col-span-2">
-                                    <label className="font-body text-xs font-semibold text-slate-600 flex items-center gap-1">
-                                        <Mail className="w-3.5 h-3.5 text-slate-400" />
-                                        Email <span className="text-slate-400 font-normal">(không bắt buộc)</span>
+                                {/* Địa chỉ */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-[#1A1A1A] mb-1.5" htmlFor="receiverAddress">
+                                        Địa chỉ giao hàng <span className="text-[#BA1A1A]">*</span>
                                     </label>
                                     <input
-                                        type="email"
-                                        placeholder="Nhập email để nhận hóa đơn và thông báo"
-                                        {...register('receiverEmail')}
-                                        className={`w-full px-3.5 py-2.5 bg-[#f4faff] border rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white transition-colors ${errors.receiverEmail
-                                                ? 'border-red-400 focus:border-red-500'
-                                                : 'border-[#dff1fb] focus:border-[#1a237e]'
-                                            }`}
-                                    />
-                                    {errors.receiverEmail && (
-                                        <p className="text-xs text-red-500 font-medium">
-                                            {errors.receiverEmail.message}
-                                        </p>
-                                    )}
-                                </div>
-
-                                {/* Address */}
-                                <div className="flex flex-col gap-1.5 sm:col-span-2">
-                                    <label className="font-body text-xs font-semibold text-slate-600 flex items-center gap-1">
-                                        <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                                        Địa chỉ cụ thể <span className="text-red-500">*</span>
-                                    </label>
-                                    <textarea
-                                        rows={2}
-                                        placeholder="Số nhà, Tên đường, Phường/Xã, Quận/Huyện, Tỉnh/Thành phố..."
+                                        id="receiverAddress"
+                                        type="text"
+                                        placeholder="Số nhà, tên đường, phường/xã, quận/huyện..."
                                         {...register('receiverAddress')}
-                                        className={`w-full px-3.5 py-2.5 bg-[#f4faff] border rounded-lg text-sm text-slate-800 placeholder-slate-400 resize-none focus:outline-none focus:bg-white transition-colors ${errors.receiverAddress
-                                                ? 'border-red-400 focus:border-red-500'
-                                                : 'border-[#dff1fb] focus:border-[#1a237e]'
+                                        className={`ledger-input block w-full appearance-none bg-transparent py-2.5 px-2 text-[#1A1A1A] placeholder:text-[#7E7576] text-sm ${errors.receiverAddress ? 'ledger-input-error' : ''
                                             }`}
                                     />
                                     {errors.receiverAddress && (
-                                        <p className="text-xs text-red-500 font-medium">
+                                        <p className="mt-1.5 text-xs text-[#BA1A1A] flex items-center gap-1 font-medium">
+                                            <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
                                             {errors.receiverAddress.message}
                                         </p>
                                     )}
                                 </div>
 
-                                {/* Note */}
-                                <div className="flex flex-col gap-1.5 sm:col-span-2">
-                                    <label className="font-body text-xs font-semibold text-slate-600 flex items-center gap-1">
-                                        <ScrollText className="w-3.5 h-3.5 text-slate-400" />
-                                        Ghi chú đơn hàng <span className="text-slate-400 font-normal">(không bắt buộc)</span>
+                                {/* Ghi chú */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-[#1A1A1A] mb-1.5" htmlFor="note">
+                                        Ghi chú <span className="text-xs text-[#7E7576] font-normal">(tùy chọn)</span>
                                     </label>
-                                    <textarea
-                                        rows={2}
-                                        placeholder="Ghi chú thêm về thời gian giao hàng, chỉ dẫn địa chỉ..."
+                                    <input
+                                        id="note"
+                                        type="text"
+                                        placeholder="Ghi chú thêm cho đơn hàng (thời gian nhận hàng, chỉ dẫn...)"
                                         {...register('note')}
-                                        className="w-full px-3.5 py-2.5 bg-[#f4faff] border border-[#dff1fb] rounded-lg text-sm text-slate-800 placeholder-slate-400 resize-none focus:outline-none focus:border-[#1a237e] focus:bg-white transition-colors"
+                                        className="ledger-input block w-full appearance-none bg-transparent py-2.5 px-2 text-[#1A1A1A] placeholder:text-[#7E7576] text-sm"
                                     />
                                 </div>
                             </div>
                         </section>
 
-                        {/* 2. Shipping Method Card */}
-                        <section className="bg-white border border-[#dff1fb] rounded-xl p-5 sm:p-6 shadow-sm">
-                            <h2 className="font-headline font-bold text-base sm:text-lg text-[#0d1e25] mb-4 flex items-center gap-2">
-                                <Truck className="w-5 h-5 text-[#1a237e]" />
-                                Phương thức vận chuyển
+                        {/* Section 2: Phương thức giao hàng */}
+                        <section>
+                            <h2 className="font-serif text-xl sm:text-2xl font-semibold text-[#1A1A1A] mb-6 border-b border-[#E5E2DD] pb-3">
+                                2. Phương thức giao hàng
                             </h2>
-                            <div className="flex flex-col gap-3">
-                                <label className="flex items-start gap-3 p-3.5 border border-[#1a237e] bg-[#e3f2fd]/40 rounded-xl cursor-pointer transition-colors">
+
+                            <label className="flex items-center justify-between p-4 border border-[#1A1A1A] bg-white rounded-lg cursor-pointer transition-colors shadow-2xs">
+                                <div className="flex items-center gap-3">
                                     <input
                                         type="radio"
                                         name="shipping"
                                         checked
                                         readOnly
-                                        className="mt-1 w-4 h-4 text-[#1a237e] accent-[#1a237e] focus:ring-[#1a237e]"
+                                        className="h-4 w-4 rounded-full border border-[#1A1A1A] text-[#1A1A1A] accent-[#1A1A1A] focus:ring-0 cursor-pointer"
                                     />
-                                    <div className="flex-grow">
-                                        <div className="flex justify-between items-center">
-                                            <span className="font-headline font-bold text-sm text-[#0d1e25]">
-                                                Giao hàng tiêu chuẩn
-                                            </span>
-                                            <span className="font-headline font-bold text-sm text-emerald-600">
-                                                Miễn phí
-                                            </span>
-                                        </div>
-                                        <p className="font-body text-xs text-slate-500 mt-0.5">
-                                            Dự kiến giao hàng trong 2 - 4 ngày làm việc.
-                                        </p>
+                                    <div>
+                                        <span className="block text-sm font-semibold text-[#1A1A1A]">
+                                            Giao hàng tiêu chuẩn
+                                        </span>
+                                        <span className="block text-xs text-[#7E7576] mt-0.5">
+                                            Dự kiến giao hàng trong 2 - 4 ngày làm việc
+                                        </span>
                                     </div>
-                                </label>
-                            </div>
+                                </div>
+                                <span className="text-sm font-semibold text-emerald-700">Miễn phí</span>
+                            </label>
                         </section>
 
-                        {/* 3. Payment Method Card */}
-                        <section className="bg-white border border-[#dff1fb] rounded-xl p-5 sm:p-6 shadow-sm">
-                            <h2 className="font-headline font-bold text-base sm:text-lg text-[#0d1e25] mb-4 flex items-center gap-2">
-                                <CreditCard className="w-5 h-5 text-[#1a237e]" />
-                                Phương thức thanh toán
+                        {/* Section 3: Phương thức thanh toán */}
+                        <section>
+                            <h2 className="font-serif text-xl sm:text-2xl font-semibold text-[#1A1A1A] mb-6 border-b border-[#E5E2DD] pb-3">
+                                3. Phương thức thanh toán
                             </h2>
 
-                            <div className="flex flex-col gap-3">
-                                {/* COD */}
+                            <div className="space-y-3">
+                                {/* COD Option */}
                                 <label
                                     onClick={() => handlePaymentSelect('COD')}
-                                    className={`flex items-start gap-3.5 p-4 rounded-xl border transition-all cursor-pointer ${selectedPayment === 'COD'
-                                            ? 'border-[#1a237e] bg-[#e3f2fd]/40 shadow-sm'
-                                            : 'border-[#dff1fb] bg-white hover:bg-[#f4faff]'
+                                    className={`flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-all ${selectedPayment === 'COD'
+                                            ? 'border-[#1A1A1A] bg-white shadow-2xs'
+                                            : 'border-[#E5E2DD] bg-white hover:bg-[#FAF9F7]'
                                         }`}
                                 >
-                                    <input
-                                        type="radio"
-                                        name="paymentMethod"
-                                        value="COD"
-                                        checked={selectedPayment === 'COD'}
-                                        onChange={() => handlePaymentSelect('COD')}
-                                        className="mt-1 w-4 h-4 text-[#1a237e] accent-[#1a237e] focus:ring-[#1a237e]"
-                                    />
-                                    <div className="w-8 h-8 rounded-lg bg-[#e3f2fd] text-[#1a237e] flex items-center justify-center shrink-0">
-                                        <Banknote className="w-4 h-4" />
+                                    <div className="flex items-center gap-3.5">
+                                        <input
+                                            type="radio"
+                                            name="paymentMethod"
+                                            value="COD"
+                                            checked={selectedPayment === 'COD'}
+                                            onChange={() => handlePaymentSelect('COD')}
+                                            className="h-4 w-4 rounded-full border border-[#1A1A1A] text-[#1A1A1A] accent-[#1A1A1A] focus:ring-0 cursor-pointer"
+                                        />
+                                        <div className="w-8 h-8 rounded-lg bg-[#FAF9F7] border border-[#E5E2DD] text-[#1A1A1A] flex items-center justify-center shrink-0">
+                                            <Banknote className="w-4 h-4" />
+                                        </div>
+                                        <div>
+                                            <span className="block text-sm font-semibold text-[#1A1A1A]">
+                                                Thanh toán khi nhận hàng (COD)
+                                            </span>
+                                            <span className="block text-xs text-[#7E7576] mt-0.5">
+                                                Thanh toán bằng tiền mặt khi shipper giao hàng tận nơi
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div className="flex-grow">
-                                        <span className="font-headline font-bold text-sm text-[#0d1e25] block">
-                                            Thanh toán khi nhận hàng (COD)
-                                        </span>
-                                        <p className="font-body text-xs text-slate-500 mt-0.5">
-                                            Thanh toán bằng tiền mặt khi shipper giao hàng tận nơi.
-                                        </p>
-                                    </div>
-                                    {selectedPayment === 'COD' && (
-                                        <CheckCircle2 className="w-5 h-5 text-[#1a237e] shrink-0" />
-                                    )}
                                 </label>
 
-                                {/* VNPAY */}
+                                {/* VNPay Option */}
                                 <label
                                     onClick={() => handlePaymentSelect('VNPAY')}
-                                    className={`flex items-start gap-3.5 p-4 rounded-xl border transition-all cursor-pointer ${selectedPayment === 'VNPAY'
-                                            ? 'border-[#1a237e] bg-[#e3f2fd]/40 shadow-sm'
-                                            : 'border-[#dff1fb] bg-white hover:bg-[#f4faff]'
+                                    className={`flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-all ${selectedPayment === 'VNPAY'
+                                            ? 'border-[#1A1A1A] bg-white shadow-2xs'
+                                            : 'border-[#E5E2DD] bg-white hover:bg-[#FAF9F7]'
                                         }`}
                                 >
-                                    <input
-                                        type="radio"
-                                        name="paymentMethod"
-                                        value="VNPAY"
-                                        checked={selectedPayment === 'VNPAY'}
-                                        onChange={() => handlePaymentSelect('VNPAY')}
-                                        className="mt-1 w-4 h-4 text-[#1a237e] accent-[#1a237e] focus:ring-[#1a237e]"
-                                    />
-                                    <div className="w-8 h-8 rounded-lg bg-[#e3f2fd] text-[#1a237e] flex items-center justify-center shrink-0">
-                                        <CreditCard className="w-4 h-4" />
+                                    <div className="flex items-center gap-3.5">
+                                        <input
+                                            type="radio"
+                                            name="paymentMethod"
+                                            value="VNPAY"
+                                            checked={selectedPayment === 'VNPAY'}
+                                            onChange={() => handlePaymentSelect('VNPAY')}
+                                            className="h-4 w-4 rounded-full border border-[#1A1A1A] text-[#1A1A1A] accent-[#1A1A1A] focus:ring-0 cursor-pointer"
+                                        />
+                                        <div className="w-8 h-8 rounded-lg bg-[#FAF9F7] border border-[#E5E2DD] text-[#1A1A1A] flex items-center justify-center shrink-0">
+                                            <CreditCard className="w-4 h-4" />
+                                        </div>
+                                        <div>
+                                            <span className="block text-sm font-semibold text-[#1A1A1A]">
+                                                Thanh toán trực tuyến VNPay
+                                            </span>
+                                            <span className="block text-xs text-[#7E7576] mt-0.5">
+                                                Hỗ trợ thẻ ATM nội địa, Visa, MasterCard, JCB và quét mã QR
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div className="flex-grow">
-                                        <span className="font-headline font-bold text-sm text-[#0d1e25] block">
-                                            Thanh toán online qua VNPAY
-                                        </span>
-                                        <p className="font-body text-xs text-slate-500 mt-0.5">
-                                            Hỗ trợ thẻ ATM nội địa, Visa, MasterCard, JCB và quét mã VNPAY-QR.
-                                        </p>
-                                    </div>
-                                    {selectedPayment === 'VNPAY' && (
-                                        <CheckCircle2 className="w-5 h-5 text-[#1a237e] shrink-0" />
-                                    )}
                                 </label>
                             </div>
 
                             {errors.paymentMethod && (
-                                <p className="mt-2 text-xs text-red-500 font-medium">
+                                <p className="mt-2 text-xs text-[#BA1A1A] flex items-center gap-1 font-medium">
+                                    <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
                                     {errors.paymentMethod.message}
                                 </p>
                             )}
                         </section>
 
-                        {/* Back link */}
-                        <div>
+                        {/* Back to Cart link */}
+                        <div className="pt-2">
                             <Link
                                 to="/cart"
-                                className="inline-flex items-center gap-1.5 text-sm font-headline font-semibold text-[#1a237e] hover:text-[#283593] transition-colors"
+                                className="inline-flex items-center gap-2 text-sm font-medium text-[#1A1A1A] hover:text-[#0070B5] hover:underline underline-offset-4 transition-colors"
                             >
                                 <ArrowLeft className="w-4 h-4" />
                                 Quay lại giỏ hàng
@@ -454,15 +419,14 @@ export default function CheckoutPage() {
                     </div>
 
                     {/* ===================== RIGHT COLUMN (Order Summary) ===================== */}
-                    <div className="lg:col-span-5 sticky top-24">
-                        <aside className="bg-white border border-[#dff1fb] rounded-xl p-5 sm:p-6 shadow-sm flex flex-col gap-5">
-                            <h2 className="font-headline font-bold text-lg sm:text-xl text-[#0d1e25] flex items-center gap-2">
-                                <Receipt className="w-5 h-5 text-[#1a237e]" />
+                    <div className="lg:col-span-5 relative mt-6 lg:mt-0">
+                        <div className="sticky top-24 bg-white border border-[#E5E2DD] p-6 sm:p-8 shadow-xs rounded-xl">
+                            <h3 className="font-serif text-xl font-bold text-[#1A1A1A] mb-6 border-b border-[#E5E2DD] pb-4">
                                 Tóm tắt đơn hàng
-                            </h2>
+                            </h3>
 
-                            {/* Product List Compact */}
-                            <div className="flex flex-col gap-3 max-h-[280px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200">
+                            {/* Cart Items List */}
+                            <div className="space-y-4 mb-6 max-h-[280px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200 border-b border-[#E5E2DD] pb-6">
                                 {cartItems.map((item) => {
                                     const discount = item.book.discount ?? 0;
                                     const discountedPrice =
@@ -473,96 +437,83 @@ export default function CheckoutPage() {
                                     return (
                                         <div
                                             key={item.id}
-                                            className="flex gap-3 items-center py-2.5 border-b border-slate-100 last:border-0"
+                                            className="flex items-center justify-between gap-3"
                                         >
-                                            <div className="relative w-14 h-18 flex-shrink-0 rounded-lg overflow-hidden border border-[#dff1fb] bg-[#f4faff]">
-                                                {item.book.image ? (
-                                                    <img
-                                                        src={`${import.meta.env.VITE_BACKEND_URL}/storage/book/${item.book.image}`}
-                                                        alt={item.book.title}
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center bg-[#e3f2fd]">
-                                                        <span className="text-lg">📚</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="flex-grow min-w-0">
-                                                <span className="font-headline font-bold text-xs sm:text-sm text-[#0d1e25] line-clamp-2">
-                                                    {item.book.title}
-                                                </span>
-                                                <div className="flex justify-between items-center mt-1">
-                                                    <span className="font-body text-xs text-slate-400">
-                                                        Số lượng: {item.quantity}
-                                                    </span>
-                                                    <span className="font-headline font-bold text-xs sm:text-sm text-[#1a237e]">
-                                                        {formatPrice(discountedPrice * item.quantity)}
-                                                    </span>
+                                            <div className="flex items-center gap-3 min-w-0">
+                                                <div className="relative w-12 h-16 flex-shrink-0 rounded border border-[#E5E2DD] overflow-hidden bg-[#FAF9F7]">
+                                                    {item.book.image ? (
+                                                        <img
+                                                            src={`${import.meta.env.VITE_BACKENDURL || import.meta.env.VITE_BACKEND_URL}/storage/book/${item.book.image}`}
+                                                            alt={item.book.title}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-sm bg-[#FAF9F7]">
+                                                            📚
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <h4 className="text-sm font-medium text-[#1A1A1A] line-clamp-1">
+                                                        {item.book.title}
+                                                    </h4>
+                                                    <p className="text-xs text-[#7E7576]">Số lượng: {item.quantity}</p>
                                                 </div>
                                             </div>
+                                            <span className="text-sm font-semibold text-[#1A1A1A] shrink-0">
+                                                {formatPrice(discountedPrice * item.quantity)}
+                                            </span>
                                         </div>
                                     );
                                 })}
                             </div>
 
                             {/* Price Breakdown */}
-                            <div className="space-y-2.5 pt-3 border-t border-slate-100 text-sm font-body">
-                                <div className="flex justify-between items-center text-slate-600">
+                            <div className="space-y-3 mb-6">
+                                <div className="flex justify-between text-sm text-[#4C4546]">
                                     <span>Tạm tính</span>
-                                    <span className="font-semibold text-slate-800">{formatPrice(totalOriginal)}</span>
-                                </div>
-                                <div className="flex justify-between items-center text-slate-600">
-                                    <span>Phí vận chuyển</span>
-                                    <span className="font-semibold text-emerald-600">
-                                        {shippingFee === 0 ? 'Miễn phí' : formatPrice(shippingFee)}
-                                    </span>
+                                    <span className="font-medium text-[#1A1A1A]">{formatPrice(totalOriginal)}</span>
                                 </div>
                                 {totalDiscount > 0 && (
-                                    <div className="flex justify-between items-center text-red-600">
+                                    <div className="flex justify-between text-sm text-[#4C4546]">
                                         <span>Giảm giá</span>
-                                        <span className="font-semibold">-{formatPrice(totalDiscount)}</span>
+                                        <span className="font-semibold text-[#BA1A1A]">-{formatPrice(totalDiscount)}</span>
                                     </div>
                                 )}
+                                <div className="flex justify-between text-sm text-[#4C4546]">
+                                    <span>Phí vận chuyển</span>
+                                    <span className="font-semibold text-emerald-700">Miễn phí</span>
+                                </div>
                             </div>
 
-                            {/* Total */}
-                            <div className="flex justify-between items-baseline pt-4 border-t border-[#dff1fb]">
-                                <span className="font-headline font-bold text-base sm:text-lg text-[#0d1e25]">
-                                    Tổng cộng
-                                </span>
-                                <span className="font-headline font-bold text-xl sm:text-2xl text-[#1a237e]">
-                                    {formatPrice(total)}
-                                </span>
+                            {/* Total Row */}
+                            <div className="flex justify-between items-center border-t border-[#E5E2DD] pt-4 mb-6">
+                                <span className="font-serif font-bold text-lg text-[#1A1A1A]">Tổng cộng</span>
+                                <span className="font-serif font-bold text-2xl text-[#1A1A1A]">{formatPrice(total)}</span>
                             </div>
 
                             {/* Submit Button */}
                             <button
                                 type="submit"
                                 disabled={isSubmitting || cartItems.length === 0}
-                                className="w-full bg-[#1a237e] text-white py-3.5 rounded-xl font-headline font-bold text-sm sm:text-base hover:bg-[#283593] transition-all shadow-md shadow-indigo-950/10 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
+                                className="w-full bg-[#1A1A1A] text-white font-semibold text-sm py-4 rounded-lg hover:bg-[#0070B5] active:bg-[#005a92] transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-xs"
                             >
                                 {isSubmitting ? (
-                                    <>
-                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                    <span className="flex items-center gap-2">
+                                        <Loader2 className="w-4 h-4 animate-spin" />
                                         Đang xử lý đặt hàng...
-                                    </>
+                                    </span>
                                 ) : (
-                                    <>
-                                        <ShieldCheck className="w-5 h-5" />
-                                        Đặt hàng ngay
-                                    </>
+                                    'Đặt hàng'
                                 )}
                             </button>
 
-                            <p className="text-center text-xs font-body text-slate-400">
-                                Bằng việc đặt hàng, bạn đồng ý với{' '}
-                                <span className="text-[#1a237e] hover:underline cursor-pointer">
-                                    Điều khoản sử dụng
-                                </span>{' '}
-                                của BookVerse.
+                            <p className="text-xs text-[#7E7576] text-center mt-4 leading-relaxed">
+                                Bằng cách đặt hàng, bạn đồng ý với{' '}
+                                <a href="#" className="underline hover:text-[#1A1A1A]">Điều khoản dịch vụ</a> và{' '}
+                                <a href="#" className="underline hover:text-[#1A1A1A]">Chính sách bảo mật</a> của BookVerse.
                             </p>
-                        </aside>
+                        </div>
                     </div>
                 </div>
             </form>

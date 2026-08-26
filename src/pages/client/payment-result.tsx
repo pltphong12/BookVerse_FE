@@ -1,147 +1,110 @@
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
-import {
-    CheckCircle2,
-    XCircle,
-    ShoppingBag,
-    Phone,
-    PackageCheck,
-    Truck,
-    RefreshCw,
-    ShieldCheck,
-    Receipt,
-} from 'lucide-react';
-
-type PaymentStatus = 'success' | 'failure';
 
 export default function PaymentResultPage() {
     const location = useLocation();
     const [searchParams] = useSearchParams();
 
-    // Determine status from the URL path
-    const status: PaymentStatus = location.pathname.includes('/payment/success')
-        ? 'success'
-        : 'failure';
+    // Get params from query string
+    const orderCode = searchParams.get('orderCode') || searchParams.get('vnp_TxnRef');
+    const method = searchParams.get('method') || (searchParams.get('vnp_BankCode') ? 'VNPAY' : undefined);
+    const vnpResponseCode = searchParams.get('vnp_ResponseCode');
 
-    // Get orderCode and payment method from query params
-    const orderCode = searchParams.get('orderCode');
-    const method = searchParams.get('method');
-
-    const isSuccess = status === 'success';
+    // Determine success/failure status
+    const isVnPaySuccess = vnpResponseCode ? vnpResponseCode === '00' : true;
+    const isSuccess = location.pathname.includes('/payment/success') && isVnPaySuccess;
 
     return (
-        <main className="flex-grow flex items-center justify-center py-12 sm:py-20 px-4 relative overflow-hidden">
-            {/* Decorative Background Elements */}
-            <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
-                <div className="absolute top-[-10%] right-[-5%] w-[40vw] h-[40vw] rounded-full bg-[#e3f2fd] blur-[100px]" />
-                <div className="absolute bottom-[-10%] left-[-5%] w-[30vw] h-[30vw] rounded-full bg-[#959efd] opacity-20 blur-[80px]" />
-            </div>
+        <main className="flex-grow flex items-center justify-center py-10 sm:py-16 px-4 sm:px-6 lg:px-8 font-sans text-[#1A1A1A]">
+            <div className="w-full max-w-3xl bg-white border border-[#E5E2DD] rounded-xl shadow-xs p-6 sm:p-10 md:p-12">
+                {/* Status Icon & Header */}
+                <div className="text-center mb-10">
 
-            <div className="relative z-10 w-full max-w-2xl bg-white border border-[#dff1fb] rounded-2xl shadow-sm p-6 sm:p-12 flex flex-col items-center text-center">
-                {/* Status Icon */}
-                <div
-                    className={`w-24 h-24 rounded-full flex items-center justify-center mb-6 transition-all ${
-                        isSuccess
-                            ? 'bg-[#e3f2fd] text-[#1a237e]'
-                            : 'bg-rose-50 text-rose-600 border border-rose-200'
-                    }`}
-                >
-                    {isSuccess ? (
-                        <CheckCircle2 className="w-14 h-14 stroke-[2.2]" />
-                    ) : (
-                        <XCircle className="w-14 h-14 stroke-[2.2]" />
-                    )}
+                    <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-[#1A1A1A] mb-3">
+                        {isSuccess ? 'Đặt hàng thành công!' : 'Thanh toán chưa thành công'}
+                    </h1>
+
+                    <p className="text-sm sm:text-base text-[#4C4546] max-w-lg mx-auto leading-relaxed">
+                        {isSuccess
+                            ? 'Cảm ơn bạn đã lựa chọn BookVerse. Đơn hàng của bạn đang được xử lý và sẽ sớm được giao đến bạn.'
+                            : 'Rất tiếc, giao dịch chưa thể hoàn tất. Bạn có thể thử thanh toán lại hoặc chọn phương thức thanh toán khác.'}
+                    </p>
                 </div>
 
-                {/* Headline */}
-                <h1 className="font-headline font-bold text-2xl sm:text-3xl text-[#0d1e25] mb-2">
-                    {isSuccess ? 'Đặt hàng thành công!' : 'Thanh toán chưa thành công'}
-                </h1>
-
-                {/* Subheadline */}
-                <p className="font-body text-sm sm:text-base text-slate-500 mb-8 max-w-md leading-relaxed">
-                    {isSuccess
-                        ? 'Cảm ơn bạn đã mua sắm tại BookVerse. Đơn hàng của bạn đang được xử lý và đóng gói.'
-                        : 'Rất tiếc, giao dịch chưa thể hoàn tất. Bạn có thể thử thanh toán lại hoặc chọn phương thức thanh toán khác.'}
-                </p>
-
-                {/* Details Card (Bento Layout matching Stitch) */}
-                <div className="w-full bg-[#f4faff] border border-[#dff1fb] rounded-xl p-5 sm:p-6 text-left mb-8 flex flex-col md:flex-row gap-6">
-                    {/* Order Summary Column */}
-                    <div className="flex-1 border-b md:border-b-0 md:border-r border-[#dff1fb] pb-5 md:pb-0 md:pr-6 space-y-3">
-                        <h2 className="font-headline font-bold text-xs text-slate-400 uppercase tracking-wider">
-                            Chi tiết đơn hàng
+                {/* Details Grid (2 Columns) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-[#E5E2DD] pt-8 mb-10 text-left">
+                    {/* Column 1: Order Information */}
+                    <div>
+                        <h2 className="text-xs font-semibold text-[#7E7576] uppercase tracking-wider mb-4">
+                            Thông tin đơn hàng
                         </h2>
-                        <div className="space-y-2 text-sm font-body">
+                        <div className="space-y-3.5 text-sm">
                             {orderCode && (
                                 <div className="flex justify-between items-center">
-                                    <span className="text-slate-500">Mã đơn hàng:</span>
-                                    <span className="font-headline font-bold text-[#0d1e25]">
+                                    <span className="text-[#4C4546]">Mã đơn hàng:</span>
+                                    <span className="font-semibold text-[#1A1A1A]">
                                         #{orderCode}
                                     </span>
                                 </div>
                             )}
                             <div className="flex justify-between items-center">
-                                <span className="text-slate-500">Dự kiến giao:</span>
-                                <span className="font-semibold text-slate-800">
-                                    2 - 4 ngày làm việc
+                                <span className="text-[#4C4546]">Phương thức thanh toán:</span>
+                                <span className="font-medium text-[#1A1A1A]">
+                                    {method === 'VNPAY'
+                                        ? 'Thanh toán trực tuyến (VNPay)'
+                                        : 'Thanh toán khi nhận hàng (COD)'}
                                 </span>
                             </div>
                             <div className="flex justify-between items-center">
-                                <span className="text-slate-500">Thanh toán:</span>
-                                <span className="font-semibold text-slate-800">
-                                    {method === 'VNPAY' ? 'VNPAY Online' : 'COD khi nhận hàng'}
+                                <span className="text-[#4C4546]">Phương thức giao hàng:</span>
+                                <span className="font-medium text-[#1A1A1A]">
+                                    Giao hàng tiêu chuẩn (Miễn phí)
                                 </span>
                             </div>
-                            <div className="flex justify-between items-center pt-2 border-t border-slate-200/60">
-                                <span className="text-slate-500">Trạng thái:</span>
-                                <span className="font-headline font-bold text-[#1a237e] inline-flex items-center gap-1">
-                                    <PackageCheck className="w-4 h-4" />
+                            <div className="flex justify-between items-center pt-2 border-t border-[#E5E2DD]">
+                                <span className="text-[#4C4546]">Trạng thái:</span>
+                                <span className="font-semibold inline-flex items-center gap-1.5 text-[#1A1A1A]">
                                     {isSuccess ? 'Đang xử lý' : 'Chưa hoàn tất'}
                                 </span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Shipping / Support Info Column */}
-                    <div className="flex-1 md:pl-2 space-y-3">
-                        <h2 className="font-headline font-bold text-xs text-slate-400 uppercase tracking-wider">
+                    {/* Column 2: Service & Support */}
+                    <div>
+                        <h2 className="text-xs font-semibold text-[#7E7576] uppercase tracking-wider mb-4">
                             Dịch vụ & Hỗ trợ
                         </h2>
-                        <div className="space-y-2.5 text-xs sm:text-sm font-body text-slate-600">
-                            <div className="flex items-center gap-2">
-                                <Truck className="w-4 h-4 text-[#1a237e] shrink-0" />
-                                <span>Giao hàng tiêu chuẩn toàn quốc</span>
+                        <div className="space-y-3 text-sm text-[#4C4546]">
+                            <div className="flex items-center gap-2.5">
+                                <span>Dự kiến giao: <strong>2 - 4 ngày làm việc</strong></span>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                                <span>Được đồng kiểm tra khi nhận hàng</span>
+                            <div className="flex items-center gap-2.5">
+                                <span>Được kiểm tra hàng trước khi nhận</span>
                             </div>
-                            <div className="flex items-center gap-2 pt-1">
-                                <Phone className="w-4 h-4 text-slate-400 shrink-0" />
-                                <span className="text-slate-500">
-                                    Hotline hỗ trợ: <strong className="text-slate-800">1900 6868</strong>
-                                </span>
+                            <div className="flex items-center gap-2.5">
+                                <span>Hotline hỗ trợ: <strong className="text-[#1A1A1A]">1900 6868</strong> (8h - 21h)</span>
+                            </div>
+                            <div className="flex items-center gap-2.5">
+                                <span>Email: <strong className="text-[#1A1A1A]">support@bookverse.vn</strong></span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* CTAs */}
-                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                {/* Actions / CTAs */}
+                <div className="border-t border-[#E5E2DD] pt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
                     {isSuccess ? (
                         <>
                             <Link
                                 to="/products"
-                                className="inline-flex items-center justify-center gap-2 bg-[#1a237e] hover:bg-[#283593] text-white font-headline font-bold text-sm px-8 py-3.5 rounded-xl shadow-md shadow-indigo-950/10 transition-all cursor-pointer"
+                                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#1A1A1A] text-white font-semibold text-sm px-8 py-3.5 rounded-lg hover:bg-[#0070B5] active:bg-[#005a92] transition-colors duration-200 shadow-xs cursor-pointer"
                             >
-                                <ShoppingBag className="w-4 h-4" />
                                 Tiếp tục mua sắm
                             </Link>
                             <Link
                                 to="/order-history"
-                                className="inline-flex items-center justify-center gap-2 bg-[#e3f2fd] text-[#1a237e] hover:bg-blue-100 font-headline font-bold text-sm px-8 py-3.5 rounded-xl transition-all cursor-pointer"
+                                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white border border-[#E5E2DD] text-[#1A1A1A] font-semibold text-sm px-8 py-3.5 rounded-lg hover:bg-[#FAF9F7] active:bg-[#F0EEEA] transition-colors duration-200 cursor-pointer"
                             >
-                                <Receipt className="w-4 h-4" />
                                 Xem lịch sử đơn hàng
                             </Link>
                         </>
@@ -149,16 +112,14 @@ export default function PaymentResultPage() {
                         <>
                             <Link
                                 to="/checkout"
-                                className="inline-flex items-center justify-center gap-2 bg-[#1a237e] hover:bg-[#283593] text-white font-headline font-bold text-sm px-8 py-3.5 rounded-xl shadow-md shadow-indigo-950/10 transition-all cursor-pointer"
+                                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#1A1A1A] text-white font-semibold text-sm px-8 py-3.5 rounded-lg hover:bg-[#0070B5] active:bg-[#005a92] transition-colors duration-200 shadow-xs cursor-pointer"
                             >
-                                <RefreshCw className="w-4 h-4" />
                                 Thử thanh toán lại
                             </Link>
                             <Link
                                 to="/cart"
-                                className="inline-flex items-center justify-center gap-2 bg-[#e3f2fd] text-[#1a237e] hover:bg-blue-100 font-headline font-bold text-sm px-8 py-3.5 rounded-xl transition-all cursor-pointer"
+                                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white border border-[#E5E2DD] text-[#1A1A1A] font-semibold text-sm px-8 py-3.5 rounded-lg hover:bg-[#FAF9F7] active:bg-[#F0EEEA] transition-colors duration-200 cursor-pointer"
                             >
-                                <ShoppingBag className="w-4 h-4" />
                                 Quay lại giỏ hàng
                             </Link>
                         </>

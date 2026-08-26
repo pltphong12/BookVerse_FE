@@ -39,19 +39,19 @@ const menuItems: MenuItem[] = [
                 label: 'Người dùng',
                 children: [
                     {
-                        key: '/admin/user',
+                        key: '/admin/users',
                         icon: <TeamOutlined />,
-                        label: <Link to="/admin/user">Danh sách người dùng</Link>,
+                        label: <Link to="/admin/users">Danh sách người dùng</Link>,
                     },
                     {
-                        key: '/admin/role',
+                        key: '/admin/roles',
                         icon: <SafetyCertificateOutlined />,
-                        label: <Link to="/admin/role">Vai trò</Link>,
+                        label: <Link to="/admin/roles">Vai trò</Link>,
                     },
                     {
-                        key: '/admin/permission',
+                        key: '/admin/permissions',
                         icon: <KeyOutlined />,
-                        label: <Link to="/admin/permission">Quyền hạn</Link>,
+                        label: <Link to="/admin/permissions">Quyền hạn</Link>,
                     },
                 ],
             },
@@ -69,29 +69,29 @@ const menuItems: MenuItem[] = [
                 label: 'Sản phẩm',
                 children: [
                     {
-                        key: '/admin/book',
+                        key: '/admin/books',
                         icon: <BookOutlined />,
-                        label: <Link to="/admin/book">Danh sách sách</Link>,
+                        label: <Link to="/admin/books">Danh sách sách</Link>,
                     },
                     {
-                        key: '/admin/author',
+                        key: '/admin/authors',
                         icon: <EditOutlined />,
-                        label: <Link to="/admin/author">Tác giả</Link>,
+                        label: <Link to="/admin/authors">Tác giả</Link>,
                     },
                     {
-                        key: '/admin/category',
+                        key: '/admin/categories',
                         icon: <TagsOutlined />,
-                        label: <Link to="/admin/category">Thể loại</Link>,
+                        label: <Link to="/admin/categories">Thể loại</Link>,
                     },
                     {
-                        key: '/admin/publisher',
+                        key: '/admin/publishers',
                         icon: <BankOutlined />,
-                        label: <Link to="/admin/publisher">Nhà xuất bản</Link>,
+                        label: <Link to="/admin/publishers">Nhà xuất bản</Link>,
                     },
                     {
-                        key: '/admin/supplier',
+                        key: '/admin/suppliers',
                         icon: <ShopOutlined />,
-                        label: <Link to="/admin/supplier">Nhà cung cấp</Link>,
+                        label: <Link to="/admin/suppliers">Nhà cung cấp</Link>,
                     },
                 ],
             },
@@ -101,9 +101,9 @@ const menuItems: MenuItem[] = [
                 label: 'Đơn hàng',
                 children: [
                     {
-                        key: '/admin/order',
+                        key: '/admin/orders',
                         icon: <ShoppingCartOutlined />,
-                        label: <Link to="/admin/order">Danh sách đơn hàng</Link>,
+                        label: <Link to="/admin/orders">Danh sách đơn hàng</Link>,
                     },
                 ],
             },

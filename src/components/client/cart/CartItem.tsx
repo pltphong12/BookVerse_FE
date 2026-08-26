@@ -20,87 +20,93 @@ export default function CartItem({ item, onIncrease, onDecrease, onRemove, loadi
 
     return (
         <div
-            className={`bg-white rounded-xl border border-[#dff1fb] p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center relative transition-shadow hover:shadow-[0_8px_20px_rgba(26,35,126,0.04)] ${
+            className={`bg-white rounded-xl border border-[#E5E2DD] p-4 sm:p-6 flex flex-col md:flex-row gap-4 sm:gap-6 items-start md:items-center relative transition-shadow hover:shadow-[0_8px_20px_rgba(26,35,126,0.04)] ${
                 isLoading ? 'opacity-70 pointer-events-none' : ''
             }`}
         >
             {/* Book Image */}
             <Link
                 to={`/product/${item.book.id}`}
-                className="relative w-24 h-32 sm:w-28 sm:h-36 flex-shrink-0 rounded-lg overflow-hidden border border-[#dff1fb] bg-[#f4faff] group"
+                className="relative w-24 h-32 md:w-32 md:h-40 flex-shrink-0 rounded-lg overflow-hidden border border-[#E5E2DD] bg-[#FAF9F7] group"
             >
                 {hasDiscount && (
-                    <span className="absolute top-2 left-2 z-10 px-2 py-0.5 text-[11px] font-bold font-headline bg-red-600 text-white rounded-md shadow-sm">
+                    <span className="absolute top-2 left-2 z-10 px-2 py-0.5 text-[11px] font-bold bg-[#BA1A1A] text-white rounded-sm shadow-xs">
                         -{discount}%
                     </span>
                 )}
                 {item.book.image ? (
                     <img
-                        src={`${import.meta.env.VITE_BACKEND_URL}/storage/book/${item.book.image}`}
+                        src={`${import.meta.env.VITE_BACKENDURL || import.meta.env.VITE_BACKEND_URL}/storage/book/${item.book.image}`}
                         alt={item.book.title}
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-[#e3f2fd]">
+                    <div className="w-full h-full flex items-center justify-center bg-[#E3F2FD]">
                         <span className="text-3xl">📚</span>
                     </div>
                 )}
             </Link>
 
             {/* Book Info & Actions */}
-            <div className="flex-grow flex flex-col justify-between h-full w-full min-w-0 pr-8 sm:pr-0">
+            <div className="flex-grow flex flex-col justify-between h-full w-full min-w-0 pr-8 md:pr-0">
                 <div>
                     <Link
                         to={`/product/${item.book.id}`}
-                        className="font-headline font-bold text-base sm:text-lg text-[#0d1e25] line-clamp-2 hover:text-[#1a237e] transition-colors"
+                        className="font-serif font-bold text-base sm:text-lg md:text-xl text-[#0D1E25] line-clamp-2 hover:text-[#0070B5] transition-colors"
                     >
                         {item.book.title}
                     </Link>
-                    <p className="font-body text-sm text-slate-500 mt-1 truncate">
+                    <p className="text-sm text-[#4C4546] mt-1 truncate">
                         {item.book.authors && item.book.authors.length > 0
                             ? item.book.authors.map((author) => author.name).join(', ')
                             : 'Chưa rõ tác giả'}
                     </p>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-3 mt-4">
+                <div className="flex flex-wrap items-center justify-between gap-4 mt-4 sm:mt-6">
                     {/* Price */}
                     <div className="flex items-baseline gap-2">
-                        <span className="font-headline font-bold text-base sm:text-lg text-[#1a237e]">
+                        <span className="font-bold text-base sm:text-lg text-[#1A1A1A]">
                             {formatPrice(discountedPrice)}
                         </span>
                         {hasDiscount && (
-                            <span className="font-body text-xs text-slate-400 line-through">
+                            <span className="text-xs text-[#7E7576] line-through">
                                 {formatPrice(originalPrice)}
                             </span>
                         )}
                     </div>
 
                     {/* Quantity Controls */}
-                    <div className="flex items-center bg-[#f4faff] rounded-lg border border-[#dff1fb] focus-within:border-[#1a237e] transition-colors">
+                    <div className="flex items-center bg-[#F4F3F1] rounded-lg border border-transparent focus-within:border-[#1A1A1A] transition-colors">
                         <button
+                            type="button"
                             onClick={() => onDecrease(item.id)}
                             disabled={item.quantity <= 1 || isLoading}
-                            className="p-2 text-slate-600 hover:text-[#1a237e] hover:bg-[#e3f2fd] rounded-l-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                            className="p-2 text-[#4C4546] hover:text-[#1A1A1A] rounded-l-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
                             aria-label="Giảm số lượng"
                         >
                             {loadingAction === 'decrease' ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <Loader2 className="w-4 h-4 animate-spin text-[#1A1A1A]" />
                             ) : (
                                 <Minus className="w-4 h-4" />
                             )}
                         </button>
-                        <span className="w-10 text-center font-body text-sm font-semibold text-[#0d1e25] select-none">
-                            {item.quantity}
-                        </span>
+                        <input
+                            aria-label="Số lượng"
+                            type="text"
+                            readOnly
+                            value={item.quantity}
+                            className="w-12 text-center bg-transparent border-none text-sm font-semibold text-[#0D1E25] focus:outline-none focus:ring-0 p-0 select-none"
+                        />
                         <button
+                            type="button"
                             onClick={() => onIncrease(item.id)}
                             disabled={isLoading}
-                            className="p-2 text-slate-600 hover:text-[#1a237e] hover:bg-[#e3f2fd] rounded-r-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                            className="p-2 text-[#4C4546] hover:text-[#1A1A1A] rounded-r-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
                             aria-label="Tăng số lượng"
                         >
                             {loadingAction === 'increase' ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <Loader2 className="w-4 h-4 animate-spin text-[#1A1A1A]" />
                             ) : (
                                 <Plus className="w-4 h-4" />
                             )}
@@ -111,13 +117,15 @@ export default function CartItem({ item, onIncrease, onDecrease, onRemove, loadi
 
             {/* Remove item button */}
             <button
+                type="button"
                 onClick={() => onRemove(item.id)}
                 disabled={isLoading}
-                className="absolute top-4 right-4 sm:relative sm:top-auto sm:right-auto p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                className="absolute top-4 right-4 md:relative md:top-auto md:right-auto p-2 text-[#7E7576] hover:text-[#BA1A1A] hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                 title="Xóa khỏi giỏ hàng"
+                aria-label="Xóa sản phẩm"
             >
                 {loadingAction === 'remove' ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <Loader2 className="w-5 h-5 animate-spin text-[#BA1A1A]" />
                 ) : (
                     <Trash2 className="w-5 h-5" />
                 )}

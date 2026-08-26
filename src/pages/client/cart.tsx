@@ -29,7 +29,7 @@ export default function CartPage() {
                 dispatch(setCartSum(cart?.sum ?? 0));
             }
         } catch (error) {
-            console.log(error);
+            console.error('Error fetching cart:', error);
         }
     };
 
@@ -51,7 +51,7 @@ export default function CartPage() {
                 dispatch(setCartSum(cart?.sum ?? 0));
             }
         } catch (error) {
-            console.log(error);
+            console.error('Error increasing quantity:', error);
         } finally {
             setItemLoading(bookId, null);
         }
@@ -67,7 +67,7 @@ export default function CartPage() {
                 dispatch(setCartSum(cart?.sum ?? 0));
             }
         } catch (error) {
-            console.log(error);
+            console.error('Error decreasing quantity:', error);
         } finally {
             setItemLoading(bookId, null);
         }
@@ -83,7 +83,7 @@ export default function CartPage() {
                 dispatch(setCartSum(cart?.sum ?? 0));
             }
         } catch (error) {
-            console.log(error);
+            console.error('Error removing item:', error);
         } finally {
             setItemLoading(bookId, null);
         }
@@ -98,23 +98,23 @@ export default function CartPage() {
     };
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 py-6 sm:py-10">
             {/* Breadcrumb */}
-            <div className="flex items-center gap-2 text-xs sm:text-sm font-body text-slate-400 mb-6">
-                <Link to="/" className="hover:text-[#1a237e] transition-colors">
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-[#7E7576] mb-6">
+                <Link to="/" className="hover:text-[#0070B5] transition-colors">
                     Trang chủ
                 </Link>
-                <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
-                <span className="text-slate-700 font-semibold">Giỏ hàng</span>
+                <ChevronRight className="w-3.5 h-3.5 text-[#CFC4C5]" />
+                <span className="text-[#1A1A1A] font-semibold">Giỏ hàng</span>
             </div>
 
             {/* Page Header */}
             <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="font-headline text-2xl sm:text-4xl font-bold text-[#0d1e25]">
+                    <h1 className="font-serif text-2xl sm:text-4xl font-bold text-[#0D1E25] tracking-tight">
                         Giỏ hàng của bạn
                     </h1>
-                    <p className="font-body text-sm text-slate-500 mt-1">
+                    <p className="text-sm text-[#4C4546] mt-1">
                         {cartItems.length > 0
                             ? `Bạn đang có ${cartItems.length} sản phẩm trong giỏ hàng`
                             : 'Chưa có sản phẩm nào trong giỏ hàng'}
@@ -122,8 +122,9 @@ export default function CartPage() {
                 </div>
                 {cartItems.length > 0 && (
                     <button
+                        type="button"
                         onClick={handleClearCart}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-body font-medium text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-medium text-[#7E7576] hover:text-[#BA1A1A] hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                     >
                         <Trash2 className="w-4 h-4" />
                         Xóa tất cả
