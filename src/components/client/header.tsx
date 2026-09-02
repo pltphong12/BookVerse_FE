@@ -1,4 +1,4 @@
-import { ChevronDown, Clock, Search, ShoppingBag, TrendingUp, User, LogIn, UserPlus } from "lucide-react";
+import { ChevronDown, Clock, Search, ShoppingBag, TrendingUp, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../../assets/logo_v2.png";
 import { useAppDispatch, useAppSelector } from "../../redux/hook";
@@ -446,7 +446,6 @@ export const Header: React.FC = () => {
                                         onClick={() => navigate('/login')}
                                         className="w-full py-2 bg-[#1A1A1A] hover:bg-[#0070B5] text-white font-medium text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                                     >
-                                        <LogIn className="w-3.5 h-3.5" />
                                         <span>Đăng nhập</span>
                                     </button>
 
@@ -454,7 +453,6 @@ export const Header: React.FC = () => {
                                         onClick={() => navigate('/register')}
                                         className="w-full py-2 bg-[#FAF9F7] hover:bg-[#E5E2DD] text-[#1A1A1A] border border-[#E5E2DD] font-medium text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                                     >
-                                        <UserPlus className="w-3.5 h-3.5" />
                                         <span>Đăng ký tài khoản</span>
                                     </button>
                                 </div>

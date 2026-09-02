@@ -98,15 +98,23 @@ export default function CartPage() {
     };
 
     return (
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 py-6 sm:py-10">
-            {/* Breadcrumb */}
-            <div className="flex items-center gap-2 text-xs sm:text-sm text-[#7E7576] mb-6">
-                <Link to="/" className="hover:text-[#0070B5] transition-colors">
-                    Trang chủ
-                </Link>
-                <ChevronRight className="w-3.5 h-3.5 text-[#CFC4C5]" />
-                <span className="text-[#1A1A1A] font-semibold">Giỏ hàng</span>
-            </div>
+        <div className="space-y-6 sm:space-y-8">
+            {/* Breadcrumbs */}
+            <nav aria-label="Breadcrumb">
+                <ol className="flex items-center flex-wrap gap-1.5 text-xs sm:text-sm font-body text-slate-500">
+                    <li>
+                        <Link to="/" className="text-slate-500 hover:text-[#0070B5] transition-colors">
+                            Trang chủ
+                        </Link>
+                    </li>
+                    <li>
+                        <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
+                    </li>
+                    <li aria-current="page" className="text-[#1A1A1A] font-semibold">
+                        Giỏ hàng
+                    </li>
+                </ol>
+            </nav>
 
             {/* Page Header */}
             <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
