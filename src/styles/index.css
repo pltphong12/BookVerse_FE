@@ -26,6 +26,10 @@
   --color-ink-black: #1A1A1A;
   --color-paper-white: #FAF9F7;
   --color-bookshelf-taupe: #E5E2DD;
+  --color-surface-container-low: #f4f3f1;
+  --color-surface-container-high: #e9e8e6;
+  --color-on-surface-variant: #4c4546;
+  --color-on-tertiary-container: #848484;
 }
 
 body {
@@ -527,4 +531,13 @@ html {
 
 .chatbot-messages::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

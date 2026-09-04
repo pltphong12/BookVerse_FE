@@ -460,19 +460,22 @@ export const Header: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Cart */}
-                    <Link
-                        to={'/cart'}
-                        className="relative p-1 text-[#1A1A1A] hover:text-[#0070B5] transition-colors cursor-pointer"
-                        title="Giỏ hàng"
-                    >
-                        <ShoppingBag className="w-5 h-5" />
-                        {account.isAuthenticated && cartSum > 0 && (
-                            <span className="absolute -top-1 -right-1 bg-[#1A1A1A] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                                {cartSum}
-                            </span>
-                        )}
-                    </Link>
+                    {/* Cart - only visible if logged in */}
+                    {account.isAuthenticated && (
+                        <Link
+                            to={'/cart'}
+                            className="relative p-1 text-[#1A1A1A] hover:text-[#0070B5] transition-colors cursor-pointer"
+                            title="Giỏ hàng"
+                            id="header-cart-btn"
+                        >
+                            <ShoppingBag className="w-5 h-5" />
+                            {cartSum > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-[#1A1A1A] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                                    {cartSum}
+                                </span>
+                            )}
+                        </Link>
+                    )}
                 </div>
             </div>
         </header>
