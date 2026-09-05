@@ -2,7 +2,7 @@ import React from 'react';
 import { Drawer, Descriptions, Avatar, Tag, Typography, Divider, Statistic, Row, Col, Card } from 'antd';
 import {
     UserOutlined, CalendarOutlined, IdcardOutlined,
-    ShoppingCartOutlined, DollarOutlined, MailOutlined, PhoneOutlined, EnvironmentOutlined
+    ShoppingCartOutlined, DollarOutlined, MailOutlined, PhoneOutlined
 } from '@ant-design/icons';
 import { ICustomer } from '../../../types/backend';
 
@@ -112,9 +112,6 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ isOpen, setIsOpen, c
             >
                 <Descriptions.Item label={<><IdcardOutlined /> Mã CCCD</>}>
                     <Text code>{customer.identityCard || 'Chưa cập nhật'}</Text>
-                </Descriptions.Item>
-                <Descriptions.Item label={<><EnvironmentOutlined /> Địa chỉ</>}>
-                    {customer.user.address || 'Chưa cập nhật'}
                 </Descriptions.Item>
             </Descriptions>
 

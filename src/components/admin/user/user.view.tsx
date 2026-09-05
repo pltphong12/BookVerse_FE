@@ -2,7 +2,7 @@ import React from 'react';
 import { Drawer, Descriptions, Avatar, Tag, Typography, Divider, Image } from 'antd';
 import {
     UserOutlined, CalendarOutlined, MailOutlined,
-    PhoneOutlined, EnvironmentOutlined
+    PhoneOutlined
 } from '@ant-design/icons';
 import { IUser } from '../../../types/backend';
 
@@ -99,9 +99,6 @@ export const UserView: React.FC<UserViewProps> = ({ isOpen, setIsOpen, user }) =
                 </Descriptions.Item>
                 <Descriptions.Item label={<><PhoneOutlined /> SĐT</>}>
                     {user.phone || '—'}
-                </Descriptions.Item>
-                <Descriptions.Item label={<><EnvironmentOutlined /> Địa chỉ</>}>
-                    {user.address || '—'}
                 </Descriptions.Item>
                 <Descriptions.Item label={<><CalendarOutlined /> Ngày tạo</>}>
                     {formatDateTime(user.createdAt)}

@@ -32,9 +32,6 @@ const createUserSchema = z.object({
         .min(2, 'Họ và tên có ít nhất 2 kí tự')
         .max(100, 'Họ và tên có nhiều nhất 100 kí tự'),
     email: z.string().email('Email không hợp lệ'),
-    address: z.string()
-        .min(5, 'Địa chỉ có ít nhất 5 kí tự')
-        .max(200, 'Địa chỉ có nhiều nhất 200 kí tự'),
     phone: z.string()
         .min(10, 'Số điện thoại có ít nhất 10 số')
         .max(15, 'Số điện thoại có nhiều nhất 15 số')
@@ -60,7 +57,7 @@ export const UserForm: React.FC<UserFormProps> = ({ isModalOpen, setIsModalOpen,
     } = useForm<CreateUserFormData>({
         resolver: zodResolver(createUserSchema),
         defaultValues: {
-            password: '', fullName: '', email: '', address: '',
+            password: '', fullName: '', email: '',
             phone: '', role: { id: '1' }, avatar: undefined,
         }
     });
@@ -69,18 +66,17 @@ export const UserForm: React.FC<UserFormProps> = ({ isModalOpen, setIsModalOpen,
         if (userToEdit) {
             setValue('fullName', userToEdit.fullName);
             setValue('email', userToEdit.email);
-            setValue('address', userToEdit.address);
             setValue('phone', userToEdit.phone);
             setValue('role.id', userToEdit.role.id.toString());
             setAvatarPreview(`${import.meta.env.VITE_BACKEND_URL}/storage/avatar/${userToEdit.avatar}`);
         } else {
-            reset({ password: '', fullName: '', email: '', address: '', phone: '', role: { id: '1' }, avatar: undefined });
+            reset({ password: '', fullName: '', email: '', phone: '', role: { id: '1' }, avatar: undefined });
             setAvatarPreview('');
         }
     }, [userToEdit, setValue, reset]);
 
     const resetForm = () => {
-        reset({ password: '', fullName: '', email: '', address: '', phone: '', role: { id: '1' }, avatar: undefined });
+        reset({ password: '', fullName: '', email: '', phone: '', role: { id: '1' }, avatar: undefined });
         setAvatarPreview('');
         setIsSubmitting(false);
     };
@@ -191,33 +187,17 @@ export const UserForm: React.FC<UserFormProps> = ({ isModalOpen, setIsModalOpen,
                     </div>
                 </div>
 
-                {/* FullName + Address */}
-                <Row gutter={16}>
-                    <Col xs={24} md={12}>
-                        <Form.Item
-                            label="Họ và tên"
-                            validateStatus={errors.fullName ? 'error' : ''}
-                            help={errors.fullName?.message}
-                            required layout="vertical"
-                        >
-                            <Controller name="fullName" control={control}
-                                render={({ field }) => <Input {...field} placeholder="Nhập họ và tên" />}
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} md={12}>
-                        <Form.Item
-                            label="Địa chỉ"
-                            validateStatus={errors.address ? 'error' : ''}
-                            help={errors.address?.message}
-                            required layout="vertical"
-                        >
-                            <Controller name="address" control={control}
-                                render={({ field }) => <Input {...field} placeholder="Nhập địa chỉ" />}
-                            />
-                        </Form.Item>
-                    </Col>
-                </Row>
+                {/* FullName */}
+                <Form.Item
+                    label="Họ và tên"
+                    validateStatus={errors.fullName ? 'error' : ''}
+                    help={errors.fullName?.message}
+                    required layout="vertical"
+                >
+                    <Controller name="fullName" control={control}
+                        render={({ field }) => <Input {...field} placeholder="Nhập họ và tên" />}
+                    />
+                </Form.Item>
 
                 {/* Password (only when creating) */}
                 {!userToEdit && (

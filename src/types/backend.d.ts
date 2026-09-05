@@ -40,7 +40,6 @@ export interface IUser{
     id: number;
     fullName: string;
     email: string;
-    address: string;
     phone: string;
     avatar: string;
     role: IRole
@@ -296,14 +295,38 @@ export interface IReqOrderLine {
     quantity: number;
 }
 
-export interface ICreateOrderReq {
+export interface IReqCustomerAddress {
+    id?: number;
     receiverName: string;
-    receiverAddress: string;
     receiverPhone: string;
-    receiverEmail?: string;
+    province: string;
+    ward: string;
+    addressLine: string;
+    isDefault: boolean;
+}
+
+export interface ICustomerAddress {
+    id: number;
+    receiverName: string;
+    receiverPhone: string;
+    province: string;
+    ward: string;
+    addressLine: string;
+    fullAddress: string;
+    isDefault: boolean;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+export interface ICreateOrderReq {
+    shippingAddressId: number;
     paymentMethod: 'COD' | 'VNPAY';
-    items: IReqOrderLine[];
     note?: string;
+    receiverName?: string;
+    receiverAddress?: string;
+    receiverPhone?: string;
+    receiverEmail?: string;
+    items?: IReqOrderLine[];
 }
 
 export interface ICreateOrderRes extends IOrder {

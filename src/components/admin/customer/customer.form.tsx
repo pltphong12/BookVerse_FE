@@ -32,9 +32,6 @@ const createCustomerSchema = z.object({
         .max(100, 'Họ và tên có nhiều nhất 100 kí tự'),
     email: z.string()
         .email('Email không hợp lệ'),
-    address: z.string()
-        .min(5, 'Địa chỉ có ít nhất 5 kí tự')
-        .max(200, 'Địa chỉ có nhiều nhất 200 kí tự'),
     phone: z.string()
         .min(10, 'Số điện thoại có ít nhất 10 kí tự')
         .max(15, 'Số điện thoại có nhiều nhất 15 kí tự')
@@ -73,7 +70,7 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ isModalOpen, setIsMo
     } = useForm<CreateCustomerFormData>({
         resolver: zodResolver(createCustomerSchema),
         defaultValues: {
-            password: '', fullName: '', email: '', address: '',
+            password: '', fullName: '', email: '',
             phone: '', avatar: undefined, customerLevel: 'BRONZE',
         }
     });
@@ -83,7 +80,6 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ isModalOpen, setIsMo
             setValue('identityCard', customerToEdit.identityCard);
             setValue('fullName', customerToEdit.user.fullName);
             setValue('email', customerToEdit.user.email);
-            setValue('address', customerToEdit.user.address);
             setValue('phone', customerToEdit.user.phone);
             if (customerToEdit?.customerLevel === 'Đồng') {
                 setValue('customerLevel', 'BRONZE');
@@ -97,7 +93,7 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ isModalOpen, setIsMo
             setAvatarPreview(`${import.meta.env.VITE_BACKEND_URL}/storage/avatar/${customerToEdit.user.avatar}`);
         } else {
             reset({
-                password: '', fullName: '', email: '', address: '',
+                password: '', fullName: '', email: '',
                 phone: '', avatar: undefined, customerLevel: 'BRONZE',
             });
             setAvatarPreview('');
@@ -106,7 +102,7 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ isModalOpen, setIsMo
 
     const resetForm = () => {
         reset({
-            password: '', fullName: '', email: '', address: '',
+            password: '', fullName: '', email: '',
             phone: '', avatar: undefined, customerLevel: 'BRONZE',
         });
         setAvatarPreview('');
@@ -239,42 +235,22 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ isModalOpen, setIsMo
                     />
                 </Form.Item>
 
-                <Row gutter={16}>
-                    <Col xs={24} md={12}>
-                        <Form.Item
-                            label="Họ và tên"
-                            validateStatus={errors.fullName ? 'error' : ''}
-                            help={errors.fullName?.message}
-                            required
-                            layout="vertical"
-                        >
-                            <Controller
-                                name="fullName"
-                                control={control}
-                                render={({ field }) => (
-                                    <Input {...field} placeholder="Nhập họ và tên" />
-                                )}
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} md={12}>
-                        <Form.Item
-                            label="Địa chỉ"
-                            validateStatus={errors.address ? 'error' : ''}
-                            help={errors.address?.message}
-                            required
-                            layout="vertical"
-                        >
-                            <Controller
-                                name="address"
-                                control={control}
-                                render={({ field }) => (
-                                    <Input {...field} placeholder="Nhập địa chỉ" />
-                                )}
-                            />
-                        </Form.Item>
-                    </Col>
-                </Row>
+                {/* FullName */}
+                <Form.Item
+                    label="Họ và tên"
+                    validateStatus={errors.fullName ? 'error' : ''}
+                    help={errors.fullName?.message}
+                    required
+                    layout="vertical"
+                >
+                    <Controller
+                        name="fullName"
+                        control={control}
+                        render={({ field }) => (
+                            <Input {...field} placeholder="Nhập họ và tên" />
+                        )}
+                    />
+                </Form.Item>
 
                 {/* Password - only for create */}
                 {!customerToEdit && (

@@ -1,4 +1,4 @@
-import { ILoginRes, IAuthor, IAuthorInBook, IBackendRes, IBook, IBookFilterCriteria, ICart, ICategory, ICategoryInBook, IChatHistory, ICreateOrderReq, ICreateOrderRes, IDashboardData, IFile, IPagination, IPermission, IPublisher, IRole, IUser, ISupplier, ICustomer, IOrder, ISearchAutocomplete } from "../types/backend";
+import { ILoginRes, IAuthor, IAuthorInBook, IBackendRes, IBook, IBookFilterCriteria, ICart, ICategory, ICategoryInBook, IChatHistory, ICreateOrderReq, ICreateOrderRes, IDashboardData, IFile, IPagination, IPermission, IPublisher, IRole, IUser, ISupplier, ICustomer, IOrder, ISearchAutocomplete, ICustomerAddress, IReqCustomerAddress } from "../types/backend";
 import axiosInstance from "./axios-customize";
 
 
@@ -13,13 +13,12 @@ export const callLoginApi = (email: string, password: string) => {
     return axiosInstance.post<IBackendRes<ILoginRes>>(url, data)
 }
 
-export const callRegisterApi = (email: string, password: string, fullName: string, address: string, phone: string) => {
+export const callRegisterApi = (email: string, password: string, fullName: string, phone: string) => {
     const url: string = 'api/v1/auth/register'
     const data = {
         email: email,
         password: password,
         fullName: fullName,
-        address: address,
         phone: phone
     }
     return axiosInstance.post<IBackendRes<IUser>>(url, data)
@@ -50,14 +49,13 @@ export const callFetchAllCustomersWithPaginationAndFilterApi = (identityCard: st
     return axiosInstance.get<IBackendRes<IPagination<ICustomer>>>(url)
 }
 
-export const callCreateCustomerApi = (identityCard: string, password: string, fullName: string, email: string, address: string, phone: string, avatar: string, customerLevel: string) => {
+export const callCreateCustomerApi = (identityCard: string, password: string, fullName: string, email: string, phone: string, avatar: string, customerLevel: string) => {
     const url = "/api/v1/customers";
     const data = {
         identityCard: identityCard,
         password: password,
         fullName: fullName,
         email: email,
-        address: address,
         phone: phone,
         avatar: avatar,
         customerLevel: customerLevel
@@ -65,7 +63,7 @@ export const callCreateCustomerApi = (identityCard: string, password: string, fu
     return axiosInstance.post<IBackendRes<ICustomer>>(url, data)
 }
 
-export const callUpdateCustomerApi = (id: number, identityCard: string, fullName: string, email: string, address: string, phone: string, avatar: string, customerLevel: string) => {
+export const callUpdateCustomerApi = (id: number, identityCard: string, fullName: string, email: string, phone: string, avatar: string, customerLevel: string) => {
     const url = "/api/v1/customers";
     const data = {
         id: id,
@@ -73,7 +71,6 @@ export const callUpdateCustomerApi = (id: number, identityCard: string, fullName
         password: null,
         fullName: fullName,
         email: email,
-        address: address,
         phone: phone,
         avatar: avatar,
         customerLevel: customerLevel
@@ -101,14 +98,13 @@ export const callFetchAllUserWithPaginationApi = (email: string, roleId: number,
     return axiosInstance.get<IBackendRes<IPagination<IUser>>>(url)
 }
 
-export const callCreateUserApi = (password: string, fullName: string, email: string, address: string, phone: string, role: number, avatar: string) => {
+export const callCreateUserApi = (password: string, fullName: string, email: string, phone: string, role: number, avatar: string) => {
     const url = "/api/v1/users";
 
     const data = {
         password: password,
         fullName: fullName,
         email: email,
-        address: address,
         phone: phone,
         role: {
             id: role,
@@ -123,7 +119,6 @@ export const callUpdateUserApi = (
     id: number,
     fullName: string,
     email: string,
-    address: string,
     phone: string,
     role: number,
     avatar: string
@@ -135,7 +130,6 @@ export const callUpdateUserApi = (
         password: null,
         fullName: fullName,
         email: email,
-        address: address,
         phone: phone,
         role: {
             id: role,
@@ -698,5 +692,28 @@ Module Chat
 export const callFetchChatHistoryApi = (sessionId: string) => {
     const url = `api/v1/chat/history?sessionId=${sessionId}`
     return axiosInstance.get<IBackendRes<IChatHistory>>(url)
+}
+
+/**
+ * Module Customer Addresses (/api/v1/addresses)
+ */
+export const callFetchMyAddressesApi = () => {
+    const url = '/api/v1/addresses/me'
+    return axiosInstance.get<IBackendRes<ICustomerAddress[]>>(url)
+}
+
+export const callCreateAddressApi = (data: IReqCustomerAddress) => {
+    const url = '/api/v1/addresses'
+    return axiosInstance.post<IBackendRes<ICustomerAddress>>(url, data)
+}
+
+export const callUpdateAddressApi = (data: IReqCustomerAddress) => {
+    const url = '/api/v1/addresses'
+    return axiosInstance.put<IBackendRes<ICustomerAddress>>(url, data)
+}
+
+export const callDeleteAddressApi = (id: number) => {
+    const url = `/api/v1/addresses/${id}`
+    return axiosInstance.delete<IBackendRes<null>>(url)
 }
 

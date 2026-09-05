@@ -20,9 +20,6 @@ const registerSchema = z.object({
     fullName: z.string()
         .min(2, 'Họ và tên phải có ít nhất 2 ký tự')
         .max(100, 'Họ và tên không được vượt quá 100 ký tự'),
-    address: z.string()
-        .min(5, 'Địa chỉ phải có ít nhất 5 ký tự')
-        .max(200, 'Địa chỉ không được vượt quá 200 ký tự'),
     phone: z.string()
         .min(10, 'Số điện thoại phải có ít nhất 10 chữ số')
         .max(15, 'Số điện thoại không được vượt quá 15 chữ số')
@@ -46,7 +43,6 @@ export const RegisterPage: React.FC = () => {
             email: '',
             password: '',
             fullName: '',
-            address: '',
             phone: ''
         }
     });
@@ -58,7 +54,6 @@ export const RegisterPage: React.FC = () => {
                 data.email,
                 data.password,
                 data.fullName,
-                data.address,
                 data.phone
             );
             showToast(`Đăng ký thành công: ${res.data.data?.email}`, ToastType.SUCCESS);
@@ -211,30 +206,6 @@ export const RegisterPage: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Address Field */}
-                        <div>
-                            <label className="block text-sm font-semibold text-[#1A1A1A] mb-2" htmlFor="address">
-                                Địa chỉ nhận hàng
-                            </label>
-                            <div className="mt-1">
-                                <input
-                                    id="address"
-                                    type="text"
-                                    autoComplete="street-address"
-                                    placeholder="Số nhà, tên đường, phường/xã, quận/huyện..."
-                                    {...register('address')}
-                                    className={`ledger-input block w-full appearance-none bg-transparent py-3 px-3 text-[#1A1A1A] placeholder:text-[#7E7576] text-sm ${
-                                        errors.address ? 'ledger-input-error' : ''
-                                    }`}
-                                />
-                            </div>
-                            {errors.address && (
-                                <p className="mt-1.5 text-xs text-[#BA1A1A] flex items-center gap-1 font-medium">
-                                    <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
-                                    {errors.address.message}
-                                </p>
-                            )}
-                        </div>
 
                         {/* Submit Button */}
                         <div className="pt-3">

@@ -9,7 +9,6 @@ export interface ICreateCustomer {
     password: string
     fullName: string
     email: string
-    address: string
     phone: string
     avatar: string
     customerLevel: string
@@ -39,7 +38,7 @@ export const createCustomer = createAsyncThunk(
     'customer/create',
     async (payload: ICreateCustomer) => {
         try {
-            const response = await callCreateCustomerApi(payload.identityCard, payload.password, payload.fullName, payload.email, payload.address, payload.phone, payload.avatar, payload.customerLevel)
+            const response = await callCreateCustomerApi(payload.identityCard, payload.password, payload.fullName, payload.email, payload.phone, payload.avatar, payload.customerLevel)
             return response.data as IBackendRes<ICustomer>
         } catch (error) {
             if (error instanceof AxiosError) {
@@ -67,7 +66,7 @@ export const updateCustomer = createAsyncThunk(
     'customer/update',
     async (payload: { id: number, data: ICreateCustomer }) => {
         try {
-            const response = await callUpdateCustomerApi(payload.id, payload.data.identityCard, payload.data.fullName, payload.data.email, payload.data.address, payload.data.phone, payload.data.avatar, payload.data.customerLevel)
+            const response = await callUpdateCustomerApi(payload.id, payload.data.identityCard, payload.data.fullName, payload.data.email, payload.data.phone, payload.data.avatar, payload.data.customerLevel)
             return response.data as IBackendRes<ICustomer>
         } catch (error) {
             if (error instanceof AxiosError) {
